@@ -6,7 +6,7 @@ php:
 matrix:
     fast_finish: true
 
-before_script:
+before_install:
     # install php-ext-snappy
     - git clone --recursive --depth=1 https://github.com/kjdev/php-ext-snappy.git
     - cd php-ext-snappy
@@ -18,6 +18,8 @@ before_script:
     # disable XDebug for now
     - phpenv config-rm xdebug.ini
 
+install:
+    - cd $TRAVIS_BUILD_DIR
     - composer self-update
     - composer check-platform-reqs
     - composer update
