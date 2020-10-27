@@ -126,7 +126,7 @@ class ParquetWriter extends ParquetActor {
    */
   private function ValidateSchemasCompatible(ThriftFooter $footer, Schema $schema): void
   {
-    $existingSchema = $footer->CreateModelSchema($this->_formatOptions);
+    $existingSchema = $footer->CreateModelSchema($this->_parquetOptions);
 
     if (!$schema->Equals($existingSchema))
     {

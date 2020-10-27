@@ -146,7 +146,7 @@ class DataTypeFactory
    */
   public static function matchPhpType($type) : ?DataTypeHandlerInterface  {
     foreach(static::$allDataTypes as $dt) {
-      if($dt->phpType === $type) {
+      if(isset($dt->phpType) && $dt->phpType === $type) {
         return $dt;
       }
     }
@@ -160,7 +160,7 @@ class DataTypeFactory
    */
   public static function matchPhpClass($class) : ?DataTypeHandlerInterface  {
     foreach(static::$allDataTypes as $dt) {
-      if($dt->phpClass === $class) {
+      if(isset($dt->phpClass) && $dt->phpClass === $class) {
         return $dt;
       }
     }
