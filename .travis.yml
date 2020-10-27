@@ -1,0 +1,15 @@
+language: php
+
+php:
+    - 7.3
+
+matrix:
+    fast_finish: true
+
+before_script:
+    - composer self-update
+    - composer update
+
+script:
+    - cd $TRAVIS_BUILD_DIR
+    - vendor/bin/phpunit tests
