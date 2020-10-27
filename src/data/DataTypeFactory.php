@@ -174,7 +174,7 @@ class DataTypeFactory
   public static function ThrowClrTypeNotSupported($type): void
   {
     $availableTypes = implode(', ', array_map(function(DataTypeHandlerInterface $dt) {
-      return $dt->phpType; // or class?
+      return isset($dt->phpType) ? $dt->phpType : null; // or class?
     }, static::$allDataTypes));
 
     $message = "PHP type/class '{$type}' is not supported, please specify one of '{$availableTypes}' or use an alternative constructor/static creation method";
