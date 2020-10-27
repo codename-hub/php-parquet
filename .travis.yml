@@ -22,7 +22,6 @@ before_install:
 install:
     - cd $TRAVIS_BUILD_DIR
     - composer self-update
-    - composer check-platform-reqs
     - composer update
 
 script:
