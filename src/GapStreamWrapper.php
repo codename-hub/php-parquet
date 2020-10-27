@@ -279,7 +279,7 @@ class GapStreamWrapper implements StreamWrapperInterface, MarkWriteFinishedInter
   public function MarkWriteFinished(): void
   {
     $innerMeta = stream_get_meta_data($this->parent);
-    if(($innerWrapperInstance = $innerMeta['wrapper_data']) instanceof MarkWriteFinishedInterface) {
+    if(($innerWrapperInstance = $innerMeta['wrapper_data'] ?? null) instanceof MarkWriteFinishedInterface) {
       $innerWrapperInstance->MarkWriteFinished();
     }
   }
