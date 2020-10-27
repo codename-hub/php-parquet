@@ -10,6 +10,7 @@ before_install:
     # install php-ext-snappy
     - git clone --recursive --depth=1 https://github.com/kjdev/php-ext-snappy.git
     - cd php-ext-snappy
+    - export CXXFLAGS=-std=c++11
     - phpize
     - ./configure
     - make
