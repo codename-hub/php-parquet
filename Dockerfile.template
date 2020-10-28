@@ -37,7 +37,7 @@ COPY . /usr/src/app
 WORKDIR /usr/src/app
 
 # run composer installation
-RUN composer self-update && composer update
+RUN composer self-update && composer update --ignore-platform-reqs
 
 ENTRYPOINT [ "vendor/bin/phpunit" ]
 CMD [ "tests" ]
