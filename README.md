@@ -1,5 +1,7 @@
 php-parquet
 ===
+[![Build Status](https://travis-ci.org/jocoon/php-parquet.svg)](https://travis-ci.org/jocoon/php-parquet)
+
 This is the first parquet file format reader/writer implementation in PHP, based on the Thrift sources provided by the Apache Foundation.
 Extensive parts of the code and concepts have been ported from parquet-dotnet (see https://github.com/elastacloud/parquet-dotnet and https://github.com/aloneguid/parquet-dotnet).
 Therefore, thanks go out to Ivan Gavryliuk (https://github.com/aloneguid).
@@ -47,6 +49,8 @@ You'll need several extensions to use this library to the full extent.
 * __snappy__ (https://github.com/kjdev/php-ext-snappy - sadly, not published yet to PECL - you'll have to compile it yourself - see Installation)
 
 This library was originally developed to/using PHP 7.3, but it should work on PHP > 7 and will be tested on 8, when released.
+At the moment, tests on PHP 7.1 and 7.2 will fail due to some DateTime issues. I'll have a look at it.
+Tests fully pass on PHP 7.3 and 7.4. At the time of writing also 8.0.0 RC2 is performing well.
 
 This library highly depends on
 
