@@ -18,7 +18,7 @@ RUN apt-get install -y libgmp-dev
 # install some php extensions
 RUN docker-php-ext-install gmp bcmath
 
-RUN apt-get install -y git
+RUN apt-get install -y git wget
 
 RUN git clone --recursive --depth=1 https://github.com/kjdev/php-ext-snappy.git \
   && cd php-ext-snappy \
@@ -28,9 +28,16 @@ RUN git clone --recursive --depth=1 https://github.com/kjdev/php-ext-snappy.git 
   && make install \
   && docker-php-ext-enable snappy
 
+# install composer
+RUN curl -sS https://getcomposer.org/installer | \
+  php -- --install-dir=/usr/bin/ --filename=composer
+
 # include the files in the docker image
 COPY . /usr/src/app
 WORKDIR /usr/src/app
+
+# run composer installation
+RUN composer self-update && composer update
 
 ENTRYPOINT [ "vendor/bin/phpunit" ]
 CMD [ "tests" ]
