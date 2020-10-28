@@ -156,7 +156,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertEquals(
       new MapField('dictionary', new DataField('key', DataType::Int32), new DataField('value', DataType::String)),
-      new MapField('dictionary', new DataField('key', DataType::Int32), new DataField('value', DataType::String)),
+      new MapField('dictionary', new DataField('key', DataType::Int32), new DataField('value', DataType::String))
     );
   }
 
@@ -167,7 +167,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertNotEquals(
       new MapField('dictionary', new DataField('key', DataType::String), new DataField('value', DataType::String)),
-      new MapField('dictionary', new DataField('key', DataType::Int32), new DataField('value', DataType::String)),
+      new MapField('dictionary', new DataField('key', DataType::Int32), new DataField('value', DataType::String))
     );
   }
 
@@ -215,7 +215,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertEquals(
       StructField::createWithField("f1", DataField::createFromType("name", 'string')),
-      StructField::createWithField("f1", DataField::createFromType("name", 'string')),
+      StructField::createWithField("f1", DataField::createFromType("name", 'string'))
     );
   }
 
@@ -226,7 +226,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertNotEquals(
       StructField::createWithField("f1", DataField::createFromType("name", 'string')),
-      StructField::createWithField("f2", DataField::createFromType("name", 'string')),
+      StructField::createWithField("f2", DataField::createFromType("name", 'string'))
     );
   }
 
@@ -237,7 +237,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertNotEquals(
       StructField::createWithField("f1", DataField::createFromType("name", 'string')),
-      StructField::createWithField("f1", DataField::createFromType("name", 'integer')),
+      StructField::createWithField("f1", DataField::createFromType("name", 'integer'))
     );
   }
 
@@ -248,7 +248,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertEquals(
       new ListField("item", DataField::createFromType('id', 'integer')),
-      new ListField("item", DataField::createFromType('id', 'integer')),
+      new ListField("item", DataField::createFromType('id', 'integer'))
     );
   }
 
@@ -259,7 +259,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertNotEquals(
       new ListField("item", DataField::createFromType('id', 'integer')),
-      new ListField("item1", DataField::createFromType('id', 'integer')),
+      new ListField("item1", DataField::createFromType('id', 'integer'))
     );
   }
 
@@ -270,7 +270,7 @@ final class SchemaTest extends TestBase
   {
     $this->assertNotEquals(
       new ListField("item", DataField::createFromType('id', 'integer')),
-      new ListField("item", DataField::createFromType('id', 'string')),
+      new ListField("item", DataField::createFromType('id', 'string'))
     );
   }
 
