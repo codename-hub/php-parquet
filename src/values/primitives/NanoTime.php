@@ -19,15 +19,52 @@ class NanoTime
 
   /**
    * [__construct description]
-   * @param string $data   [description]
-   * @param int    $offset [description]
+   * @param string      $data   [description]
+   * @param int|null    $offset [description]
    */
-  public function __construct($data, int $offset)
+  public function __construct($data = null, ?int $offset = null)
   {
     // _timeOfDayNanos = BitConverter.ToInt64(data, offset);
     // _julianDay = BitConverter.ToInt32(data, offset + 8);
-    $this->timeOfDayNanos = unpack("q", $data, $offset)[1];
-    $this->julianDay = unpack("l",  $data, $offset + 8)[1];
+    if($data !== null && $offset !== null) {
+      $this->timeOfDayNanos = unpack("q", $data, $offset)[1];
+      $this->julianDay = unpack("l",  $data, $offset + 8)[1];
+    }
+  }
+
+  public static function NanoTimeFromDateTimeImmutable(DateTimeImmutable $dt) : NanoTime {
+    $m = $dt->format('m'); // .Month;
+    $d = $dt->format('d'); // int d = dt.Day;
+    $y = $dt->format('Y'); // int y = dt.Year;
+
+    // if (m < 3)
+    // {
+    // m = m + 12;
+    // y = y - 1;
+    // }
+    if($m < 3) {
+      $m = $m + 12;
+      $y = $y - 1;
+    }
+
+    $nanoTime = new self();
+    $nanoTime->julianDay = $d + (153 * $m - 457) / 5 + 365 * $y + ($y / 4) - ($y / 100) + ($y / 400) + 1721119;
+
+    $seconds = $dt->format('H') * 60 * 60
+      + $dt->format('i') * 60
+      + $dt->format('s');
+    $nanoTime->timeOfDayNanos = (($seconds * 1000000000) + ($dt->format('u') * 1000));
+
+    return $nanoTime;
+  }
+
+  /**
+   * [Write description]
+   * @param \Nelexa\Buffer\Buffer $writer [description]
+   */
+  public function Write(\Nelexa\Buffer\Buffer $writer):void {
+    $writer->insertLong($this->timeOfDayNanos);
+    $writer->insertInt($this->julianDay);
   }
 
   /**

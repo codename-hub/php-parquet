@@ -33,7 +33,16 @@ class OtherExtensions
      // return UnixEpoch.AddDays(unixDays);
   }
 
-  // public static DateTimeOffset FromUnixMilliseconds(this long unixMilliseconds)
+  /**
+   * [ToUnixDays description]
+   * @param  DateTimeImmutable $dto [description]
+   * @return int                    [description]
+   */
+  public static function ToUnixDays(DateTimeImmutable $dto): int
+  {
+    $diff = $dto->diff(static::$UnixEpoch);
+    return $diff->days;
+  }
 
   /**
    * [FromUnixMilliseconds description]
@@ -45,6 +54,33 @@ class OtherExtensions
     return static::$UnixEpoch->setTime(0,0,0,$unixMilliseconds * 1000);
     // return UnixEpoch.AddMilliseconds(unixMilliseconds);
   }
+
+  /**
+   * [ToUnixMilliseconds description]
+   * @param  DateTimeImmutable $dto [description]
+   * @return int                    [description]
+   */
+  public static function ToUnixMilliseconds(DateTimeImmutable $dto): int
+  {
+    $diff = $dto->diff(static::$UnixEpoch);
+    $days = $diff->format('%a');
+    $seconds = 0;
+    if($days){
+        $seconds += 24 * 60 * 60 * $days;
+    }
+    $hours = $diff->format('%H');
+    if($hours){
+        $seconds += 60 * 60 * $hours;
+    }
+    $minutes = $diff->format('%i');
+    if($minutes){
+        $seconds += 60 * $minutes;
+    }
+    $seconds += $diff->format('%s');
+    $milliseconds = $seconds * 1000;
+    return $milliseconds;
+  }
+
 
   /**
    * [FromUnixMicroseconds description]

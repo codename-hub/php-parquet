@@ -298,7 +298,6 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    */
   protected function WriteOne(Buffer $writer, $value): void
   {
-    echo("CLASS:".get_class($this));
     throw new Exception('Not supported');
   }
 }

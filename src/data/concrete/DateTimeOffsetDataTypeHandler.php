@@ -7,6 +7,8 @@ use DateTimeImmutable;
 use PhpBinaryReader\BinaryReader;
 
 use jocoon\parquet\data\DataType;
+use jocoon\parquet\data\DateTimeFormat;
+use jocoon\parquet\data\DateTimeDataField;
 use jocoon\parquet\data\BasicPrimitiveDataTypeHandler;
 
 use jocoon\parquet\format\Type;
@@ -46,6 +48,39 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * @inheritDoc
    */
+  public function createThrift(
+    \jocoon\parquet\data\Field $field,
+    \jocoon\parquet\format\SchemaElement $parent,
+    array &$container
+  ): void {
+    parent::createThrift($field, $parent, $container);
+
+    //modify annotations
+    $tse = end($container);
+    if($tse instanceof DateTimeDataField) {
+      switch ($tse->dateTimeFormat)
+      {
+        case DateTimeFormat::DateAndTime:
+          $tse->type = Type::INT64;
+          $tse->converted_type = ConvertedType::TIMESTAMP_MILLIS;
+          break;
+        case DateTimeFormat::Date:
+          $tse->type = Type::INT32;
+          $tse->converted_type = ConvertedType::DATE;
+          break;
+
+        //other cases are just default
+      }
+    }
+    else
+    {
+      //default annotation is fine
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function read(
     \PhpBinaryReader\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
@@ -69,6 +104,30 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
   }
 
   /**
+   * @inheritDoc
+   */
+  public function Write(
+    \jocoon\parquet\format\SchemaElement $tse,
+    \Nelexa\Buffer\Buffer $writer,
+    array $values,
+    \jocoon\parquet\format\Statistics $statistics
+  ): void {
+    switch($tse->type) {
+      case Type::INT32:
+        $this->WriteAsInt32($writer, $values);
+        break;
+      case Type::INT64:
+        $this->WriteAsInt64($writer, $values);
+        break;
+      case Type::INT96:
+        $this->WriteAsInt96($writer, $values);
+        break;
+      default:
+       throw new \Exception("data type '{$tse->type}' does not represent any date types");
+    }
+  }
+
+  /**
    * [readAsInt32 description]
    * @param  BinaryReader $reader [description]
    * @param  array                       &$dest   [description]
@@ -88,6 +147,19 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
   }
 
   /**
+   * [WriteAsInt32 description]
+   * @param \Nelexa\Buffer\Buffer  $writer [description]
+   * @param DateTimeImmutable[]   $values [description]
+   */
+  protected function WriteAsInt32(\Nelexa\Buffer\Buffer $writer, array $values): void
+  {
+    foreach($values as $dto) {
+      $days = OtherExtensions::ToUnixDays($dto);
+      $writer->insertInt($days);
+    }
+  }
+
+  /**
    * [readAsInt64 description]
    * @param  BinaryReader $reader [description]
    * @param  array        &$dest   [description]
@@ -104,6 +176,19 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
     }
 
     return $idx - $offset;
+  }
+
+  /**
+   * [WriteAsInt64 description]
+   * @param \Nelexa\Buffer\Buffer  $writer [description]
+   * @param DateTimeImmutable[]   $values [description]
+   */
+  protected function WriteAsInt64(\Nelexa\Buffer\Buffer $writer, array $values): void
+  {
+    foreach($values as $dto) {
+      $value = OtherExtensions::ToUnixMilliseconds($dto);
+      $writer->insertLong($value);
+    }
   }
 
   /**
@@ -139,6 +224,19 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
     }
 
     return $idx - $offset;
+  }
+
+  /**
+   * [WriteAsInt96 description]
+   * @param \Nelexa\Buffer\Buffer  $writer [description]
+   * @param DateTimeImmutable[]   $values [description]
+   */
+  protected function WriteAsInt96(\Nelexa\Buffer\Buffer $writer, array $values): void
+  {
+    foreach($values as $dto) {
+      $nano = NanoTime::NanoTimeFromDateTimeImmutable($dto);
+      $nano->write($writer);
+    }
   }
 
   /**
