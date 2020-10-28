@@ -15,6 +15,7 @@ before_install:
     - ./configure
     - make
     - make install
+    - echo "extension = snappy.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
     # disable XDebug for now
     - phpenv config-rm xdebug.ini
