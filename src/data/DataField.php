@@ -77,6 +77,9 @@ class DataField extends Field
       // TODO: throw exception on enumerableType not null?
     }
 
+
+    $handler = null;
+
     switch($baseType) {
       case 'string':
         $dataType = DataType::String;
@@ -84,18 +87,39 @@ class DataField extends Field
       case 'integer':
         $dataType = DataType::Int32; // or 64?
         break;
+      case 'long': // Faking it
+        $baseType = 'integer';
+        $dataType = DataType::Int64; // or 64?
+        break;
       case 'boolean':
         $dataType = DataType::Boolean;
         break;
       case 'float':
+        // NOTE: PHP is using doubles, internally - at any time possible.
+        // Therefore, we have to hook into this thing right now to get the right DataTypeHandler
+        $baseType = 'double';
         $dataType = DataType::Float;
+        $handler = DataTypeFactory::matchType($dataType);
         break;
       case 'double':
         $dataType = DataType::Double;
         break;
+      case 'byte':
+        // TODO/WIP: ByteArrays seem to be a little bit trickier
+        // As PHP uses bare strings to store bytes - or at least, supports it this way.
+        if($isArray) {
+          $dataType = DataType::ByteArray;
+        } else {
+          $dataType = DataType::Byte;
+        }
+        $handler = DataTypeFactory::matchType($dataType);
+        break;
+
     }
 
-    $handler = DataTypeFactory::matchPhpType($baseType);
+    if($handler === null) {
+      $handler = DataTypeFactory::matchPhpType($baseType);
+    }
 
     if($handler === null) {
       $handler = DataTypeFactory::matchPhpClass($baseType);

@@ -13,7 +13,6 @@ class DateTimeDataField extends DataField
    * [create description]
    * @param  string  $name     [description]
    * @param  int     $format   [description]
-   * @param  int     $dataType [description]
    * @param  bool    $hasNulls [description]
    * @param  bool    $isArray  [description]
    * @return self              [description]
@@ -21,11 +20,10 @@ class DateTimeDataField extends DataField
   public static function create(
     string $name,
     $format,
-    int $dataType,
     bool $hasNulls = true,
     bool $isArray = false
   ): self {
-    $field = new self($name, $dataType, $hasNulls, $isArray);
+    $field = new self($name, DataType::DateTimeOffset, $hasNulls, $isArray);
     $field->dateTimeFormat = $format;
     return $field;
 
