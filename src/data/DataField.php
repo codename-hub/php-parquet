@@ -94,6 +94,15 @@ class DataField extends Field
       case 'boolean':
         $dataType = DataType::Boolean;
         break;
+      case 'decimal':
+        // NOTE: PHP has no explicit decimal type
+        // Instead, we use strings, so we can use these arbitrary precision numbers
+        // with libaries like BCMath
+        // Therefore, we have to hook into this thing right now to get the right DataTypeHandler
+        $baseType = 'string';
+        $dataType = DataType::Decimal;
+        $handler = DataTypeFactory::matchType($dataType);
+        break;
       case 'float':
         // NOTE: PHP is using doubles, internally - at any time possible.
         // Therefore, we have to hook into this thing right now to get the right DataTypeHandler

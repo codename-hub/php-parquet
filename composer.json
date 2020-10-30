@@ -15,6 +15,7 @@
         "ext-snappy" : "*",
         "ext-bcmath" : "*",
         "ext-zlib": "*",
+        "pear/math_biginteger" : "^1.0",
         "apache/thrift": "^0.13.0",
         "mdurrant/php-binary-reader": "^1.0",
         "nelexa/buffer": "^1.3"

@@ -56,30 +56,30 @@ final class EndToEndTypeTest extends TestBase
       ],
 
       // various cases of decimals
-      // "simple decimal" => [
-      //   'field'         => DataField::createFromType("decDefault", 'decimal'),
-      //   'expectedValue' => 123.4m
-      // ],
-      // "huge decimal" => [
-      //   'field'         => DataField::createFromType("hugeDec", 'decimal'),
-      //   'expectedValue' => 83086059037282.54m
-      // ],
-      // "int32 decimal" => [
-      //   'field'         => DecimalDataField::create("decInt32", 4, 1),
-      //   'expectedValue' => 12.4m
-      // ],
-      // "int64 decimal" => [
-      //   'field'         => DecimalDataField::create("decInt64", 17, 12),
-      //   'expectedValue' => 1234567.88m,
-      // ],
-      // "fixed byte array decimal" => [
-      //   'field'         => DecimalDataField::create("decFixedByteArray", 48, 12),
-      //   'expectedValue' => 34434.5m
-      // ],
-      // "negative decimal" => [
-      //   'field'         => DecimalDataField::create("decMinus", 10, 2, true),
-      //   'expectedValue' => -1m
-      // ],
+      "simple decimal" => [
+        'field'         => DataField::createFromType("decDefault", 'decimal'),
+        'expectedValue' => "123.4" // 123.4m
+      ],
+      "huge decimal" => [
+        'field'         => DataField::createFromType("hugeDec", 'decimal'),
+        'expectedValue' => "83086059037282.54" // 83086059037282.54m
+      ],
+      "int32 decimal" => [
+        'field'         => DecimalDataField::create("decInt32", 4, 1),
+        'expectedValue' => "12.4" // 12.4m
+      ],
+      "int64 decimal" => [
+        'field'         => DecimalDataField::create("decInt64", 17, 12),
+        'expectedValue' => "1234567.88" // 1234567.88m,
+      ],
+      "fixed byte array decimal" => [
+        'field'         => DecimalDataField::create("decFixedByteArray", 48, 12),
+        'expectedValue' => "34434.5" // 34434.5m
+      ],
+      "negative decimal" => [
+        'field'         => DecimalDataField::create("decMinus", 10, 2, true),
+        'expectedValue' => "-1" // -1m
+      ],
 
       // might lose precision slightly, i.e.
       // Expected: 2017-07-13T10:58:44.3767154+00:00

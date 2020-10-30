@@ -57,6 +57,7 @@ This library highly depends on
 * __apache/thrift__ for working with the Thrift-related objects and data
 * __mdurrant/php-binary-reader__ for reading binary data (and btw. it's super close to C#'s BinaryReader)
 * __nelexa/buffer__ for writing binary data (I decided not to do a C# BinaryWriter clone)
+* __pear/Math_BigInteger__ for working with binary stored arbitrary-precision decimals (paradox, I know)
 
 (You really have to pay attention to Nelexa's package - as it is, by default, configured to do everything in Big Endian. But for parquet, you'll need to perform various parts in Little Endian).
 

@@ -10,6 +10,7 @@ docker run --rm -v "$(pwd):/home/php-parquet" -it -w="/home/php-parquet" --entry
 # docker run --rm -v "$(pwd):/home/php-parquet" -it -w="/home/php-parquet" --entrypoint="vendor/bin/phpunit" php-parquet-test tests/SnappyTest.php
 # docker run --rm -v "$(pwd):/home/php-parquet" -it -w="/home/php-parquet" --entrypoint="vendor/bin/phpunit" php-parquet-test tests/CompressionTest.php
 # docker run --rm -v "$(pwd):/home/php-parquet" -it -w="/home/php-parquet" --entrypoint="vendor/bin/phpunit" php-parquet-test tests/EndToEndTypeTest.php
+# docker run --rm -v "$(pwd):/home/php-parquet" -it -w="/home/php-parquet" --entrypoint="vendor/bin/phpunit" php-parquet-test tests/values/primitives/BigDecimalTest.php
 
 # interactive shell
 # docker run --rm -v "$(pwd):/home/php-parquet" -it -w="/home/php-parquet" --entrypoint="bash" php-parquet-test
