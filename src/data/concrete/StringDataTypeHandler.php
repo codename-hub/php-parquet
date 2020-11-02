@@ -64,7 +64,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
       return 0;
     }
 
-    $tdest = &$dest; // TODO/QUESTION: either this or clone $dest; ??
+    // $tdest = &$dest; // TODO/QUESTION: either this or clone $dest; ??
 
     // reading string one by one is extremely slow, read all data
 
@@ -72,7 +72,8 @@ class StringDataTypeHandler extends BasicDataTypeHandler
     // $allBytes = []; // TODO: pre-fill or SplFixedArray ?
 
     // reader.BaseStream.Read(allBytes, 0, remLength);
-    $allBytes = $reader->readAlignedString($remLength);
+    // $allBytes = $reader->readAlignedString($remLength);
+    $allBytes = $reader->readBytes($remLength);
 
     $destIdx = $offset;
 
@@ -83,8 +84,9 @@ class StringDataTypeHandler extends BasicDataTypeHandler
 
       $spanIdx = 0;
       $spanLength = \strlen($allBytes);
+      $destCount = \count($dest);
 
-      while ($spanIdx < $spanLength && $destIdx < \count($tdest))
+      while ($spanIdx < $spanLength && $destIdx < $destCount)
       {
         // $length = span.Slice(spanIdx, 4).ReadInt32();
         // $length = intval(substr($span, $spanIdx, 4));
@@ -97,7 +99,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
         $s = \substr($allBytes, $spanIdx + 4, $length);
 
         // tdest[destIdx++] = s;
-        $tdest[$destIdx++] = $s;
+        $dest[$destIdx++] = $s;
 
         $spanIdx = $spanIdx + 4 + $length;
         // spanIdx = spanIdx + 4 + length;

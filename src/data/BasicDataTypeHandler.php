@@ -68,10 +68,14 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
 
     $result = &$data;
 
+    // Performance HACK, avoid consecutive calls to count() of the dictionary arg
+    // which doesnt change during method execution.
+    $dictionaryCount = \count($dictionary);
+
     for ($i = 0; $i < $length; $i++)
     {
       $index = $indexes[$i];
-      if ($index < count($dictionary))
+      if ($index < $dictionaryCount)
       {
         // may not be true when value is null
         $value = $dictionary[$index];
