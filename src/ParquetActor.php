@@ -1,7 +1,11 @@
 <?php
 namespace jocoon\parquet;
 
+use Exception;
+
 use PhpBinaryReader\BinaryReader;
+
+use jocoon\parquet\exception\ArgumentNullException;
 
 use jocoon\parquet\file\ThriftStream;
 
@@ -38,6 +42,15 @@ class ParquetActor {
    */
   protected function __construct($_fileStream)
   {
+    if($_fileStream === null) {
+      throw new ArgumentNullException('No stream');
+    }
+
+    if(!is_resource($_fileStream)) {
+      // not a resource, cannot open?
+      throw new Exception('Not a stream');
+    }
+
     $this->_fileStream = $_fileStream;
     $this->Reader = new BinaryReader($this->_fileStream);
     //

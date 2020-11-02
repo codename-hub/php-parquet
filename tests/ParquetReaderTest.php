@@ -2,10 +2,70 @@
 declare(strict_types=1);
 namespace jocoon\parquet\tests;
 
+use Exception;
+
 use jocoon\parquet\ParquetReader;
+
+use jocoon\parquet\exception\ArgumentNullException;
 
 final class ParquetReaderTest extends TestBase
 {
+  /**
+   * [testOpeningNullStreamFails description]
+   */
+  public function testOpeningNullStreamFails(): void
+  {
+    $this->expectException(ArgumentNullException::class);
+    new ParquetReader(null);
+  }
+
+  /**
+   * [testOpeningSmallFileFails description]
+   */
+  public function testOpeningSmallFileFails(): void
+  {
+    $this->expectException(Exception::class);
+    $content = 'small';
+    $stream = fopen('data://text/plain,' . $content,'r');
+    new ParquetReader($stream);
+  }
+
+  /**
+   * [testOpeningFileWithoutProperHeadFails description]
+   */
+  public function testOpeningFileWithoutProperHeadFails(): void
+  {
+    $this->expectException(Exception::class);
+    $content = 'PAR2dataPAR1';
+    $stream = fopen('data://text/plain,' . $content,'r');
+    new ParquetReader($stream);
+  }
+
+  /**
+   * [testOpeningFileWithoutProperTailFails description]
+   */
+  public function testOpeningFileWithoutProperTailFails(): void
+  {
+    $this->expectException(Exception::class);
+    $content = 'PAR1dataPAR2';
+    $stream = fopen('data://text/plain,' . $content,'r');
+    new ParquetReader($stream);
+  }
+
+  //
+  // NOTE: the following tests are excluded for now
+  // as Streams are not as easy to use/fake/mock like in C#.
+  //
+  // public function testOpening_readable_but_not_seekable_stream_fails(): void
+  // {
+  //   Assert.Throws<ArgumentException>(() => new ParquetReader(new ReadableNonSeekableStream(new MemoryStream(RandomGenerator.GetRandomBytes(5, 6)))));
+  // }
+  //
+  // public function testOpening_not_readable_but_seekable_stream_fails(): void
+  // {
+  //   Assert.Throws<ArgumentException>(() => new ParquetReader(new NonReadableSeekableStream(new MemoryStream(RandomGenerator.GetRandomBytes(5, 6)))));
+  // }
+
 
   /**
    * [testReadSimpleMap description]
