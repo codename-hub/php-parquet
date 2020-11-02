@@ -41,7 +41,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
   ): bool {
     return
       ($tse->type === Type::INT96 && $formatOptions->TreatBigIntegersAsDates) || // Impala
-      ($tse->type === Type::INT64 && isset($tse->converted_type) && $tse->converted_type === ConvertedType::TIME_MILLIS) ||
+      ($tse->type === Type::INT64 && isset($tse->converted_type) && $tse->converted_type === ConvertedType::TIMESTAMP_MILLIS) ||
       ($tse->type === Type::INT32 && isset($tse->converted_type) && $tse->converted_type === ConvertedType::DATE);
   }
 
@@ -57,8 +57,9 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
     //modify annotations
     $tse = end($container);
-    if($tse instanceof DateTimeDataField) {
-      switch ($tse->dateTimeFormat)
+    if($field instanceof DateTimeDataField) {
+      $dse = $field;
+      switch ($dse->dateTimeFormat)
       {
         case DateTimeFormat::DateAndTime:
           $tse->type = Type::INT64;
@@ -87,16 +88,12 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
     array &$dest,
     int $offset
   ): int {
-    // echo("DateTimeOffsetData Read");
     switch($tse->type) {
       case Type::INT32:
-        // echo("INT32");
         return $this->readAsInt32($reader, $dest, $offset);
       case Type::INT64:
-        // echo("INT64");
         return $this->readAsInt64($reader, $dest, $offset);
       case Type::INT96:
-        // echo("INT96");
         return $this->readAsInt96($reader, $dest, $offset);
       default:
         throw new \LogicException('Not supported type');

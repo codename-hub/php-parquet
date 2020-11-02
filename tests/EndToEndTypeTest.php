@@ -84,28 +84,82 @@ final class EndToEndTypeTest extends TestBase
       // might lose precision slightly, i.e.
       // Expected: 2017-07-13T10:58:44.3767154+00:00
       // Actual:   2017-07-12T10:58:44.3770000+00:00
+      // NOTE: this seems not to be a problem in PHP ?
       "dateTimeOffset" => [
         'field'         => DataField::createFromType("dateTimeOffset", \DateTimeImmutable::class),
-        'expectedValue' => new \DateTimeImmutable('now'), // new DateTimeOffset(DateTime.UtcNow.RoundToSecond())
+        'expectedValue' => (new \DateTimeImmutable('now')),
       ],
       "impala date" => [
         'field'         => DateTimeDataField::create("dateImpala", DateTimeFormat::Impala),
-        'expectedValue' => new \DateTimeImmutable('now'), // new DateTimeOffset(DateTime.UtcNow.RoundToSecond())
+        'expectedValue' => (new \DateTimeImmutable('now')),
       ],
       "dateDateAndTime" => [
         'field'         => DateTimeDataField::create("dateDateAndTime", DateTimeFormat::DateAndTime),
-        'expectedValue' => new \DateTimeImmutable('now'), // new DateTimeOffset(DateTime.UtcNow.RoundToSecond())
+        'expectedValue' => (new \DateTimeImmutable('now'))->setTimestamp(time()), // Modifying the DT via timestamp to get rid of the microseconds
       ],
       // don't want any excess info in the offset INT32 doesn't contain or care about this data
       "dateDate" => [
-        'field' => DateTimeDataField::create("dateDate", DateTimeFormat::Date),
-        'expectedValue' => new \DateTimeImmutable('now'), // new DateTimeOffset(DateTime.UtcNow.RoundToDay(), TimeSpan.Zero)
+        'field'         => DateTimeDataField::create("dateDate", DateTimeFormat::Date),
+        'expectedValue' => (new \DateTimeImmutable('now'))->setTime(0,0,0), // Set time to be all 0 (NOTE: check for microseconds behaviour?)
       ],
       // "interval" => [
       //   'field'         => DataField::createFromType("interval", 'Interval'),
       //   'expectedValue' => new Interval(3, 2, 1)
       // ],
 
+      "byte min value" => [
+        'field'         => DataField::createFromType("byte", 'byte'),
+        'expectedValue' => 0 // 0x00 // byte.MinValue
+      ],
+      // TODO: byte reading/writing still causes errors
+      // "byte max value" => [
+      //   'field'         => DataField::createFromType("byte", 'byte'),
+      //   'expectedValue' => 255 // 0xFF
+      // ],
+
+      // "signed byte min value" => [
+      //   'field'         => DataField::createFromType("sbyte", 'sbyte'),
+      //   'expectedValue' => sbyte.MinValue
+      // ],
+      // "signed byte max value" => [
+      //   'field'         => DataField::createFromType("sbyte", 'sbyte'),
+      //   'expectedValue' => sbyte.MaxValue
+      // ],
+      //
+      // "short min value" => [
+      //   'field'         => DataField::createFromType("short", 'short'),
+      //   'expectedValue' => short.MinValue
+      // ],
+      // "short max value" => [
+      //   'field'         => DataField::createFromType("short", 'short'),
+      //   'expectedValue' => short.MaxValue
+      // ],
+      // "unsigned short min value" => [
+      //   'field'         => DataField::createFromType("ushort", 'ushort'),
+      //   'expectedValue' => ushort.MinValue
+      // ],
+      // "unsigned short max value" => [
+      //   'field'         => DataField::createFromType("ushort", 'ushort'),
+      //   'expectedValue' => ushort.MaxValue
+      // ],
+
+      "nullable decimal" => [
+        'field'         => DecimalDataField::create("decimal?", 4, 1, true, true),
+        'expectedValue' => null
+      ],
+      // "nullable DateTime" =>  [
+      //   'field' => new DateTimeDataField("DateTime?", DateTimeFormat::DateAndTime, true),
+      //   'expectedValue' => null,
+      // ],
+
+      "bool" => [
+        'field'         => DataField::createFromType("bool", 'boolean'),
+        'expectedValue' => true
+      ],
+      // "nullable bool" => [
+      //   'field'         => DataField::createFromType("bool?", 'bool?'),
+      //   'expectedValue' => new bool?(true)
+      // ],
     ];
   }
 
