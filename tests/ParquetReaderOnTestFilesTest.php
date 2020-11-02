@@ -78,7 +78,9 @@ final class ParquetReaderOnTestFilesTest extends TestBase
 
     $this->assertNotNull($as_at_date_col);
 
-    $offset = OtherExtensions::FromUnixMilliseconds((int)$as_at_date_col->getData()[0]);
-    $this->assertEquals(new \DateTime('2018-12-14 00:00:00'), $offset);
+    // NOTE: at this point we may compare DateTime to DateTimeImmutable objects
+    // without a difference. But I suggest using DateTimeImmutable at the moment.
+    $offset = $as_at_date_col->getData()[0];
+    $this->assertEquals(new \DateTimeImmutable('2018-12-14 00:00:00'), $offset);
   }
 }
