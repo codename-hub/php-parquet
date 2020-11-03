@@ -22,7 +22,7 @@ class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
@@ -32,8 +32,8 @@ class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * @inheritDoc
    */
-  protected function WriteOne(\Nelexa\Buffer\Buffer $writer, $value): void
+  protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    $writer->insertInt($value);
+    $writer->writeInt32($value);
   }
 }

@@ -31,7 +31,7 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -49,7 +49,7 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
 
     // $allBytes = []; _bytePool.Rent(remLength);
 
-    $allBytes = $reader->readAlignedString($remLength);
+    $allBytes = $reader->readString($remLength);
 
     // var_dump($allBytes);
     // die();
@@ -95,7 +95,7 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
@@ -121,9 +121,9 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
   /**
    * @inheritDoc
    */
-  protected function WriteOne(\Nelexa\Buffer\Buffer $writer, $value): void
+  protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    $writer->insertInt(strlen($value));
-    $writer->insertString($value); // or UTF8?
+    $writer->writeInt32(strlen($value));
+    $writer->writeString($value); // or UTF8?
   }
 }

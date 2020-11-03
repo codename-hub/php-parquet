@@ -3,9 +3,8 @@ namespace jocoon\parquet\data;
 
 use Exception;
 
-use Nelexa\Buffer\Buffer;
-
-use PhpBinaryReader\BinaryReader;
+use jocoon\parquet\adapter\BinaryReader;
+use jocoon\parquet\adapter\BinaryWriter;
 
 use jocoon\parquet\format\Statistics;
 use jocoon\parquet\format\SchemaElement;
@@ -146,7 +145,7 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -158,7 +157,7 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function readObject(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
@@ -275,11 +274,11 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
   /**
    * [Write description]
    * @param SchemaElement $tse        [description]
-   * @param Buffer        $writer     [description]
+   * @param BinaryWriter        $writer     [description]
    * @param array         $values     [description]
    * @param Statistics    $statistics [description]
    */
-  public function Write(SchemaElement $tse, Buffer $writer, array $values, Statistics $statistics): void
+  public function Write(SchemaElement $tse, BinaryWriter $writer, array $values, Statistics $statistics): void
   {
     // casing to an array of TSystemType means we avoid Array.GetValue calls, which are slow
     // var typedArray = (TSystemType[]) values;
@@ -297,10 +296,10 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
 
   /**
    * [WriteOne description]
-   * @param Buffer $writer [description]
+   * @param BinaryWriter $writer [description]
    * @param [type] $value  [description]
    */
-  protected function WriteOne(Buffer $writer, $value): void
+  protected function WriteOne(BinaryWriter $writer, $value): void
   {
     throw new Exception('Not supported');
   }

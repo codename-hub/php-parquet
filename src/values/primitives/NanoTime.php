@@ -60,11 +60,11 @@ class NanoTime
 
   /**
    * [Write description]
-   * @param \Nelexa\Buffer\Buffer $writer [description]
+   * @param \jocoon\parquet\adapter\BinaryWriter $writer [description]
    */
-  public function Write(\Nelexa\Buffer\Buffer $writer):void {
-    $writer->insertLong($this->timeOfDayNanos);
-    $writer->insertInt($this->julianDay);
+  public function Write(\jocoon\parquet\adapter\BinaryWriter $writer):void {
+    $writer->writeInt64($this->timeOfDayNanos);
+    $writer->writeInt32($this->julianDay);
   }
 
   /**

@@ -3,7 +3,7 @@ namespace jocoon\parquet;
 
 use Exception;
 
-use PhpBinaryReader\BinaryReader;
+use jocoon\parquet\adapter\BinaryReader;
 
 use jocoon\parquet\exception\ArgumentNullException;
 
@@ -27,7 +27,7 @@ class ParquetActor {
 
   /**
    * [private description]
-   * @var \Nelexa\Buffer\ResourceBuffer
+   * @var \jocoon\parquet\adapter\BinaryWriter
    */
   protected $Writer;
 
@@ -52,30 +52,30 @@ class ParquetActor {
     }
 
     $this->_fileStream = $_fileStream;
-    $this->Reader = new BinaryReader($this->_fileStream);
+    $this->Reader = \jocoon\parquet\adapter\BinaryReader::createInstance($this->_fileStream); // new \jocoon\parquet\adapter\BinaryReader($this->_fileStream);
     //
     // NOTE: Nelexa's ResourceBuffer is, by default, BIG ENDIAN.
     //
-    $this->Writer = new \Nelexa\Buffer\ResourceBuffer($this->_fileStream); // do we always need this? TODO: writer on-demand (NOTE ResourceBuffer is resetting position at init)
-    $this->Writer->setOrder(\Nelexa\Buffer\Buffer::LITTLE_ENDIAN); // enforce little endian
+    $this->Writer = \jocoon\parquet\adapter\BinaryWriter::createInstance($this->_fileStream); // do we always need this? TODO: writer on-demand (NOTE ResourceBuffer is resetting position at init)
+    // $this->Writer->setOrder(\jocoon\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
 
     $this->ThriftStream = new ThriftStream($this->_fileStream);
   }
 
   // /**
   //  * [getWriter description]
-  //  * @return \Nelexa\Buffer\ResourceBuffer [description]
+  //  * @return \jocoon\parquet\adapter\BinaryWriter [description]
   //  */
-  // public function getWriter(): \Nelexa\Buffer\ResourceBuffer {
+  // public function getWriter(): \jocoon\parquet\adapter\BinaryWriter {
   //   if($this->Writer) {
   //     return $this->Writer;
   //   } else {
   //     $pos = ftell($this->_fileStream);
-  //     $this->Writer = new \Nelexa\Buffer\ResourceBuffer($this->_fileStream);
+  //     $this->Writer = new \jocoon\parquet\adapter\BinaryWriter($this->_fileStream);
   //     $this->Writer->setPosition($pos);
   //     return $this->Writer;
   //   }
-  //   // return $this->Writer ?? $this->Writer = new \Nelexa\Buffer\ResourceBuffer($this->_fileStream); // do we always need this?
+  //   // return $this->Writer ?? $this->Writer = new \jocoon\parquet\adapter\BinaryWriter($this->_fileStream); // do we always need this?
   // }
 
   protected function ValidateFile()

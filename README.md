@@ -55,11 +55,24 @@ Tests fully pass on PHP 7.3 and 7.4. At the time of writing also 8.0.0 RC2 is pe
 This library highly depends on
 
 * __apache/thrift__ for working with the Thrift-related objects and data
-* __mdurrant/php-binary-reader__ for reading binary data (and btw. it's super close to C#'s BinaryReader)
-* __nelexa/buffer__ for writing binary data (I decided not to do a C# BinaryWriter clone)
+* __nelexa/buffer__ for reading and writing binary data (I decided not to do a C# BinaryWriter clone)
 * __pear/Math_BigInteger__ for working with binary stored arbitrary-precision decimals (paradox, I know)
 
-(You really have to pay attention to Nelexa's package - as it is, by default, configured to do everything in Big Endian. But for parquet, you'll need to perform various parts in Little Endian).
+As of v0.2, I've also switched to an implementation-agnostic approach of using readers and writers.
+Now, we're dealing with BinaryReader(Interface) and BinaryWriter(Interface) implementations that abstract the underlying mechanism.
+I've noticed __mdurrant/php-binary-reader__ is just way too slow. I just didn't want to refactor everything just to try out Nelexa's reading powers.
+Instead, I've made those two interfaces mentioned above to abstract various packages delivering binary reading/writing.
+This finally leads to an optimal way of testing/benchmarking different implementations - and also mixing, e.g. using wapmorgan's package for reading while using Nelexa's for writing.
+
+
+At the time of writing, __nelexa/buffer__ seems to deliver the best performance for reading __and__ writing.
+
+Binary reading/writing packages in scope:
+
+* __mdurrant/php-binary-reader__
+* __nelexa/buffer__
+* __wapmorgan/binary-stream__
+
 
 ## Installation
 Install this package via composer, e.g.

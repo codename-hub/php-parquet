@@ -36,7 +36,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
@@ -51,7 +51,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -128,11 +128,12 @@ class StringDataTypeHandler extends BasicDataTypeHandler
   /**
    * @inheritDoc
    */
-  protected function WriteOne(\Nelexa\Buffer\Buffer $writer, $value): void
+  protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    if ($value === null || strlen($value) === 0)
+    $valueLength = null;
+    if ($value === null || ($valueLength = strlen($value)) === 0)
     {
-      $writer->insertInt(0);
+      $writer->writeInt32(0);
     }
     else
     {
@@ -140,8 +141,9 @@ class StringDataTypeHandler extends BasicDataTypeHandler
       // byte[] data = E.GetBytes(value);
       // writer.Write(data.Length);
       // writer.Write(data);
-      $writer->insertInt(strlen($value));
-      $writer->insertString($value);
+      $valueLength = $valueLength ?? \strlen($value);
+      $writer->writeInt32($valueLength);
+      $writer->writeString($value);
     }
   }
 

@@ -1,9 +1,9 @@
 <?php
 namespace jocoon\parquet\data;
 
-use PhpBinaryReader\BinaryReader;
-
 use jocoon\parquet\ParquetOptions;
+
+use jocoon\parquet\adapter\BinaryReader;
 
 use jocoon\parquet\format\SchemaElement;
 

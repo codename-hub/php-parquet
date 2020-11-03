@@ -3,11 +3,10 @@ namespace jocoon\parquet\data\concrete;
 
 use Exception;
 
-use Nelexa\Buffer\Buffer;
-
-use PhpBinaryReader\BinaryReader;
-
 use jocoon\parquet\ParquetException;
+
+use jocoon\parquet\adapter\BinaryReader;
+use jocoon\parquet\adapter\BinaryWriter;
 
 use jocoon\parquet\data\DataType;
 use jocoon\parquet\data\DecimalDataField;
@@ -94,7 +93,7 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -141,17 +140,17 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * [WriteAsInt32 description]
    * @param SchemaElement $tse    [description]
-   * @param Buffer        $writer [description]
+   * @param BinaryWriter        $writer [description]
    * @param array         $values [description]
    */
-  protected function WriteAsInt32(SchemaElement $tse, Buffer $writer, array $values): void
+  protected function WriteAsInt32(SchemaElement $tse, BinaryWriter $writer, array $values): void
   {
     $scaleFactor = bcpow(10, $tse->scale, $tse->precision); // Math.Pow(10, tse.Scale);
     foreach($values as $d) {
       try
       {
         $i = (int)bcmul($d, $scaleFactor, 0);
-        $writer->insertInt($i);
+        $writer->writeInt32($i);
       }
       catch (Exception $e) // OverflowException ?
       {
@@ -189,10 +188,10 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * [WriteAsInt64 description]
    * @param SchemaElement $tse    [description]
-   * @param Buffer        $writer [description]
+   * @param BinaryWriter        $writer [description]
    * @param array         $values [description]
    */
-  protected function WriteAsInt64(SchemaElement $tse, Buffer $writer, array $values): void
+  protected function WriteAsInt64(SchemaElement $tse, BinaryWriter $writer, array $values): void
   {
     $scaleFactor = bcpow(10, $tse->scale, $tse->precision); // Math.Pow(10, tse.Scale);
 
@@ -202,7 +201,7 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
       {
         // long l = (long)(d * (decimal)scaleFactor);
         $l = (int)bcmul($d, $scaleFactor, 0);
-        $writer->insertLong($l);
+        $writer->writeInt64($l);
       }
       catch (Exception $e) // OverflowException
       {
@@ -244,10 +243,10 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * [WriteAsFixedLengthByteArray description]
    * @param SchemaElement $tse    [description]
-   * @param Buffer        $writer [description]
+   * @param BinaryWriter        $writer [description]
    * @param array         $values [description]
    */
-  protected function WriteAsFixedLengthByteArray(SchemaElement $tse, Buffer $writer, array $values): void
+  protected function WriteAsFixedLengthByteArray(SchemaElement $tse, BinaryWriter $writer, array $values): void
   {
     foreach($values as $d)
     {
@@ -258,7 +257,7 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
       $tse->type_length = count($itemData); //always re-set type length as it can differ from default type length
 
       // writer.Write(itemData);
-      $writer->insertArrayBytes($itemData);
+      $writer->writeBytes($itemData);
     }
   }
 
@@ -267,7 +266,7 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
@@ -300,7 +299,7 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   public function Write(
     \jocoon\parquet\format\SchemaElement $tse,
-    \Nelexa\Buffer\Buffer $writer,
+    \jocoon\parquet\adapter\BinaryWriter $writer,
     array $values,
     \jocoon\parquet\format\Statistics $statistics
   ): void {

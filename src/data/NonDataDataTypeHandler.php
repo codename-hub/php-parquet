@@ -15,7 +15,7 @@ abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -27,7 +27,7 @@ abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function readObject(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {

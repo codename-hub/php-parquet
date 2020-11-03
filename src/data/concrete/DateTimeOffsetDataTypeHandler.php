@@ -4,7 +4,7 @@ namespace jocoon\parquet\data\concrete;
 use DateTime;
 use DateTimeImmutable;
 
-use PhpBinaryReader\BinaryReader;
+use jocoon\parquet\adapter\BinaryReader;
 
 use jocoon\parquet\data\DataType;
 use jocoon\parquet\data\DateTimeFormat;
@@ -83,7 +83,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -105,7 +105,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   public function Write(
     \jocoon\parquet\format\SchemaElement $tse,
-    \Nelexa\Buffer\Buffer $writer,
+    \jocoon\parquet\adapter\BinaryWriter $writer,
     array $values,
     \jocoon\parquet\format\Statistics $statistics
   ): void {
@@ -145,14 +145,14 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
   /**
    * [WriteAsInt32 description]
-   * @param \Nelexa\Buffer\Buffer  $writer [description]
+   * @param \jocoon\parquet\adapter\BinaryWriter  $writer [description]
    * @param DateTimeImmutable[]   $values [description]
    */
-  protected function WriteAsInt32(\Nelexa\Buffer\Buffer $writer, array $values): void
+  protected function WriteAsInt32(\jocoon\parquet\adapter\BinaryWriter $writer, array $values): void
   {
     foreach($values as $dto) {
       $days = OtherExtensions::ToUnixDays($dto);
-      $writer->insertInt($days);
+      $writer->writeInt32($days);
     }
   }
 
@@ -177,14 +177,14 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
   /**
    * [WriteAsInt64 description]
-   * @param \Nelexa\Buffer\Buffer  $writer [description]
+   * @param \jocoon\parquet\adapter\BinaryWriter  $writer [description]
    * @param DateTimeImmutable[]   $values [description]
    */
-  protected function WriteAsInt64(\Nelexa\Buffer\Buffer $writer, array $values): void
+  protected function WriteAsInt64(\jocoon\parquet\adapter\BinaryWriter $writer, array $values): void
   {
     foreach($values as $dto) {
       $value = OtherExtensions::ToUnixMilliseconds($dto);
-      $writer->insertLong($value);
+      $writer->writeInt64($value);
     }
   }
 
@@ -225,10 +225,10 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
   /**
    * [WriteAsInt96 description]
-   * @param \Nelexa\Buffer\Buffer  $writer [description]
+   * @param \jocoon\parquet\adapter\BinaryWriter  $writer [description]
    * @param DateTimeImmutable[]   $values [description]
    */
-  protected function WriteAsInt96(\Nelexa\Buffer\Buffer $writer, array $values): void
+  protected function WriteAsInt96(\jocoon\parquet\adapter\BinaryWriter $writer, array $values): void
   {
     foreach($values as $dto) {
       $nano = NanoTime::NanoTimeFromDateTimeImmutable($dto);
@@ -240,7 +240,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {

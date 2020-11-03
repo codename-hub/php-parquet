@@ -21,7 +21,7 @@ class DoubleDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) : float {
@@ -37,8 +37,8 @@ class DoubleDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * @inheritDoc
    */
-  protected function WriteOne(\Nelexa\Buffer\Buffer $writer, $value): void
+  protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    $writer->insertDouble($value); // re-pack?
+    $writer->writeDouble($value); // re-pack?
   }
 }

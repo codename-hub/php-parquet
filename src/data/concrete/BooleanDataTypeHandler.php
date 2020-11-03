@@ -22,7 +22,7 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) : bool {
@@ -37,7 +37,7 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    \jocoon\parquet\adapter\BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -70,7 +70,7 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   public function Write(
     \jocoon\parquet\format\SchemaElement $tse,
-    \Nelexa\Buffer\Buffer $writer,
+    \jocoon\parquet\adapter\BinaryWriter $writer,
     array $values,
     \jocoon\parquet\format\Statistics $statistics
   ): void {
@@ -97,6 +97,6 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
     if ($n !== 0) $buffer[$ib] = $b;
 
-    $writer->insertArrayBytes($buffer);
+    $writer->writeBytes($buffer);
   }
 }

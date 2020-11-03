@@ -4,7 +4,7 @@ namespace jocoon\parquet\data\concrete;
 use DateTime;
 use DateTimeImmutable;
 
-use PhpBinaryReader\BinaryReader;
+use jocoon\parquet\adapter\BinaryReader;
 
 use jocoon\parquet\data\DataType;
 use jocoon\parquet\data\BasicPrimitiveDataTypeHandler;
@@ -45,7 +45,7 @@ class DateTimeDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
@@ -59,7 +59,7 @@ class DateTimeDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \PhpBinaryReader\BinaryReader $reader,
+    BinaryReader $reader,
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {

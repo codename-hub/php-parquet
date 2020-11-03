@@ -1,9 +1,9 @@
 <?php
 namespace jocoon\parquet\file;
 
-use PhpBinaryReader\BinaryReader;
-
 use jocoon\parquet\ParquetOptions;
+
+use jocoon\parquet\adapter\BinaryReader;
 
 use jocoon\parquet\data\DataType;
 use jocoon\parquet\data\DataField;
@@ -148,7 +148,7 @@ class DataColumnReader
     $bytes = $this->readPageDataByPageHeader($ph);
 
     $ms = $bytes;
-    $reader = new BinaryReader($ms);
+    $reader = \jocoon\parquet\adapter\BinaryReader::createInstance($ms);
 
     if($this->maxRepetitionLevel > 0) {
       //todo: use rented buffers, but be aware that rented length can be more than requested so underlying logic relying on array length must be fixed too.
@@ -459,7 +459,7 @@ class DataColumnReader
 
         // using (var dataReader = new BinaryReader(ms))
         // {
-        $dataReader = new \PhpBinaryReader\BinaryReader($ms);
+        $dataReader = \jocoon\parquet\adapter\BinaryReader::createInstance($ms); // new \jocoon\parquet\adapter\PhpBinaryReader($ms);
 
 
         // dictionary = _dataTypeHandler.GetArray(ph.Dictionary_page_header.Num_values, false, false);

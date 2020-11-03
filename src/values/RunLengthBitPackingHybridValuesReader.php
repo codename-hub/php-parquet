@@ -1,7 +1,7 @@
 <?php
 namespace jocoon\parquet\values;
 
-use PhpBinaryReader\BinaryReader;
+use jocoon\parquet\adapter\BinaryReader;
 
 class RunLengthBitPackingHybridValuesReader
 {
@@ -22,12 +22,12 @@ class RunLengthBitPackingHybridValuesReader
        // echo("ReadRleBitpackedHybrid=$length ".chr(10));
      }
 
-     $start = ftell($reader->getInputHandle()); // $reader->getPosition(); // is this really accessing the base stream?
+     $start = $reader->getPosition(); //  ftell($reader->getInputHandle()); // $reader->getPosition(); // is this really accessing the base stream?
      $startOffset = $offset;
 
      // echo("base stream position=".ftell($reader->getInputHandle())." ".chr(10));
 
-     while(ftell($reader->getInputHandle()) - $start < $length) {
+     while($reader->getPosition() - $start < $length) {
        $header = static::ReadUnsignedVarInt($reader);
        $isRle = ($header & 1) == 0;
 

@@ -3,7 +3,7 @@ namespace jocoon\parquet\values;
 
 use Exception;
 
-use Nelexa\Buffer\Buffer;
+use jocoon\parquet\adapter\BinaryWriter;
 
 /**
  * [RunLengthBitPackingHybridValuesWriter description]
@@ -12,15 +12,16 @@ class RunLengthBitPackingHybridValuesWriter
 {
   /**
    * [WriteForwardOnly description]
-   * @param Buffer $writer   [description]
+   * @param BinaryWriter $writer   [description]
    * @param int    $bitWidth [description]
    * @param int[]  $data     [description]
    * @param int    $count    [description]
    */
-  public static function WriteForwardOnly(Buffer $writer, int $bitWidth, array $data, int $count): void
+  public static function WriteForwardOnly(BinaryWriter $writer, int $bitWidth, array $data, int $count): void
   {
     //write data to a memory buffer, as we need data length to be written before the data
-    $ms = fopen('php://memory', 'r+');
+    // $ms = fopen('php://memory', 'r+');
+    $ms = ''; // TEST as string
 
     // using (var ms = new MemoryStream())
     // {
@@ -28,8 +29,8 @@ class RunLengthBitPackingHybridValuesWriter
     // echo("WriteForwardOnly");
     // var_dump($data);
 
-    $bw = new \Nelexa\Buffer\ResourceBuffer($ms);
-    $bw->setOrder(\Nelexa\Buffer\Buffer::LITTLE_ENDIAN); // enforce little endian
+    $bw = \jocoon\parquet\adapter\BinaryWriter::createInstance($ms);
+    // $bw->setOrder(\jocoon\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
     //
     // using (var bw = new BinaryWriter(ms, Encoding.UTF8, true))
     // {
@@ -39,37 +40,44 @@ class RunLengthBitPackingHybridValuesWriter
 
     // int32 - length of data
     // writer.Write((int)ms.Length);
-    $writer->insertInt($len = fstat($ms)['size']);
+    // $writer->writeInt32($len = fstat($ms)['size']);
+    $writer->writeInt32($bw->getEofPosition());
 
     //actual data
     // ms.Position = 0;
-    fseek($ms, 0);
+    // fseek($ms, 0);
     $bw->setPosition(0);
+
 
     // DEBUG/TODO: do we need to reset this one?
     // $writer->setPosition(0);
 
-    // if($writer instanceof \Nelexa\Buffer\ResourceBuffer) {
+    // if($writer instanceof \jocoon\parquet\adapter\BinaryWriter) {
     //   $writer->insert()
     // }
     // $streamContent = stream_get_contents($ms);
 
-    $writer->insert($bw);
+    // $writer->insert($bw);
+
+    // stream_copy_to_stream($ms, $writer->getBaseStream());
+
+
+    $writer->writeString($bw->toString());
 
     // stream_copy_to_stream($ms, $writer->)
     // ms.CopyTo(writer.BaseStream); //warning! CopyTo performs .Flush internally
 
-    fclose($ms);
+    // fclose($ms);
   }
 
   /**
    * [WriteData description]
-   * @param Buffer $writer   [description]
+   * @param BinaryWriter $writer   [description]
    * @param int[]  $data     [description]
    * @param int    $count    [description]
    * @param int    $bitWidth [description]
    */
-  private static function WriteData(Buffer $writer, array $data, int $count, int $bitWidth): void
+  private static function WriteData(BinaryWriter $writer, array $data, int $count, int $bitWidth): void
   {
     //for simplicity, we're only going to write RLE, however bitpacking needs to be implemented as well
     $maxCount = PHP_INT_MAX >> 1;  //max count for an integer with one lost bit
@@ -147,12 +155,12 @@ class RunLengthBitPackingHybridValuesWriter
 
   /**
    * [WriteRle description]
-   * @param Buffer $writer     [description]
+   * @param BinaryWriter $writer     [description]
    * @param int    $chunkCount [description]
    * @param int    $value      [description]
    * @param int    $bitWidth   [description]
    */
-  private static function WriteRle(Buffer $writer, int $chunkCount, int $value, int $bitWidth): void
+  private static function WriteRle(BinaryWriter $writer, int $chunkCount, int $value, int $bitWidth): void
   {
     $header = 0x0; // the last bit for RLE is 0
     $header = $chunkCount << 1;
@@ -173,11 +181,11 @@ class RunLengthBitPackingHybridValuesWriter
 
   /**
    * [WriteIntBytes description]
-   * @param Buffer $writer    [description]
+   * @param BinaryWriter $writer    [description]
    * @param int    $value     [description]
    * @param int    $byteWidth [description]
    */
-  private static function WriteIntBytes(Buffer $writer, int $value, int $byteWidth): void
+  private static function WriteIntBytes(BinaryWriter $writer, int $value, int $byteWidth): void
   {
     // byte[] dataBytes = BitConverter.GetBytes(value);
 
@@ -205,21 +213,21 @@ class RunLengthBitPackingHybridValuesWriter
       case 0:
         break;
       case 1:
-        $writer->insertByte($dataBytes[1+0]);
+        $writer->writeByte($dataBytes[1+0]);
         break;
       case 2:
-        $writer->insertByte($dataBytes[1+1]);
-        $writer->insertByte($dataBytes[1+0]);
+        $writer->writeByte($dataBytes[1+1]);
+        $writer->writeByte($dataBytes[1+0]);
         break;
       case 3:
-        $writer->insertByte($dataBytes[1+2]);
-        $writer->insertByte($dataBytes[1+1]);
-        $writer->insertByte($dataBytes[1+0]);
+        $writer->writeByte($dataBytes[1+2]);
+        $writer->writeByte($dataBytes[1+1]);
+        $writer->writeByte($dataBytes[1+0]);
         break;
       case 4:
         // TODO: Test...
         echo(chr(10)."################################################################################# insertArrayBytes".chr(10));
-        $writer->insertArrayBytes($dataBytes);
+        $writer->writeBytes($dataBytes);
         break;
       default:
       throw new Exception("encountered bit width ({$byteWidth}) that requires more than 4 bytes.");
@@ -228,21 +236,21 @@ class RunLengthBitPackingHybridValuesWriter
 
   /**
    * [WriteUnsignedVarInt description]
-   * @param Buffer $writer [description]
+   * @param BinaryWriter $writer [description]
    * @param int    $value  [description]
    */
-  private static function WriteUnsignedVarInt(Buffer $writer, int $value): void
+  private static function WriteUnsignedVarInt(BinaryWriter $writer, int $value): void
   {
     while($value > 127)
     {
       $b = (($value & 0x7F) | 0x80);
 
-      $writer->insertByte($b);
+      $writer->writeByte($b);
 
       $value >>= 7;
     }
 
-    $writer->insertByte($value);
+    $writer->writeByte($value);
   }
 
 }

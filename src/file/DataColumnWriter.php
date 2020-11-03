@@ -175,8 +175,8 @@ class DataColumnWriter
     // using (var writer = new BinaryWriter(pageStream, Encoding.UTF8, true))
     // {
     // $writer = new BinaryWriter
-    $writer = new \Nelexa\Buffer\ResourceBuffer($pageStream);
-    $writer->setOrder(\Nelexa\Buffer\Buffer::LITTLE_ENDIAN); // enforce little endian
+    $writer = \jocoon\parquet\adapter\BinaryWriter::createInstance($pageStream);
+    // $writer->setOrder(\jocoon\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
 
     // if (column.RepetitionLevels != null)
     // {
@@ -312,12 +312,12 @@ class DataColumnWriter
 
   /**
    * [WriteLevels description]
-   * @param \Nelexa\Buffer\ResourceBuffer $writer   [description]
+   * @param \jocoon\parquet\adapter\BinaryWriter $writer   [description]
    * @param int[]                      $levels   [description]
    * @param int                        $count    [description]
    * @param int                        $maxLevel [description]
    */
-  protected function WriteLevels(\Nelexa\Buffer\ResourceBuffer $writer, array $levels, int $count, int $maxLevel): void
+  protected function WriteLevels(\jocoon\parquet\adapter\BinaryWriter $writer, array $levels, int $count, int $maxLevel): void
   {
     // echo("WRITE LEVELS");
     $bitWidth = static::GetBitWidth($maxLevel);
