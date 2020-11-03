@@ -37,9 +37,11 @@ function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
   // Schema schema;
   // DataColumn[] columns;
 
-  $start = microtime(true);
+  $start = hrtime(true);
+
 
   $handle = fopen(__DIR__ . '/tests/data/customer.impala.parquet', 'r');
+
   $opts = new ParquetOptions();
   $opts->TreatByteArrayAsString = true;
   $reader = new ParquetReader($handle, $opts);
@@ -55,13 +57,13 @@ function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
   }
   $columns = $cl;
 
-  $readTime = microtime(true) - $start;
+  $readTime = (hrtime(true) - $start) / 1e9;
 
   //
   // Writing uncompressed data
   //
   $dest = fopen('perf.uncompressed.parquet', 'w');
-  $start = microtime(true);
+  $start = hrtime(true);
 
   $writer = new ParquetWriter($schema, $dest);
   $writer->compressionMethod = CompressionMethod::None;
@@ -72,14 +74,13 @@ function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
   $rg->finish();
   $writer->finish();
 
-  $uncompressedWriteTime = microtime(true) - $start;
-
+  $uncompressedWriteTime = (hrtime(true) - $start) / 1e9;
 
   //
   // Writing GZIP compressed data
   //
   $dest = fopen('perf.gzip.parquet', 'w');
-  $start = microtime(true);
+  $start = hrtime(true);
 
   $writer = new ParquetWriter($schema, $dest);
   $writer->compressionMethod = CompressionMethod::Gzip;
@@ -90,6 +91,6 @@ function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
   $rg->finish();
   $writer->finish();
 
-  $gzipWriteTime = microtime(true) - $start;
+  $gzipWriteTime = (hrtime(true) - $start) / 1e9;
 
 }
