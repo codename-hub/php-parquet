@@ -154,7 +154,7 @@ class DataColumnWriter
     $pages = [];
 
     /*
-    * Page header must preceeed actual data (compressed or not) however it contains both
+    * Page header must precede actual data (compressed or not) however it contains both
     * the uncompressed and compressed data size which we don't know! This somehow limits
     * the write efficiency.
     */
