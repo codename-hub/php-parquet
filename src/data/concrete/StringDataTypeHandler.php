@@ -80,7 +80,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
     try
     {
       // Span<byte> span = allBytes.AsSpan(0, remLength);   //will be passed as input in future versions
-      $span = $allBytes; // substr($allBytes, 0, $remLength);
+      // $span = $allBytes; // substr($allBytes, 0, $remLength);
 
       $spanIdx = 0;
       $spanLength = \strlen($allBytes);
@@ -93,7 +93,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
 
         // see https://www.php.net/manual/de/function.unpack.php
         // unpack("l", $value)[1]  is for int32
-        $length = \unpack("l", \substr($span, $spanIdx, 4))[1];
+        $length = \unpack("l", \substr($allBytes, $spanIdx, 4))[1];
 
         // string s = E.GetString(allBytes, spanIdx + 4, length);
         $s = \substr($allBytes, $spanIdx + 4, $length);

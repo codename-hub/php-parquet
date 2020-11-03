@@ -24,6 +24,15 @@ class DataStreamFactory
   ];
 
   /**
+   * Registers required/available stream wrappers
+   */
+  public static function registerStreamWrappers(): void {
+    GapStreamWrapper::register();
+    GzipStreamWrapper::register();
+    SnappyInMemoryStreamWrapper::register();
+  }
+
+  /**
    * [CreateWriter description]
    * @param resource  $nakedStream       [description]
    * @param int       $compressionMethod [description]
@@ -39,13 +48,11 @@ class DataStreamFactory
      switch($compressionMethod)
      {
         case CompressionMethod::Gzip:
-          GzipStreamWrapper::register();
           $dest = GzipStreamWrapper::createWrappedStream($nakedStream, 'r+', GzipStreamWrapper::MODE_COMPRESS, $leaveNakedOpen);
           $leaveNakedOpen = false;
           break;
 
         case CompressionMethod::Snappy:
-          SnappyInMemoryStreamWrapper::register();
           $dest = SnappyInMemoryStreamWrapper::createWrappedStream($nakedStream, 'r+', SnappyInMemoryStreamWrapper::MODE_COMPRESS);
           $leaveNakedOpen = false;
            break;

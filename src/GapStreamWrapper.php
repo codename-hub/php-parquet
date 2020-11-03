@@ -170,7 +170,7 @@ class GapStreamWrapper implements StreamWrapperInterface, MarkWriteFinishedInter
   public function stream_write(string $data): int
   {
     // echo("GapStream::WRITE @ ".ftell($this->parent)." >> ".$data." <<  ".chr(10));
-    $written = fwrite($this->parent, $data);
+    $written = \fwrite($this->parent, $data);
     // echo("GapStream::WRITE written + ".$written.chr(10));
     $this->position += $written;
     return $written;

@@ -7,6 +7,7 @@ use jocoon\parquet\data\Schema;
 use jocoon\parquet\data\DataColumn;
 
 use jocoon\parquet\file\ThriftFooter;
+use jocoon\parquet\file\DataStreamFactory;
 
 /**
  * [ParquetWriter description]
@@ -64,8 +65,9 @@ class ParquetWriter extends ParquetActor {
    */
   public function __construct(Schema $schema, $output, ?ParquetOptions $formatOptions = null, bool $append = false)
   {
+    DataStreamFactory::registerStreamWrappers();
+
     $this->baseStream = $output;
-    GapStreamWrapper::register();
     // NOTE: due to GC, we have to leave the stream open
     $gapStream = GapStreamWrapper::createWrappedStream($output, 'r+', null, true);
     parent::__construct($gapStream);

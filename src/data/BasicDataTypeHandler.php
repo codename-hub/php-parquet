@@ -170,7 +170,9 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
     $totalLength = $reader->getEofPosition();
     $idx = $offset;
 
-    while ($reader->getPosition() < $totalLength && $idx < \count($dest))
+    $destCount = \count($dest);
+
+    while ($reader->getPosition() < $totalLength && $idx < $destCount)
     {
       $element = $this->readSingle($reader, $tse, -1);  //potential performance hit on calling a method
       $dest[$idx++] = $element;
@@ -224,7 +226,13 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
     $definitionLevels = array_fill(0, count($data), 0); // QUESTION/TODO: fill with null or 0?
     $definitionsLength = count($data);
 
-    $nullCount = count(array_filter($data, function($i) { return $i === null; }));
+    // $nullCount = count(array_filter($data, function($i) { return $i === null; }));
+    $nullCount = 0;
+    foreach($data as $i) {
+      if($i === null) {
+        $nullCount++;
+      }
+    }
     $result = array_fill(0, count($data) - $nullCount, null);
 
     $ir = 0;
