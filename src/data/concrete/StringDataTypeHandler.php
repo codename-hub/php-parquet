@@ -42,9 +42,8 @@ class StringDataTypeHandler extends BasicDataTypeHandler
   ) {
     if ($length === -1) $length = $reader->readInt32();
 
-    // NOTE/TODO/QUESTION: unsure about this part - should be perform a utf8_decode or not?
-    return $reader->readString($length); // UTF8?
-    // return utf8_decode($reader->readString($length)); // UTF8?
+    // NOTE: possible UTF8 handling needed.
+    return $reader->readString($length);
   }
 
   /**
@@ -57,57 +56,28 @@ class StringDataTypeHandler extends BasicDataTypeHandler
     int $offset
   ): int {
 
-
     $remLength = (int)($reader->getEofPosition() - $reader->getPosition());
 
-    if ($remLength == 0) {
+    if ($remLength === 0) {
       return 0;
     }
 
-    // $tdest = &$dest; // TODO/QUESTION: either this or clone $dest; ??
-
     // reading string one by one is extremely slow, read all data
-
-    // byte[] allBytes = _bytePool.Rent(remLength);
-    // $allBytes = []; // TODO: pre-fill or SplFixedArray ?
-
-    // reader.BaseStream.Read(allBytes, 0, remLength);
-    // $allBytes = $reader->readAlignedString($remLength);
     $allBytes = $reader->readBytes($remLength);
 
     $destIdx = $offset;
+    $spanIdx = 0;
+    $destCount = \count($dest);
 
-    try
+    while ($spanIdx < $remLength && $destIdx < $destCount)
     {
-      // Span<byte> span = allBytes.AsSpan(0, remLength);   //will be passed as input in future versions
-      // $span = $allBytes; // substr($allBytes, 0, $remLength);
+      // see https://www.php.net/manual/de/function.unpack.php
+      // unpack("l", $value)[1]  is for int32
+      $length = \unpack('l', \substr($allBytes, $spanIdx, 4))[1];
+      $s = \substr($allBytes, $spanIdx + 4, $length);
 
-      $spanIdx = 0;
-      $spanLength = \strlen($allBytes);
-      $destCount = \count($dest);
-
-      while ($spanIdx < $spanLength && $destIdx < $destCount)
-      {
-        // $length = span.Slice(spanIdx, 4).ReadInt32();
-        // $length = intval(substr($span, $spanIdx, 4));
-
-        // see https://www.php.net/manual/de/function.unpack.php
-        // unpack("l", $value)[1]  is for int32
-        $length = \unpack("l", \substr($allBytes, $spanIdx, 4))[1];
-
-        // string s = E.GetString(allBytes, spanIdx + 4, length);
-        $s = \substr($allBytes, $spanIdx + 4, $length);
-
-        // tdest[destIdx++] = s;
-        $dest[$destIdx++] = $s;
-
-        $spanIdx = $spanIdx + 4 + $length;
-        // spanIdx = spanIdx + 4 + length;
-      }
-    }
-    finally
-    {
-      // _bytePool.Return(allBytes);
+      $dest[$destIdx++] = $s;
+      $spanIdx = $spanIdx + 4 + $length;
     }
 
     return $destIdx - $offset;
@@ -131,16 +101,15 @@ class StringDataTypeHandler extends BasicDataTypeHandler
   protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
     $valueLength = null;
-    if ($value === null || ($valueLength = strlen($value)) === 0)
+    if ($value === null || ($valueLength = \strlen($value)) === 0)
     {
       $writer->writeInt32(0);
     }
     else
     {
-      //transofrm to byte array first, as we need the length of the byte buffer, not string length
+      // transform to byte array first, as we need the length of the byte buffer, not string length
       // byte[] data = E.GetBytes(value);
-      // writer.Write(data.Length);
-      // writer.Write(data);
+      // NOTE: for php, we already have binary-safe functions, so we simply write a string.
       $valueLength = $valueLength ?? \strlen($value);
       $writer->writeInt32($valueLength);
       $writer->writeString($value);

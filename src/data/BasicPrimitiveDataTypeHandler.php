@@ -25,11 +25,14 @@ abstract class BasicPrimitiveDataTypeHandler extends BasicDataTypeHandler
    */
   protected function UnpackDefinitionsInternal(array $src, array $definitionLevels, int $maxDefinitionLevel, array &$hasValueFlags) : array
   {
-    $result = \array_fill(0, \count($definitionLevels), null); // (TSystemType?[])GetArray(definitionLevels.Length, false, true);
-    $hasValueFlags = \array_fill(0, \count($definitionLevels), false); // new bool[definitionLevels.Length];
+    // Micro-Optimization
+    $definitionLevelCount = \count($definitionLevels);
+
+    $result = \array_fill(0, $definitionLevelCount, null); // (TSystemType?[])GetArray(definitionLevels.Length, false, true);
+    $hasValueFlags = \array_fill(0, $definitionLevelCount, false); // new bool[definitionLevels.Length];
 
     $isrc = 0;
-    for ($i = 0; $i < \count($definitionLevels); $i++)
+    for ($i = 0; $i < $definitionLevelCount; $i++)
     {
       $level = $definitionLevels[$i];
 

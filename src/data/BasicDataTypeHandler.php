@@ -223,8 +223,11 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
     int &$definitionsLength,
     int &$nullCount
   ): array {
-    $definitionLevels = array_fill(0, count($data), 0); // QUESTION/TODO: fill with null or 0?
-    $definitionsLength = count($data);
+    // Micro-Optimization
+    $dataCount = \count($data);
+
+    $definitionLevels = \array_fill(0, $dataCount, 0); // QUESTION/TODO: fill with null or 0?
+    $definitionsLength = $dataCount;
 
     // $nullCount = count(array_filter($data, function($i) { return $i === null; }));
     $nullCount = 0;
@@ -233,10 +236,10 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
         $nullCount++;
       }
     }
-    $result = array_fill(0, count($data) - $nullCount, null);
+    $result = \array_fill(0, $dataCount - $nullCount, null);
 
     $ir = 0;
-    for ($i = 0; $i < count($data); $i++)
+    for ($i = 0; $i < $dataCount; $i++)
     {
       $value = $data[$i];
 

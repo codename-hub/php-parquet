@@ -22,13 +22,28 @@ class CustomBinaryReader extends BinaryReader
       $this->stream = $stream;
     }
 
+
     fseek($this->stream, 0);
+    $this->position = 0;
+    $this->size = fstat($this->stream)['size'];
 
     // Set LE by default
     $this->setByteOrder(static::LITTLE_ENDIAN);
 
     // TODO: options
   }
+
+  /**
+   * [protected description]
+   * @var int
+   */
+  protected $size = null;
+
+  /**
+   * [protected description]
+   * @var int
+   */
+  protected $position = null;
 
   /**
    * [protected description]
@@ -92,6 +107,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readBytes($count)
   {
+    $this->position += $count;
     return fread($this->stream, $count);
     // NOTE: we might REALLY parse bytes here instead of returning the read data as string
   }
@@ -117,6 +133,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readInt16()
   {
+    $this->position += 2;
     return Cast::toShort(unpack($this->orderLittleEndian ? 'v' : 'n', fread($this->stream, 2))[1]);
   }
 
@@ -125,6 +142,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readUInt16()
   {
+    $this->position += 2;
     return unpack($this->orderLittleEndian ? 'v' : 'n', fread($this->stream, 2))[1];
   }
 
@@ -133,6 +151,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readInt32()
   {
+    $this->position += 4;
     return Cast::toInt(unpack($this->orderLittleEndian ? 'V' : 'N', fread($this->stream, 4))[1]);
   }
 
@@ -141,6 +160,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readUInt32()
   {
+    $this->position += 4;
     return unpack($this->orderLittleEndian ? 'V' : 'N', fread($this->stream, 4))[1];
   }
 
@@ -149,6 +169,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readInt64()
   {
+    $this->position += 8;
     return unpack($this->orderLittleEndian ? 'P' : 'J', fread($this->stream, 8))[1];
   }
 
@@ -166,6 +187,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readSingle()
   {
+    $this->position += 4;
     return unpack($this->orderLittleEndian ? 'g' : 'G', fread($this->stream, 4))[1];
   }
 
@@ -174,6 +196,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readDouble()
   {
+    $this->position += 8;
     return unpack($this->orderLittleEndian ? 'e' : 'E', fread($this->stream, 8))[1];
   }
 
@@ -182,6 +205,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readString($length)
   {
+    $this->position += $length; // ?
     return fread($this->stream, $length);
   }
 
@@ -217,6 +241,7 @@ class CustomBinaryReader extends BinaryReader
   public function setPosition(int $position)
   {
     fseek($this->stream, $position);
+    $this->size = ftell($this->stream);
   }
 
   /**
@@ -224,7 +249,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function getPosition(): int
   {
-    return ftell($this->stream); // might be cached?
+    return $this->position; // ftell($this->stream); // might be cached?
   }
 
   /**
@@ -232,6 +257,6 @@ class CustomBinaryReader extends BinaryReader
    */
   public function getEofPosition(): int
   {
-    return fstat($this->stream)['size']; // might be cached
+    return $this->size; // fstat($this->stream)['size']; // might be cached
   }
 }
