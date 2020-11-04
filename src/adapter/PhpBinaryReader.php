@@ -128,6 +128,14 @@ class PhpBinaryReader extends BinaryReader
   /**
    * @inheritDoc
    */
+  public function readDouble()
+  {
+    return \unpack($this->binaryReader->getEndian() === \PhpBinaryReader\Endian::LITTLE  ? 'e' : 'E', $this->binaryReader->readBytes(8))[1];
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function readString($length)
   {
     return $this->binaryReader->readString($length);

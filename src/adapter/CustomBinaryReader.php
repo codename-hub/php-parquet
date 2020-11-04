@@ -1,9 +1,9 @@
 <?php
 namespace jocoon\parquet\adapter;
 
-use Nelexa\Buffer\Buffer;
+use Nelexa\Buffer\Cast;
 
-class NelexaBufferBinaryReader extends BinaryReader
+class CustomBinaryReader extends BinaryReader
 {
   /**
    * @inheritDoc
@@ -11,28 +11,50 @@ class NelexaBufferBinaryReader extends BinaryReader
   public function __construct($stream, $options = null)
   {
     if(!is_resource($stream)) {
-      // //
-      // // This adapter relies on the concept of always working with a stream
-      // // Therefore, write into memory.
-      // //
-      // $this->stream = fopen('php://memory', 'r+');
-      // fwrite($this->stream, $stream);
-      // fseek($this->stream, 0);
-
       //
-      // We're using Nelexa's specialty of a StringBuffer, avoiding stream initialisation.
-      // NOTE: we are always relying on $stream being a string in this case and not a filepath.
+      // This adapter relies on the concept of always working with a stream
+      // Therefore, write into memory.
       //
-      $this->buffer = new \Nelexa\Buffer\StringBuffer($stream);
+      $this->stream = fopen('php://memory', 'r+');
+      fwrite($this->stream, $stream);
     } else {
       $this->stream = $stream;
-      $this->buffer = new \Nelexa\Buffer\ResourceBuffer($this->stream);
     }
 
+    fseek($this->stream, 0);
+
     // Set LE by default
-    $this->buffer->setOrder(Buffer::LITTLE_ENDIAN);
+    $this->setByteOrder(static::LITTLE_ENDIAN);
+
     // TODO: options
   }
+
+  /**
+   * [protected description]
+   * @var bool
+   */
+  protected $orderLittleEndian = false;
+
+  /**
+   * [setByteOrder description]
+   * @param [type] $order [description]
+   */
+  public function setByteOrder($order) {
+    $this->byteOrder = $order;
+    $this->orderLittleEndian = $this->byteOrder === static::LITTLE_ENDIAN;
+  }
+
+  /**
+   * [ENDIANESS_BIG_ENDIAN description]
+   * @var int
+   */
+  const BIG_ENDIAN = 1;
+
+  /**
+   * [ENDIANNESS_LITTLE_ENDIAN description]
+   * @var int
+   */
+  const LITTLE_ENDIAN = 2;
 
   /**
    * [protected description]
@@ -41,18 +63,11 @@ class NelexaBufferBinaryReader extends BinaryReader
   protected $stream;
 
   /**
-   * [protected description]
-   * @var Buffer
-   */
-  protected $buffer = null;
-
-  /**
    * @inheritDoc
    */
   public function isEof(): bool
   {
-    return $this->buffer->position() >= $this->buffer->size();
-    // return ftell($this->stream) >= fstat($this->stream)['size']; // feof($this->stream); // TODO: check if this really works.
+    return feof($this->stream);
   }
 
   /**
@@ -60,7 +75,6 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readBits($count)
   {
-    // nelexa doesn't support Bit reading
     throw new \LogicException('Not implemented');
   }
 
@@ -69,7 +83,6 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readUBits($count)
   {
-    // nelexa doesn't support Bit reading
     throw new \LogicException('Not implemented');
   }
 
@@ -78,7 +91,8 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readBytes($count)
   {
-    return $this->buffer->getString($count);
+    return fread($this->stream, $count);
+    // NOTE: we might REALLY parse bytes here instead of returning the read data as string
   }
 
   /**
@@ -86,7 +100,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readInt8()
   {
-    return $this->buffer->getByte();
+    throw new \LogicException('Not implemented');
   }
 
   /**
@@ -94,7 +108,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readUInt8()
   {
-    return $this->buffer->getUnsignedByte();
+    throw new \LogicException('Not implemented');
   }
 
   /**
@@ -102,7 +116,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readInt16()
   {
-    return $this->buffer->getShort();
+    return Cast::toShort(unpack($this->orderLittleEndian ? 'v' : 'n', fread($this->stream, 2))[1]);
   }
 
   /**
@@ -110,7 +124,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readUInt16()
   {
-    return $this->buffer->getUnsignedShort();
+    return unpack($this->orderLittleEndian ? 'v' : 'n', fread($this->stream, 2))[1];
   }
 
   /**
@@ -118,7 +132,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readInt32()
   {
-    return $this->buffer->getInt();
+    return Cast::toInt(unpack($this->orderLittleEndian ? 'V' : 'N', fread($this->stream, 4))[1]);
   }
 
   /**
@@ -126,7 +140,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readUInt32()
   {
-    return $this->buffer->getUnsignedInt();
+    return unpack($this->orderLittleEndian ? 'V' : 'N', fread($this->stream, 4))[1];
   }
 
   /**
@@ -134,7 +148,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readInt64()
   {
-    return $this->buffer->getLong();
+    return unpack($this->orderLittleEndian ? 'P' : 'J', fread($this->stream, 8))[1];
   }
 
   /**
@@ -151,7 +165,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readSingle()
   {
-    return $this->buffer->getFloat();
+    return unpack($this->orderLittleEndian ? 'g' : 'G', fread($this->stream, 4))[1];
   }
 
   /**
@@ -159,7 +173,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readDouble()
   {
-    return $this->buffer->getDouble();
+    return unpack($this->orderLittleEndian ? 'e' : 'E', fread($this->stream, 8))[1];
   }
 
   /**
@@ -167,7 +181,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function readString($length)
   {
-    return $this->buffer->getString($length);
+    return fread($this->stream, $length);
   }
 
   /**
@@ -191,7 +205,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function setPosition(int $position)
   {
-    return $this->buffer->setPosition($position);
+    fseek($this->stream, $position);
   }
 
   /**
@@ -199,7 +213,7 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function getPosition(): int
   {
-    return $this->buffer->position(); // ftell($this->stream);
+    return ftell($this->stream); // might be cached?
   }
 
   /**
@@ -207,10 +221,6 @@ class NelexaBufferBinaryReader extends BinaryReader
    */
   public function getEofPosition(): int
   {
-    if($this->stream) {
-      return fstat($this->stream)['size'];
-    } else {
-      return $this->buffer->size();
-    }
+    return fstat($this->stream)['size']; // might be cached
   }
 }

@@ -25,13 +25,7 @@ class DoubleDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) : float {
-    // throw new \Exception('Double not implemented yet due to PHP clarification needed');
-    // return $reader->readDouble();
-
-    $bytes = $reader->readBytes(8);
-    $b = \unpack('d', $bytes);
-    // var_dump($b);
-    return $b[1];
+    return $reader->readDouble();
   }
 
   /**
@@ -39,6 +33,6 @@ class DoubleDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    $writer->writeDouble($value); // re-pack?
+    $writer->writeDouble($value);
   }
 }

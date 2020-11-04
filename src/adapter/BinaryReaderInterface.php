@@ -82,6 +82,11 @@ interface BinaryReaderInterface
   public function readSingle();
 
   /**
+   * @return float
+   */
+  public function readDouble();
+
+  /**
    * @param  int    $length
    * @return string
    */

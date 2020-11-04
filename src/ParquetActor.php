@@ -11,12 +11,27 @@ use jocoon\parquet\file\ThriftStream;
 
 use jocoon\parquet\format\FileMetaData;
 
+/**
+ * [ParquetActor description]
+ */
 class ParquetActor {
 
+  /**
+   * [MagicString description]
+   * @var string
+   */
   const MagicString = "PAR1";
 
+  /**
+   * [MagicBytes description]
+   * @var string
+   */
   const MagicBytes = "PAR1";
 
+  /**
+   * [protected description]
+   * @var resource
+   */
   protected $_fileStream;
 
   /**
@@ -52,32 +67,19 @@ class ParquetActor {
     }
 
     $this->_fileStream = $_fileStream;
-    $this->Reader = \jocoon\parquet\adapter\BinaryReader::createInstance($this->_fileStream); // new \jocoon\parquet\adapter\BinaryReader($this->_fileStream);
+
     //
-    // NOTE: Nelexa's ResourceBuffer is, by default, BIG ENDIAN.
+    // NOTE: Readers/writers should use little endian, by default
     //
-    $this->Writer = \jocoon\parquet\adapter\BinaryWriter::createInstance($this->_fileStream); // do we always need this? TODO: writer on-demand (NOTE ResourceBuffer is resetting position at init)
-    // $this->Writer->setOrder(\jocoon\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
+    $this->Reader = \jocoon\parquet\adapter\BinaryReader::createInstance($this->_fileStream);
+    $this->Writer = \jocoon\parquet\adapter\BinaryWriter::createInstance($this->_fileStream);
 
     $this->ThriftStream = new ThriftStream($this->_fileStream);
   }
 
-  // /**
-  //  * [getWriter description]
-  //  * @return \jocoon\parquet\adapter\BinaryWriter [description]
-  //  */
-  // public function getWriter(): \jocoon\parquet\adapter\BinaryWriter {
-  //   if($this->Writer) {
-  //     return $this->Writer;
-  //   } else {
-  //     $pos = ftell($this->_fileStream);
-  //     $this->Writer = new \jocoon\parquet\adapter\BinaryWriter($this->_fileStream);
-  //     $this->Writer->setPosition($pos);
-  //     return $this->Writer;
-  //   }
-  //   // return $this->Writer ?? $this->Writer = new \jocoon\parquet\adapter\BinaryWriter($this->_fileStream); // do we always need this?
-  // }
-
+  /**
+   * [ValidateFile description]
+   */
   protected function ValidateFile()
   {
     // _fileStream.Seek(0, SeekOrigin.Begin);
@@ -107,37 +109,44 @@ class ParquetActor {
     }
   }
 
+  /**
+   * [ReadMetadata description]
+   * @return FileMetaData [description]
+   */
   protected function ReadMetadata() : FileMetaData
   {
      $this->GoBeforeFooter();
 
-     // return ThriftStream.Read<Thrift.FileMetaData>();
      return $this->ThriftStream->Read(FileMetaData::class);
   }
 
-  protected function GoToBeginning()
+  /**
+   * [GoToBeginning description]
+   */
+  protected function GoToBeginning(): void
   {
-     // _fileStream.Seek(0, SeekOrigin.Begin);
      fseek($this->_fileStream, 0, SEEK_SET);
   }
 
-  protected function GoToEnd()
+  /**
+   * [GoToEnd description]
+   */
+  protected function GoToEnd(): void
   {
-     // _fileStream.Seek(0, SeekOrigin.End);
      fseek($this->_fileStream, 0, SEEK_END);
   }
 
-  protected function GoBeforeFooter()
+  /**
+   * [GoBeforeFooter description]
+   */
+  protected function GoBeforeFooter(): void
   {
-     //go to -4 bytes (PAR1) -4 bytes (footer length number)
-     // _fileStream.Seek(-8, SeekOrigin.End);
+     // go to -4 bytes (PAR1) -4 bytes (footer length number)
      fseek($this->_fileStream, -8, SEEK_END);
 
-     // int footerLength = Reader.ReadInt32();
      $footerLength = $this->Reader->readInt32();
 
      //set just before footer starts
-     // _fileStream.Seek(-8 - footerLength, SeekOrigin.End);
      fseek($this->_fileStream, -8 - $footerLength, SEEK_END);
   }
 

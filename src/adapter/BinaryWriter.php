@@ -13,7 +13,8 @@ abstract class BinaryWriter implements BinaryWriterInterface
    * @return BinaryWriter
    */
   public static function createInstance($stream, $options = null): BinaryWriter {
-    return new NelexaBufferBinaryWriter($stream, $options); // Preferred implementation at the moment
+    return new CustomBinaryWriter($stream, $options); // Preferred implementation at the moment
+    // return new NelexaBufferBinaryWriter($stream, $options); // Preferred implementation at the moment
     // return new WapMorganBinaryWriter($stream, $options); // Alternative implementaion - needs additional dependencies.
   }
 }

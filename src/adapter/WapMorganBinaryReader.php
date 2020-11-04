@@ -145,6 +145,14 @@ class WapMorganBinaryReader extends BinaryReader
   /**
    * @inheritDoc
    */
+  public function readDouble()
+  {
+    return $this->binaryStream->readFloat(64);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function readString($length)
   {
     return $this->binaryStream->readString($length);
