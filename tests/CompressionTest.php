@@ -16,7 +16,7 @@ final class CompressionTest extends TestBase
   public function testGenericGzipCompressionProcedure(): void {
 
     $sampleString = 'This is a to-be compressed stringgggggg.';
-    $compressed = zlib_encode($sampleString, ZLIB_ENCODING_GZIP, 9);
+    $compressed = zlib_encode($sampleString, ZLIB_ENCODING_GZIP, GzipStreamWrapper::DEFAULT_COMPRESSION_LEVEL);
 
     GzipStreamWrapper::register();
 

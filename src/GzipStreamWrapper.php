@@ -10,6 +10,15 @@ use Exception;
 class GzipStreamWrapper implements StreamWrapperInterface
 {
   /**
+   * The internal default compression level
+   * 1 = Lowest compression, highest speed
+   * 6 = ZLIB/Gzip common default (usually)
+   * 9 = 'Highest' compression, lowest speed
+   * @var int
+   */
+  const DEFAULT_COMPRESSION_LEVEL = 6;
+
+  /**
    * [createWrappedStream description]
    * @param resource  $stream           [description]
    * @param string    $mode             [read-write-mode]
@@ -22,7 +31,7 @@ class GzipStreamWrapper implements StreamWrapperInterface
       'gzip' => [
         'leave_open'        => $leaveOpen,
         'compression_mode'  => $compressionMode,
-        'compression_level'  => 9,
+        'compression_level'  => static::DEFAULT_COMPRESSION_LEVEL,
       ]
     ]);
     return fopen('gzip://'.$stream, $mode, false, $context);
@@ -250,7 +259,7 @@ class GzipStreamWrapper implements StreamWrapperInterface
       // Passed via stream option
       $this->leaveOpen = stream_context_get_options($this->context)['gzip']['leave_open'] ?? false;
       $this->compressionMode = stream_context_get_options($this->context)['gzip']['compression_mode'] ?? null;
-      $this->compressionLevel = stream_context_get_options($this->context)['gzip']['compression_level'] ?? 9; // Default fallback: 9 (maximum)
+      $this->compressionLevel = stream_context_get_options($this->context)['gzip']['compression_level'] ?? 6; // Default fallback: 6 (common default)
 
       if($this->compressionMode === null) {
         throw new Exception('Compression mode undefined');
@@ -303,8 +312,17 @@ class GzipStreamWrapper implements StreamWrapperInterface
   protected function writeCompressedStream(): void {
     if($this->compressionMode === static::MODE_COMPRESS) {
       $uncompressedLength = fstat($this->ms)['size'];
-      // $compressed = gzencode($content = stream_get_contents($this->ms, $uncompressedLength, 0));
-      $compressed = zlib_encode(stream_get_contents($this->ms, $uncompressedLength, 0), ZLIB_ENCODING_GZIP, 9);
+
+      //
+      // These three are all valid and compatible choices for compression.
+      // gzcompress seems to be a liiiiittle bit faster than zlib_encode, but its hard to notice
+      // and detect, while not being good to be reproduced. Therefore: we stay with zlib_encode right now.
+      // TODO: select the best approach by benchmarking and/or automatic detection?
+      //
+      $compressed = zlib_encode(stream_get_contents($this->ms, $uncompressedLength, 0), ZLIB_ENCODING_GZIP, $this->compressionLevel);
+      // $compressed = gzcompress(stream_get_contents($this->ms, $uncompressedLength, 0), $this->compressionLevel, ZLIB_ENCODING_GZIP);
+      // $compressed = gzencode(stream_get_contents($this->ms, $uncompressedLength, 0), $this->compressionLevel, FORCE_GZIP);
+
       $compressedSize = strlen($compressed);
       fseek($this->parent, 0);
       fwrite($this->parent, $compressed);
