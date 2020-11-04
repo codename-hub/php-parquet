@@ -55,7 +55,7 @@ Tests fully pass on PHP 7.3 and 7.4. At the time of writing also 8.0.0 RC2 is pe
 This library highly depends on
 
 * __apache/thrift__ for working with the Thrift-related objects and data
-* __nelexa/buffer__ for reading and writing binary data (I decided not to do a C# BinaryWriter clone)
+* __nelexa/buffer__ for reading and writing binary data (I decided not to do a C# BinaryWriter clone. (UPDATE 2020-11-04: I just did my own clone, see below.)
 * __pear/Math_BigInteger__ for working with binary stored arbitrary-precision decimals (paradox, I know)
 
 As of v0.2, I've also switched to an implementation-agnostic approach of using readers and writers.
@@ -64,12 +64,12 @@ I've noticed __mdurrant/php-binary-reader__ is just way too slow. I just didn't 
 Instead, I've made those two interfaces mentioned above to abstract various packages delivering binary reading/writing.
 This finally leads to an optimal way of testing/benchmarking different implementations - and also mixing, e.g. using wapmorgan's package for reading while using Nelexa's for writing.
 
+As of v0.2.1 I've done the binary reader/writer implementations myself, as no implementation met the performance requirements. Especially for writing, this ultra-lightweight implementation delivers thrice the performance of Nelexa's buffer.
 
-At the time of writing, __nelexa/buffer__ seems to deliver the best performance for reading __and__ writing.
+Alternative 3rd party binary reading/writing packages in scope:
 
-Binary reading/writing packages in scope:
-
-* __mdurrant/php-binary-reader__
+* __nelexa/buffer__
+* __mdurrant/php-binary-reader__ (reading only)
 * __nelexa/buffer__
 * __wapmorgan/binary-stream__
 

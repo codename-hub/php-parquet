@@ -15,8 +15,9 @@ class CustomBinaryReader extends BinaryReader
       // This adapter relies on the concept of always working with a stream
       // Therefore, write into memory.
       //
-      $this->stream = fopen('php://memory', 'r+');
-      fwrite($this->stream, $stream);
+      // $this->stream = fopen('php://memory', 'r+');
+      // fwrite($this->stream, $stream);
+      $this->setInputString($stream);
     } else {
       $this->stream = $stream;
     }
@@ -189,7 +190,17 @@ class CustomBinaryReader extends BinaryReader
    */
   public function setInputHandle($inputHandle)
   {
-    throw new \LogicException('Not implemented');
+    $this->stream = $inputHandle;
+  }
+
+  /**
+   * [setInputString description]
+   * @param [type] $inputString [description]
+   */
+  public function setInputString($inputString) {
+    $this->stream = fopen('php://memory', 'r+');
+    fwrite($this->stream, $inputString);
+    fseek($this->stream, 0);
   }
 
   /**

@@ -94,9 +94,13 @@ interface BinaryReaderInterface
 
   /**
    * @param  resource $inputHandle
-   * @return $this
    */
   public function setInputHandle($inputHandle);
+
+  /**
+   * @param  string $inputString
+   */
+  public function setInputString($inputString);
 
   /**
    * @return resource
@@ -105,7 +109,6 @@ interface BinaryReaderInterface
 
   /**
    * @param  int   $position
-   * @return $this
    */
   public function setPosition(int $position);
 

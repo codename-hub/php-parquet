@@ -152,6 +152,14 @@ class PhpBinaryReader extends BinaryReader
   /**
    * @inheritDoc
    */
+  public function setInputString($inputString)
+  {
+    $this->binaryReader->setInputString($inputString);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getInputHandle()
   {
     return $this->binaryReader->getInputHandle();

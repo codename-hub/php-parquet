@@ -181,6 +181,14 @@ class NelexaBufferBinaryReader extends BinaryReader
   /**
    * @inheritDoc
    */
+  public function setInputString($inputString)
+  {
+    throw new \LogicException('Not implemented'); // TODO
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function getInputHandle()
   {
     return $this->stream;
