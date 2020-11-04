@@ -147,8 +147,7 @@ class DataColumnReader
 
     $bytes = $this->readPageDataByPageHeader($ph);
 
-    $ms = $bytes;
-    $reader = \jocoon\parquet\adapter\BinaryReader::createInstance($ms);
+    $reader = \jocoon\parquet\adapter\BinaryReader::createInstance($bytes);
 
     if($this->maxRepetitionLevel > 0) {
       //todo: use rented buffers, but be aware that rented length can be more than requested so underlying logic relying on array length must be fixed too.
@@ -437,6 +436,13 @@ class DataColumnReader
 
   }
 
+  /**
+   * [TryReadDictionaryPage description]
+   * @param  PageHeader   $ph               [description]
+   * @param  array|null   &$dictionary       [description]
+   * @param  int|null     &$dictionaryOffset [description]
+   * @return bool                         [description]
+   */
   private function TryReadDictionaryPage(PageHeader $ph, ?array &$dictionary, ?int &$dictionaryOffset) : bool
   {
     if ($ph->type != PageType::DICTIONARY_PAGE)
@@ -455,27 +461,27 @@ class DataColumnReader
       //todo: this is ugly, but will be removed once other parts are migrated to System.Memory
       // using (var ms = new MemoryStream(bytes.Memory.ToArray()))
       // {
-      $ms = $bytes;
+      // $ms = $bytes;
 
         // using (var dataReader = new BinaryReader(ms))
         // {
-        $dataReader = \jocoon\parquet\adapter\BinaryReader::createInstance($ms); // new \jocoon\parquet\adapter\PhpBinaryReader($ms);
+    $dataReader = \jocoon\parquet\adapter\BinaryReader::createInstance($bytes); // new \jocoon\parquet\adapter\PhpBinaryReader($ms);
 
 
         // dictionary = _dataTypeHandler.GetArray(ph.Dictionary_page_header.Num_values, false, false);
 
 
-        // NOTE: we have to pre-fill the dictionary at this point.
-        // Otherwise, some counts and iterators won't do their work correctly
-        // We might even HAVE to implement this f*cking getArray method.
-        $dictionary = array_fill(0, $ph->dictionary_page_header->num_values, null); // $this->dataTypeHandler->getArray($ph->dictionary_page_header->num_values, false, false)
+    // NOTE: we have to pre-fill the dictionary at this point.
+    // Otherwise, some counts and iterators won't do their work correctly
+    // We might even HAVE to implement this f*cking getArray method.
+    $dictionary = array_fill(0, $ph->dictionary_page_header->num_values, null); // $this->dataTypeHandler->getArray($ph->dictionary_page_header->num_values, false, false)
 
         // dictionaryOffset = _dataTypeHandler.Read(dataReader, _thriftSchemaElement, dictionary, 0);
         // $dictionaryOffset = $this->dataTypeHandler->read($dataReader, $this->thriftSchemaElement, $dictionary, 0);
 
         // $this->thriftSchemaElement->
 
-        $dictionaryOffset = $this->dataTypeHandler->read($dataReader, $this->thriftSchemaElement, $dictionary, 0);
+    $dictionaryOffset = $this->dataTypeHandler->read($dataReader, $this->thriftSchemaElement, $dictionary, 0);
 
         // for ($i=0; $i < $ph->dictionary_page_header->num_values; $i++) {
         //   // code...
@@ -484,19 +490,18 @@ class DataColumnReader
         //   // print_r($ex);
         // }
 
-        return true;
+    return true;
         // }
       // }
     // }
   }
 
+  /**
+   * Reads data according to page header
+   * @param  PageHeader $pageHeader [description]
+   * @return string                 [description]
+   */
   protected function readPageDataByPageHeader(PageHeader $pageHeader) {
-
-    // print_r([
-    //   'action' => 'readPageDataByPageHeader',
-    //   'pageHeader' => $pageHeader
-    // ]);
-
     return DataStreamFactory::ReadPageData(
       $this->inputStream,
       $this->thriftColumnChunk->meta_data->codec,
