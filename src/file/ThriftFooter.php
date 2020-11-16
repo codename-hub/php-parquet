@@ -215,10 +215,11 @@ class ThriftFooter {
 
     $i = 0;
     $path = $columnChunk->meta_data->path_in_schema;
+    $fieldCount = \count($this->fileMeta->schema);
 
     foreach ($path as $pp)
     {
-      while($i < count($this->fileMeta->schema))
+      while($i < $fieldCount)
       {
         if($this->fileMeta->schema[$i]->name == $pp)
         {
