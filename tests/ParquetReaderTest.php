@@ -195,6 +195,31 @@ final class ParquetReaderTest extends TestBase
     // Assert.Equal("0.867111980015206", seq.Max(p => p.v).ToString(CultureInfo.InvariantCulture));
   }
 
+  /**
+   * [testReadMultiPageDictionaryWithNulls description]
+   */
+  public function testReadMultiPageDictionaryWithNulls(): void
+  {
+    $reader = new ParquetReader($this->openTestFile('special/multi_page_dictionary_with_nulls.parquet'));
+
+    $columns = $reader->ReadEntireRowGroup();
+
+    $rg = $reader->OpenRowGroupReader(0); // not needed?
+
+    // reading columns
+    $data = $columns[0]->getData();
+
+    // ground truth from spark
+    // check page boundary (first page contains 107432 rows)
+    $this->assertEquals("xc3w4eudww", $data[107432]);
+    $this->assertEquals("bpywp4wtwk", $data[107433]);
+    $this->assertEquals("z6x8652rle", $data[107434]);
+
+    // check near the end of the file
+    $this->assertNull($data[310028]);
+    $this->assertEquals("wok86kie6c", $data[310029]);
+    $this->assertEquals("le9i7kbbib", $data[310030]);
+  }
 
   //
   // NOTE: The following test requires snappy compression
