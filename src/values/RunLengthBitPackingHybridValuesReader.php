@@ -6,6 +6,20 @@ use jocoon\parquet\adapter\BinaryReader;
 class RunLengthBitPackingHybridValuesReader
 {
   /**
+   * [Read description]
+   * @param  BinaryReader $reader       [description]
+   * @param  int          $bitWidth     [description]
+   * @param  array        &$dest         [description]
+   * @param  int          $destOffset   [description]
+   * @param  int          $maxReadCount [description]
+   * @return int                        [description]
+   */
+  public static function Read(BinaryReader $reader, int $bitWidth, array &$dest, int $destOffset, int $maxReadCount): int {
+    $length = static::GetRemainingLength($reader);
+    return static::ReadRleBitpackedHybrid($reader, $bitWidth, $length, $dest, $destOffset, $maxReadCount);
+  }
+
+  /**
    * [ReadRleBitpackedHybrid description]
    * @param  BinaryReader $reader   [description]
    * @param  int          $bitWidth [description]
@@ -232,6 +246,16 @@ class RunLengthBitPackingHybridValuesReader
      }
 
      return $result;
+  }
+
+  /**
+   * [GetRemainingLength description]
+   * @param  BinaryReader $reader [description]
+   * @return int                  [description]
+   */
+  private static function GetRemainingLength(BinaryReader $reader): int
+  {
+    return $reader->getEofPosition() - $reader->getPosition();
   }
 
 }

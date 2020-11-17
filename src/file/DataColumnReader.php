@@ -237,13 +237,14 @@ class DataColumnReader
            break;
 
         case Encoding::RLE:
-
-          die("RLE");
-           // if (cd.indexes == null) cd.indexes = new int[(int)totalValues];
-           // int indexCount = RunLengthBitPackingHybridValuesReader.Read(reader, _thriftSchemaElement.Type_length, cd.indexes, 0, maxReadCount);
-           // _dataTypeHandler.MergeDictionary(cd.dictionary, cd.indexes, cd.values, cd.valuesOffset, indexCount);
-           // cd.valuesOffset += indexCount;
-           break;
+          if ($cd->indexes === null) {
+            // QUESTION: should we pre-fill the array?
+            $cd->indexes = array_fill(0, $totalValues, 0);
+          }
+          $indexCount = RunLengthBitPackingHybridValuesReader::Read($reader, $this->thriftSchemaElement->type_length, $cd->indexes, 0, $maxReadCount);
+          $this->dataTypeHandler->mergeDictionary($cd->dictionary, $cd->indexes, $cd->values, $cd->valuesOffset, $indexCount);
+          $cd->valuesOffset += $indexCount;
+          break;
 
         case Encoding::PLAIN_DICTIONARY:
           if($cd->indexes === null) {
