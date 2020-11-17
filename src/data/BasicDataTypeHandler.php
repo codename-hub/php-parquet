@@ -291,15 +291,6 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    */
   public function Write(SchemaElement $tse, BinaryWriter $writer, array $values, Statistics $statistics): void
   {
-    // casing to an array of TSystemType means we avoid Array.GetValue calls, which are slow
-    // var typedArray = (TSystemType[]) values;
-
-    // foreach(TSystemType one in typedArray)
-    // {
-    //   WriteOne(writer, one);
-    // }
-    // echo("BDTH WRITE ".static::class.chr(10));
-    // print_r($values);
     foreach($values as $one) {
       $this->WriteOne($writer, $one);
     }

@@ -1,7 +1,6 @@
 <?php
 namespace jocoon\parquet\data\concrete;
 
-use DateTime;
 use DateTimeImmutable;
 
 use jocoon\parquet\adapter\BinaryReader;
@@ -200,23 +199,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
     while($reader->getPosition() + 8 <= $reader->getEofPosition()) {
       $bytes = $reader->readBytes(12);
-
       $dto = NanoTime::DateTimeImmutableFromNanoTimeBytes($bytes, 0);
-
-      // $nanoTime = new NanoTime($bytes, 0);
-      // $dto = NanoTime::getDateTimeObject($nanoTime);
-
-      // $gmpObj = gmp_import($bytes);
-      // $q = gmp_div_q($gmpObj, 1000);
-      // $v = (int)gmp_strval($q);
-      // var_dump($gmpObj);
-      // die();
-      // return gmp_strval($gmpObj);
-      // $lv = $reader->readBytes(12);
-      // var_dump([$gmpObj, $q, $v]);
-      // die();
-      // $dto = OtherExtensions::FromUnixMicroseconds($v);
-
       $dest[$idx++] = $dto;
     }
 
@@ -248,30 +231,12 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
       case Type::INT32:
         $iv = $reader->readInt32();
         return OtherExtensions::FromUnixDays($iv);
-        // DateTimeImmutable::createFromFormat()
-        // return $iv.FromUnixDays();
       case Type::INT64:
         $lv = $reader->readInt64();
         return OtherExtensions::FromUnixMilliseconds($lv);
-        // return $iv.FromUnixMilliseconds();
       case Type::INT96:
         $bytes = $reader->readBytes(12);
-
-        // echo("DateTimeOffsetDataTypeHandler::readSingle -> DateTimeImmutableFromNanoTimeBytes");
         return NanoTime::DateTimeImmutableFromNanoTimeBytes($bytes, 0);
-
-        // $gmpObj = gmp_import($bytes);
-        // $q = gmp_div_q($gmpObj, 1000);
-        // $v = (int)gmp_strval($q);
-        // return OtherExtensions::FromUnixMilliseconds($v);
-
-
-        // var_dump($gmpObj);
-        // die();
-
-        // NOTE: we might use parts of this solution: https://stackoverflow.com/a/58639983/4610086
-        // throw new \Exception('DateTimeOffset by INT96 - IMPLEMENT ME');
-        // return new NanoTime($reader->readBytes(12));
       default:
         throw new \LogicException('Not supported type');
     }

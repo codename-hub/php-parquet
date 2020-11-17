@@ -32,12 +32,6 @@ class FloatDataTypeHandler extends BasicPrimitiveDataTypeHandler
     // decimal places after the 7th (the 'real' float, if you know what I mean. Pun intended)
     //
     return round($reader->readSingle(), 7);
-
-    // return $reader->readSingle();
-    // $v = (float)$reader->readSingle();
-    // echo("float - ReadSingle: ");
-    // var_dump([$v, floatval($v)]);
-    // return $v;
   }
 
   /**

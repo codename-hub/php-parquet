@@ -253,11 +253,7 @@ class DataColumnReader
           $this->dataTypeHandler->mergeDictionary($cd->dictionary, $cd->indexes, $cd->values, $cd->valuesOffset, $indexCount);
 
           $cd->valuesOffset += $indexCount;
-           // if (cd.indexes == null) cd.indexes = new int[(int)totalValues];
-           // indexCount = ReadPlainDictionary(reader, maxReadCount, cd.indexes, 0);
-           // _dataTypeHandler.MergeDictionary(cd.dictionary, cd.indexes, cd.values, cd.valuesOffset, indexCount);
-           // cd.valuesOffset += indexCount;
-           break;
+          break;
 
         default:
            throw new \Exception("encoding {$encoding} is not supported.");
