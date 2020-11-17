@@ -205,6 +205,23 @@ $groupWriter->finish();   // finish inner writer(s)
 $parquetWriter->finish(); // finish the parquet writer last
 ```
 
+## Performance
+This package also provides the same benchmark as parquet-dotnet. These are the results on __my machine__:
+
+|                    |Parquet.Net (.NET Core 2.1)|php-parquet (bare metal 7.3)|php-parquet (dockerized* 7.3)|Fastparquet (python)|parquet-mr (Java)|
+|--------------------|---------------------------|----------------------------|-----------------------------|--------------------|-----------------|
+|Read                |                      255ms|                     1'090ms|                      1'244ms|             154ms**|       _untested_
+|Write (uncompressed)|                      209ms|                     1'272ms|                      1'392ms|             237ms**|       _untested_
+|Write (gzip)        |                    1'945ms|                     3'314ms|                      3'695ms|           1'737ms**|       _untested_
+
+<small>
+* Dockerized on a Windows 10 machine with bind-mounts, which slow down most of those high-IOPS processes.<br>
+** It seems fastparquet or Python does some internal caching - the original results on first file opening are way worse (~ 2'700ms)
+
+In general, these tests were performed with gzip compression level 6 for php-parquet. It will roughly halve with 1 (minimum compression) and almost double at 9 (maximum compression).
+Note, the latter might not yield the smallest file size, but always the longest compression time.
+</small>
+
 ## Coding Style
 As this is a partial port of a package from a completely different programming language, the programming style is pretty much a pure mess.
 I decided to keep most of the casing (e.g. $writer->CreateRowGroup() instead of ->createRowGroup()) to keep a certain 'visual compatibility' to parquet-dotnet.
