@@ -42,6 +42,11 @@ final class EndToEndTypeTest extends TestBase
         'field'         => DataField::createFromType("float", 'float'),
         'expectedValue' => (float)1.23
       ],
+      "float fluctuation" => [
+        'field'         => DataField::createFromType("float", 'float'),
+        'expectedValue' => (float)2.1,
+        'delta'         => 0.000001 // Floating-point fluctuation delta
+      ],
       "double" => [
         'field'         => DataField::createFromType("double", 'double'),
         'expectedValue' => (double)10.44
@@ -206,6 +211,11 @@ final class EndToEndTypeTest extends TestBase
     $expectedValueFormatted = print_r($input['expectedValue'], true);
     $actualFormatted = print_r($actual, true);
     $fieldFormatted = print_r($input['field'], true);
-    $this->assertTrue($equal, "{$name} | expected: [ {$expectedValueFormatted} ], actual: [ {$actualFormatted} ], schema element: {$fieldFormatted}");
+
+    if($input['delta'] ?? false) {
+      $this->assertEqualsWithDelta($input['expectedValue'], $actual, $input['delta'], "{$name} | expected: [ {$expectedValueFormatted} ], actual: [ {$actualFormatted} ], schema element: {$fieldFormatted}");
+    } else {
+      $this->assertTrue($equal, "{$name} | expected: [ {$expectedValueFormatted} ], actual: [ {$actualFormatted} ], schema element: {$fieldFormatted}");
+    }
   }
 }
