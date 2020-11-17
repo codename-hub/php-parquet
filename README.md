@@ -64,13 +64,13 @@ I've noticed __mdurrant/php-binary-reader__ is just way too slow. I just didn't 
 Instead, I've made those two interfaces mentioned above to abstract various packages delivering binary reading/writing.
 This finally leads to an optimal way of testing/benchmarking different implementations - and also mixing, e.g. using wapmorgan's package for reading while using Nelexa's for writing.
 
-As of v0.2.1 I've done the binary reader/writer implementations myself, as no implementation met the performance requirements. Especially for writing, this ultra-lightweight implementation delivers thrice the performance of Nelexa's buffer.
+As of v0.2.1 I've done the binary reader/writer implementations myself, as no implementation met the performance requirements. Especially for writing, this ultra-lightweight implementation delivers thrice* the performance of Nelexa's buffer.
+<br><sub><sup><sub><sup>\* intended, I love this word</sup></sub></sup></sub>
 
 Alternative 3rd party binary reading/writing packages in scope:
 
 * __nelexa/buffer__
 * __mdurrant/php-binary-reader__ (reading only)
-* __nelexa/buffer__
 * __wapmorgan/binary-stream__
 
 
@@ -208,10 +208,10 @@ $parquetWriter->finish(); // finish the parquet writer last
 ## Coding Style
 As this is a partial port of a package from a completely different programming language, the programming style is pretty much a pure mess.
 I decided to keep most of the casing (e.g. $writer->CreateRowGroup() instead of ->createRowGroup()) to keep a certain 'visual compatibility' to parquet-dotnet.
-At least, this is a desirable state from my perspective, as it makes comparing and extending much easier.
+At least, this is a desirable state from my perspective, as it makes comparing and extending much easier during initial development stages.
 
 ## Acknowledgements
-Code parts and concepts have been ported from C#/.NET, see:
+Some code parts and concepts have been ported from C#/.NET, see:
 
 * https://github.com/elastacloud/parquet-dotnet
 * https://github.com/aloneguid/parquet-dotnet
