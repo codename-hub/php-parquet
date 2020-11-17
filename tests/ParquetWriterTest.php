@@ -77,6 +77,9 @@ final class ParquetWriterTest extends TestBase
     $dc = $rg->ReadColumn($id);
     $this->assertEquals([3], $dc->getData());
 
+    // Assert we have the correct num_rows value
+    $this->assertEquals(3, $reader->getThriftMetadata()->num_rows);
+
     fclose($ms);
   }
 
