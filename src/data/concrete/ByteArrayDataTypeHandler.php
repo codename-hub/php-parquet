@@ -126,4 +126,30 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
     $writer->writeInt32(strlen($value));
     $writer->writeString($value); // or UTF8?
   }
+
+  /**
+   * @inheritDoc
+   */
+  public function compare($x, $y): int
+  {
+    return 0;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  {
+    return $x;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function plainDecode(
+    \jocoon\parquet\format\SchemaElement $tse,
+    $encoded
+  ) {
+    return $encoded;
+  }
 }

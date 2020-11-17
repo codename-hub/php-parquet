@@ -66,6 +66,12 @@ class DataColumnWriter
    */
   protected $rowCount;
 
+  /**
+   * [public description]
+   * @var bool
+   */
+  public $calculateStatistics = false;
+
 
   /**
    * [__construct description]
@@ -102,7 +108,7 @@ class DataColumnWriter
   public function Write(array $path, DataColumn $column, DataTypeHandlerInterface $dataTypeHandler): ColumnChunk
   {
     $chunk = $this->footer->CreateColumnChunk($this->compressionMethod, $this->stream, $this->schemaElement->type, $path, 0);
-    $ph = $this->footer->createDataPage(count($column->getData()));
+    $ph = $this->footer->CreateDataPage(count($column->getData()));
 
     $maxRepetitionLevel = 0;
     $maxDefinitionLevel = 0;
@@ -110,12 +116,15 @@ class DataColumnWriter
     // _footer.GetLevels(chunk, out int maxRepetitionLevel, out int maxDefinitionLevel);
     $this->footer->GetLevels($chunk, $maxRepetitionLevel, $maxDefinitionLevel);
 
-    $pages = $this->WriteColumn($column, $this->schemaElement, $dataTypeHandler, $maxRepetitionLevel, $maxDefinitionLevel, $chunk->meta_data->statistics);
+    $pages = $this->WriteColumn($column, $this->schemaElement, $dataTypeHandler, $maxRepetitionLevel, $maxDefinitionLevel);
+    // generate stats for column chunk
+    $chunk->meta_data->statistics = $column->statistics->ToThriftStatistics($dataTypeHandler, $this->schemaElement);
 
     //this count must be set to number of all values in the column, including nulls.
     //for hierarchy/repeated columns this is a count of flattened list, including nulls.
     // chunk.Meta_data.Num_values = ph.Data_page_header.Num_values;
     $chunk->meta_data->num_values = $ph->data_page_header->num_values;
+    $ph->data_page_header->statistics = $chunk->meta_data->statistics; // simply copy statistics to page header
 
     //the following counters must include both data size and header size
     // chunk.Meta_data.Total_compressed_size = pages.Sum(p => p.HeaderMeta.Compressed_page_size + p.HeaderSize);
@@ -148,8 +157,7 @@ class DataColumnWriter
     SchemaElement $tse,
     DataTypeHandlerInterface $dataTypeHandler,
     int $maxRepetitionLevel,
-    int $maxDefinitionLevel,
-    Statistics $statistics): array
+    int $maxDefinitionLevel): array
   {
     $pages = [];
 
@@ -198,7 +206,7 @@ class DataColumnWriter
       $data = $column->PackDefinitions($maxDefinitionLevel, $definitionLevels, $definitionLevelsLength, $nullCount);
 
       //last chance to capture null count as null data is compressed now
-      $statistics->null_count = $nullCount;
+      $column->statistics->nullCount = $nullCount;
 
       try
       {
@@ -232,10 +240,15 @@ class DataColumnWriter
     else
     {
       //no defitions means no nulls
-      $statistics->null_count = 0;
+      $column->statistics->nullCount = 0;
     }
 
-    $dataTypeHandler->Write($tse, $writer, $data, $statistics);
+    // TODO: enable or disable statistics generation
+    if($this->calculateStatistics) {
+      $dataTypeHandler->Write($tse, $writer, $data, $column->statistics);
+    } else {
+      $dataTypeHandler->Write($tse, $writer, $data);
+    }
 
     // $writer->close();
     // $writer->(); // Flush();
@@ -257,6 +270,7 @@ class DataColumnWriter
     $dataPageHeader->compressed_page_size = (int)ftell($ms);
 
     //write the header in
+    $dataPageHeader->data_page_header->statistics = $column->statistics->ToThriftStatistics($dataTypeHandler, $this->schemaElement);
     $headerSize = $this->thriftStream->Write(PageHeader::class, $dataPageHeader);
 
     // echo("DataPageHeader Written");
@@ -270,11 +284,11 @@ class DataColumnWriter
     $copiedBytes = stream_copy_to_stream($ms, $this->stream);
     // echo("Copied bytes=".$copiedBytes.chr(10));
 
-    $stats = new Statistics(['distinct_count' => $statistics->distinct_count]);
+    // $stats = new Statistics(['distinct_count' => $statistics->distinct_count]);
     // {
     //    Distinct_count = statistics.Distinct_count
     // };
-    $dataPageHeader->data_page_header->statistics = $stats;
+    // $dataPageHeader->data_page_header->statistics = $stats;
 
     // var dataTag = new PageTag
     // {

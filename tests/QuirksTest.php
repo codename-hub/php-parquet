@@ -9,11 +9,16 @@ final class QuirksTest extends TestBase
    * behaves similar to C#'s string.CompareOrdinal()
    */
   public function testStringCompareOrdinal(): void {
+
+    $o = 'one';
     $a = 'two';
     $b = 'three';
     $c = 'zz';
     $d = 'zzzz';
     $e = 'zzzzz';
+
+    $this->assertLessThan(0, strcmp($o, $a));
+    $this->assertLessThan(0, strcmp($o, $b));
 
     $this->assertGreaterThan(0, strcmp($a, $b));
     $this->assertLessThan(0, strcmp($b, $a));
@@ -23,5 +28,10 @@ final class QuirksTest extends TestBase
     $this->assertLessThan(0, strcmp($a, $d));
     $this->assertLessThan(0, strcmp($b, $d));
     $this->assertLessThan(0, strcmp($b, $e));
+
+    $x = 'one';
+    $z = 'three';
+
+    $this->assertLessThan(0, strcmp($x, $z));
   }
 }

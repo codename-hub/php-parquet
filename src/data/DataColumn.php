@@ -31,6 +31,12 @@ class DataColumn
   protected $dataTypeHandler;
 
   /**
+   * [public description]
+   * @var DataColumnStatistics
+   */
+  public $statistics;
+
+  /**
    * [__construct description]
    * @param DataField       $field            [description]
    * @param array           $data             [description]
@@ -42,6 +48,8 @@ class DataColumn
 
     $this->data = $data;
     $this->repetitionLevels = $repetitionLevels;
+
+    $this->statistics = new DataColumnStatistics();
   }
 
   /**

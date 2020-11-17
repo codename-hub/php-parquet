@@ -11,13 +11,14 @@ class ParquetExtensions
 {
   /**
    * Writes a file with a single row group
-   * @param [type]       $stream  [description]
-   * @param Schema       $schema  [description]
-   * @param DataColumn[] $columns [description]
+   * @param [type]              $stream  [description]
+   * @param Schema              $schema  [description]
+   * @param DataColumn[]        $columns [description]
+   * @param ParquetOptions|null $options
    */
-  public static function WriteSingleRowGroupParquetFile($stream, Schema $schema, array $columns): void
+  public static function WriteSingleRowGroupParquetFile($stream, Schema $schema, array $columns, ?ParquetOptions $options = null): void
   {
-    $writer = new ParquetWriter($schema, $stream);
+    $writer = new ParquetWriter($schema, $stream, $options);
     $writer->compressionMethod = CompressionMethod::None;
 
     $rgw = $writer->CreateRowGroup();

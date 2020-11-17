@@ -72,7 +72,7 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     \jocoon\parquet\adapter\BinaryWriter $writer,
     array $values,
-    \jocoon\parquet\format\Statistics $statistics
+    \jocoon\parquet\data\DataColumnStatistics $statistics = null
   ): void {
     $n = 0;
     $b = 0; // byte
@@ -98,5 +98,23 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
     if ($n !== 0) $buffer[$ib] = $b;
 
     $writer->writeBytes($buffer);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  {
+    return null;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function plainDecode(
+    \jocoon\parquet\format\SchemaElement $tse,
+    $encoded
+  ) {
+    return null;
   }
 }

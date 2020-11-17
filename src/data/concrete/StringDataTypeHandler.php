@@ -1,6 +1,9 @@
 <?php
 namespace jocoon\parquet\data\concrete;
 
+use jocoon\parquet\adapter\BinaryReader;
+use jocoon\parquet\adapter\BinaryWriter;
+
 use jocoon\parquet\data\DataType;
 use jocoon\parquet\data\BasicDataTypeHandler;
 
@@ -40,7 +43,30 @@ class StringDataTypeHandler extends BasicDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
-    if ($length === -1) $length = $reader->readInt32();
+    $this->readSingleInternal($reader, $tse, $length, true);
+  }
+
+  /**
+   * [readSingleInternal description]
+   * @param  \jocoon\parquet\adapter\BinaryReader $reader          [description]
+   * @param  \jocoon\parquet\format\SchemaElement $tse             [description]
+   * @param  int                                  $length          [description]
+   * @param  bool                                 $hasLengthPrefix [description]
+   * @return [type]                                            [description]
+   */
+  protected function readSingleInternal(
+    \jocoon\parquet\adapter\BinaryReader $reader,
+    \jocoon\parquet\format\SchemaElement $tse,
+    int $length,
+    bool $hasLengthPrefix
+  ) {
+    if ($length === -1) {
+      if($hasLengthPrefix) {
+        $length = $reader->readInt32();
+      } else {
+        $length = $reader->getEofPosition();
+      }
+    }
 
     // NOTE: possible UTF8 handling needed.
     return $reader->readString($length);
@@ -96,24 +122,79 @@ class StringDataTypeHandler extends BasicDataTypeHandler
   }
 
   /**
-   * @inheritDoc
+  * @inheritDoc
    */
   protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
+  {
+    $this->writeOneInternal($writer, $value, true);
+  }
+
+  /**
+   * Internal write function to allow writing without length prefix
+   */
+  /**
+   * [WriteOneInternal description]
+   * @param \jocoon\parquet\adapter\BinaryWriter $writer [description]
+   * @param string                               $value  [description]
+   * @param bool                                 $includeLengthPrefix
+   */
+  protected function WriteOneInternal(\jocoon\parquet\adapter\BinaryWriter $writer, $value, bool $includeLengthPrefix): void
   {
     $valueLength = null;
     if ($value === null || ($valueLength = \strlen($value)) === 0)
     {
-      $writer->writeInt32(0);
+      if($includeLengthPrefix) {
+        $writer->writeInt32(0);
+      }
     }
     else
     {
       // transform to byte array first, as we need the length of the byte buffer, not string length
       // byte[] data = E.GetBytes(value);
       // NOTE: for php, we already have binary-safe functions, so we simply write a string.
-      $valueLength = $valueLength ?? \strlen($value);
-      $writer->writeInt32($valueLength);
+      if($includeLengthPrefix) {
+        $valueLength = $valueLength ?? \strlen($value);
+        $writer->writeInt32($valueLength);
+      }
       $writer->writeString($value);
     }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function compare($x, $y): int
+  {
+    return strcmp($x, $y);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  {
+    if($x === null) return null;
+
+    $ms = fopen('php://memory', 'r+');
+    $bs = BinaryWriter::createInstance($ms);
+    $this->WriteOneInternal($bs, $x, false);
+    return $bs->toString();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function plainDecode(
+    \jocoon\parquet\format\SchemaElement $tse,
+    $encoded
+  ) {
+    if ($encoded === null) return null;
+
+    $ms = fopen('php://memory', 'r+');
+    fwrite($ms, $encoded);
+    $br = BinaryReader::createInstance($ms);
+    $element = $this->readSingleInternal($br, $tse, -1, false);
+    return $element;
   }
 
 }

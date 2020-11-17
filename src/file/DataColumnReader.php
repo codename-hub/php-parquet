@@ -9,6 +9,7 @@ use jocoon\parquet\data\DataType;
 use jocoon\parquet\data\DataField;
 use jocoon\parquet\data\DataColumn;
 use jocoon\parquet\data\DataTypeFactory;
+use jocoon\parquet\data\DataColumnStatistics;
 use jocoon\parquet\data\DataTypeHandlerInterface;
 
 use jocoon\parquet\format\Encoding;
@@ -422,13 +423,27 @@ class DataColumnReader
     //   colData.dictionary,
     //   colData.indexes);
 
-    return DataColumn::DataColumnExtended(
+    $finalColumn = DataColumn::DataColumnExtended(
       $this->dataField, $colData->values,
       $colData->definitions, $this->maxDefinitionLevel,
       $colData->repetitions, $this->maxRepetitionLevel,
       $colData->dictionary,
       $colData->indexes
     );
+
+    // DEBUG
+    // print_r($this->thriftColumnChunk->meta_data);
+
+    if($this->thriftColumnChunk->meta_data->statistics) {
+      $finalColumn->statistics = new DataColumnStatistics(
+        $this->thriftColumnChunk->meta_data->statistics->null_count,
+        $this->thriftColumnChunk->meta_data->statistics->distinct_count,
+        $this->dataTypeHandler->plainDecode($this->thriftSchemaElement, $this->thriftColumnChunk->meta_data->statistics->min_value),
+        $this->dataTypeHandler->plainDecode($this->thriftSchemaElement, $this->thriftColumnChunk->meta_data->statistics->max_value)
+      );
+    }
+
+    return $finalColumn;
 
   }
 

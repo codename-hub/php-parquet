@@ -301,7 +301,7 @@ class DecimalDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     \jocoon\parquet\adapter\BinaryWriter $writer,
     array $values,
-    \jocoon\parquet\format\Statistics $statistics
+    \jocoon\parquet\data\DataColumnStatistics $statistics = null
   ): void {
     switch($tse->type)
     {

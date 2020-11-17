@@ -1,6 +1,9 @@
 <?php
 namespace jocoon\parquet\data;
 
+use jocoon\parquet\adapter\BinaryReader;
+use jocoon\parquet\adapter\BinaryWriter;
+
 abstract class BasicPrimitiveDataTypeHandler extends BasicDataTypeHandler
 {
   /**
@@ -100,5 +103,42 @@ abstract class BasicPrimitiveDataTypeHandler extends BasicDataTypeHandler
   //   return result;
   // }
 
+  /**
+   * @inheritDoc
+   */
+  public function compare($x, $y): int
+  {
+    return $x <=> $y;
+  }
 
+  /**
+   * @inheritDoc
+   */
+  public function plainEncode(
+    \jocoon\parquet\format\SchemaElement $tse,
+    $x
+  ) {
+    if($x === null) return null;
+
+    $ms = fopen('php://memory', 'r+');
+    $bs = BinaryWriter::createInstance($ms);
+    $this->WriteOne($bs, $x);
+    return $bs->toString();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function plainDecode(
+    \jocoon\parquet\format\SchemaElement $tse,
+    $encoded
+  ) {
+    if ($encoded === null) return null;
+
+    $ms = fopen('php://memory', 'r+');
+    fwrite($ms, $encoded);
+    $br = BinaryReader::createInstance($ms);
+    $element = $this->readSingle($br, $tse, -1);
+    return $element;
+  }
 }

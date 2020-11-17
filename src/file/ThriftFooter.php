@@ -341,6 +341,7 @@ class ThriftFooter {
       'definition_level_encoding' => Encoding::RLE,
       'repetition_level_encoding' => Encoding::RLE,
       'num_values' => $valueCount,
+      'statistics' => new Statistics(),
     ]);
 
     return $ph;

@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 use jocoon\parquet\ParquetReader;
 use jocoon\parquet\ParquetWriter;
+use jocoon\parquet\ParquetOptions;
 use jocoon\parquet\CompressionMethod;
 use jocoon\parquet\ParquetExtensions;
 
@@ -25,16 +26,17 @@ class TestBase extends TestCase {
 
   /**
    *
-   * @param DataField  $field      [description]
-   * @param DataColumn $dataColumn [description]
+   * @param DataField           $field      [description]
+   * @param DataColumn          $dataColumn [description]
+   * @param ParquetOptions|null $options
    * @return DataColumn|null
    */
-  protected function WriteReadSingleColumn(DataField $field, DataColumn $dataColumn): ?DataColumn
+  protected function WriteReadSingleColumn(DataField $field, DataColumn $dataColumn, ?ParquetOptions $options = null): ?DataColumn
   {
     $ms = fopen('php://memory', 'r+');
 
       // write with built-in extension method
-    ParquetExtensions::WriteSingleRowGroupParquetFile($ms, new Schema([$field]), [$dataColumn]);
+    ParquetExtensions::WriteSingleRowGroupParquetFile($ms, new Schema([$field]), [$dataColumn], $options);
     fseek($ms, 0);
 
     // read first gow group and first column

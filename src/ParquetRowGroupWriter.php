@@ -152,6 +152,9 @@ class ParquetRowGroupWriter
 
     $writer = new DataColumnWriter($this->stream, $this->thriftStream, $this->footer, $tse, $this->compressionMethod, $this->rowCount); // TODO: check row count default value?
 
+    // Set configuration to enable/disable statistics generation
+    $writer->calculateStatistics = $this->formatOptions->CalculateStatistics;
+
     // Thrift.ColumnChunk chunk = writer.Write(path, column, dataTypeHandler);
     $chunk = $writer->write($path, $column, $dataTypeHandler);
     $this->thriftRowGroup->columns[] = $chunk;

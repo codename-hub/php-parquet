@@ -287,14 +287,63 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    * @param SchemaElement $tse        [description]
    * @param BinaryWriter        $writer     [description]
    * @param array         $values     [description]
-   * @param Statistics    $statistics [description]
+   * @param DataColumnStatistics    $statistics [description]
    */
-  public function Write(SchemaElement $tse, BinaryWriter $writer, array $values, Statistics $statistics): void
+  public function Write(SchemaElement $tse, BinaryWriter $writer, array $values, DataColumnStatistics $statistics = null): void
   {
     foreach($values as $one) {
       $this->WriteOne($writer, $one);
     }
+
+    // calculate statistics if required
+    if ($statistics !== null)
+    {
+      $this->calculateStatistics($values, $statistics);
+    }
   }
+
+  /**
+   * [calculateStatistics description]
+   * @param array                $values     [description]
+   * @param DataColumnStatistics $statistics [description]
+   */
+  protected function calculateStatistics(array $values, DataColumnStatistics $statistics): void {
+
+    // number of distinct values
+    $statistics->distinctCount = count(array_unique($values, SORT_REGULAR)); // ((TSystemType[])values).Distinct(this).Count();
+
+    $min = null; // default value for type?
+    $max = null; // default value for type?
+
+    foreach($values as $i => $current) {
+
+      if($i === 0) {
+        $min = $current;
+        $max = $current;
+      } else {
+        $cmin = $this->compare($min, $current);
+        $cmax = $this->compare($max, $current);
+
+        if($cmin > 0) {
+          $min = $current;
+        }
+        if($cmax < 0) {
+          $max = $current;
+        }
+      }
+    }
+
+    $statistics->minValue = $min;
+    $statistics->maxValue = $max;
+  }
+
+  /**
+   * [Compare description]
+   * @param  [type] $x [description]
+   * @param  [type] $y [description]
+   * @return int       [description]
+   */
+  public abstract function compare($x, $y): int;
 
   /**
    * [WriteOne description]

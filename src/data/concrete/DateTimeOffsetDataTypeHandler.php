@@ -4,6 +4,7 @@ namespace jocoon\parquet\data\concrete;
 use DateTimeImmutable;
 
 use jocoon\parquet\adapter\BinaryReader;
+use jocoon\parquet\adapter\BinaryWriter;
 
 use jocoon\parquet\data\DataType;
 use jocoon\parquet\data\DateTimeFormat;
@@ -106,8 +107,9 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     \jocoon\parquet\adapter\BinaryWriter $writer,
     array $values,
-    \jocoon\parquet\format\Statistics $statistics
+    \jocoon\parquet\data\DataColumnStatistics $statistics = null
   ): void {
+
     switch($tse->type) {
       case Type::INT32:
         $this->WriteAsInt32($writer, $values);
@@ -120,6 +122,12 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
         break;
       default:
        throw new \Exception("data type '{$tse->type}' does not represent any date types");
+    }
+
+    // calculate statistics if required
+    if ($statistics !== null)
+    {
+      $this->calculateStatistics($values, $statistics);
     }
   }
 
@@ -240,5 +248,32 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
       default:
         throw new \LogicException('Not supported type');
     }
+  }
+
+  /**
+  * @inheritDoc
+  */
+  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  {
+    if($x === null) return null;
+
+    $ms = fopen('php://memory', 'r+');
+    $writer = BinaryWriter::createInstance($ms);
+    $this->write($tse, $writer, [$x]);
+    return $writer->toString();
+  }
+
+  /**
+  * @inheritDoc
+  */
+  public function plainDecode(
+    \jocoon\parquet\format\SchemaElement $tse,
+    $encoded
+  ) {
+    if ($encoded === null) return null;
+    $ms = fopen('php://memory', 'r+');
+    fwrite($ms, $encoded);
+    $reader = BinaryReader::createInstance($ms);
+    return $this->readSingle($reader, $tse, -1);
   }
 }

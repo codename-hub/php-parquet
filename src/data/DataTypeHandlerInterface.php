@@ -4,6 +4,7 @@ namespace jocoon\parquet\data;
 use jocoon\parquet\ParquetOptions;
 
 use jocoon\parquet\adapter\BinaryReader;
+use jocoon\parquet\adapter\BinaryWriter;
 
 use jocoon\parquet\format\SchemaElement;
 
@@ -69,11 +70,24 @@ interface DataTypeHandlerInterface
   function packDefinitions(array $data, int $maxDefinitionLevel, array &$definitions, int &$definitionsLength, int &$nullCount) : array;
 
   /**
+   * [write description]
+   * @param SchemaElement        $tse        [description]
+   * @param BinaryWriter         $writer     [description]
+   * @param array                $values     [description]
+   * @param DataColumnStatistics $statistics [description]
+   */
+  function write(SchemaElement $tse, BinaryWriter $writer, array $values, DataColumnStatistics $statistics = null): void;
+
+  /**
    * [createThrift description]
    * @param Field             $field     [description]
    * @param SchemaElement     $parent    [description]
    * @param SchemaElement[]   &$container [description]
    */
   function createThrift(Field $field, SchemaElement $parent, array &$container): void;
+
+  function plainEncode(SchemaElement $tse, $x);
+
+  function plainDecode(SchemaElement $tse, $encoded);
 
 }
