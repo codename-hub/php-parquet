@@ -142,6 +142,14 @@ class DataField extends Field
         // DateTimeOffset should not be nullable by default
         if($dataType === DataType::DateTimeOffset) {
           $hasNulls = false;
+
+          // NOTE/TODO default fallback for DateTimeDataField ?
+          return \jocoon\parquet\data\DateTimeDataField::create(
+            $name,
+            \jocoon\parquet\data\DateTimeFormat::Impala,
+            $hasNulls,
+            $isArray ?? false
+          );
         }
       }
 
