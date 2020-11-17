@@ -93,6 +93,12 @@ final class EndToEndTypeTest extends TestBase
         'field'         => DateTimeDataField::create("dateImpala", DateTimeFormat::Impala),
         'expectedValue' => (new \DateTimeImmutable('now')),
       ],
+      "impala date explicit" => [
+        // We're including this test, though it looks random.
+        // This caused a major discrepancy, due to the non-strict nature of PHP, in conjunction with NanoTime
+        'field'         => DataField::createFromType("dateImpalaExplicit", \DateTimeImmutable::class),
+        'expectedValue' => new \DateTimeImmutable('2019-12-15 05:00:00'),
+      ],
       "dateDateAndTime" => [
         'field'         => DateTimeDataField::create("dateDateAndTime", DateTimeFormat::DateAndTime),
         'expectedValue' => (new \DateTimeImmutable('now'))->setTimestamp(time()), // Modifying the DT via timestamp to get rid of the microseconds

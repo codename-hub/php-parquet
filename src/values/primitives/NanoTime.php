@@ -32,23 +32,24 @@ class NanoTime
     }
   }
 
+  /**
+   * Creates a NanoTime object from a DateTimeImmutable
+   * @param  DateTimeImmutable $dt [description]
+   * @return NanoTime              [description]
+   */
   public static function NanoTimeFromDateTimeImmutable(DateTimeImmutable $dt) : NanoTime {
-    $m = $dt->format('m'); // .Month;
-    $d = $dt->format('d'); // int d = dt.Day;
-    $y = $dt->format('Y'); // int y = dt.Year;
+    $m = (int)$dt->format('n'); // month without leading zero
+    $d = (int)$dt->format('j'); // day without leading zero
+    $y = (int)$dt->format('Y'); // year
 
-    // if (m < 3)
-    // {
-    // m = m + 12;
-    // y = y - 1;
-    // }
     if($m < 3) {
       $m = $m + 12;
       $y = $y - 1;
     }
 
     $nanoTime = new self();
-    $nanoTime->julianDay = $d + (153 * $m - 457) / 5 + 365 * $y + ($y / 4) - ($y / 100) + ($y / 400) + 1721119;
+    // NOTE: we have to perform some integer casting - otherwise, we get differences and an internal float-based discrepancy
+    $nanoTime->julianDay = (int)($d + (int)(153 * $m - 457) / 5 + 365 * $y + (int)($y / 4) - (int)($y / 100) + (int)($y / 400) + 1721119);
 
     $seconds = $dt->format('H') * 60 * 60
       + $dt->format('i') * 60
