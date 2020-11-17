@@ -30,12 +30,22 @@ class ThriftFooter {
   protected $fileMeta = null;
 
   /**
+   * [protected description]
+   * @var ThriftSchemaTree
+   */
+  protected $tree;
+
+  /**
    * [__construct description]
    * @param FileMetaData|null $fileMeta [description]
    */
   public function __construct(?FileMetaData $fileMeta)
   {
     $this->fileMeta = $fileMeta;
+    if($fileMeta) {
+      // only construct ThriftSchemaTree, if we already have a FileMetaData object
+      $this->tree = new ThriftSchemaTree($this->fileMeta->schema);
+    }
   }
 
   /**
@@ -49,6 +59,7 @@ class ThriftFooter {
     $instance->fileMeta = $instance->CreateThriftSchema($schema);
     $instance->fileMeta->num_rows = $totalRowCount;
     $instance->fileMeta->created_by = 'php-parquet'; // TODO add version identifier
+    $instance->tree = new ThriftSchemaTree($instance->fileMeta->schema);
     return $instance;
   }
 
@@ -268,7 +279,8 @@ class ThriftFooter {
   {
     $path = [];
 
-    $tree = new ThriftSchemaTree($this->fileMeta->schema);
+    // $tree = new ThriftSchemaTree($this->fileMeta->schema);
+    $tree = $this->tree;
     $wrapped = $tree->Find($schemaElement);
 
     while($wrapped->parent !== null)
@@ -382,12 +394,21 @@ class ThriftSchemaTree
    */
   public $root;
 
+  // /**
+  //  * [protected description]
+  //  * @var \SplObjectStorage
+  //  */
+  // protected $memoizedFindResults;
+
   /**
    * [__construct description]
    * @param SchemaElement[] $schema [description]
    */
   public function __construct(array $schema)
   {
+    // NOTE: SplObjectStorage might not be the right choice
+    // for caching tree traversal results. It yields worse results.
+    // $this->memoizedFindResults = new \SplObjectStorage();
     $this->root = new Node();
     $this->root->element = $schema[0];
     $i = 1;
@@ -402,7 +423,14 @@ class ThriftSchemaTree
    */
   public function Find(SchemaElement $tse): Node
   {
-    return $this->FindInternal($this->root, $tse);
+    // NOTE: see constructor note
+    // if($this->memoizedFindResults->contains($tse)) {
+    //   return $this->memoizedFindResults->offsetGet($tse);
+    // }
+    $node = $this->FindInternal($this->root, $tse);
+    // NOTE: see constructor note
+    // $this->memoizedFindResults->offsetSet($tse, $node);
+    return $node;
   }
 
   /**
