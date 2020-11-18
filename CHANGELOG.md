@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.1] - 2020-11-18
+### Changed
+- dropped requirement of 'ext-snappy' and made it a suggestion, as it is only required for using snappy compression.
+- dropped requirement of 'mdurrant/php-binary-reader', as it has been replaced with a custom implementation
 
 ## [0.3.0] - 2020-11-17
 ### Added
