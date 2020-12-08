@@ -118,6 +118,7 @@ class DataField extends Field
         // As PHP uses bare strings to store bytes - or at least, supports it this way.
         if($isArray) {
           $dataType = DataType::ByteArray;
+          $isArray = false; // ByteArrayDataHandler already incorporates this
         } else {
           $dataType = DataType::Byte;
         }

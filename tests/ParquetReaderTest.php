@@ -122,13 +122,13 @@ final class ParquetReaderTest extends TestBase
   public function testReadByteArrays(): void {
     $reader = new ParquetReader($this->openTestFile('real/nation.plain.parquet'));
 
-    $expectedValue = unpack('C*', 'ALGERIA');
+    // NOTE: PHP's unpack() returns byte arrays on a 0-index basis
+    $expectedValue = array_values(unpack('C*', 'ALGERIA'));
     $data = $reader->ReadEntireRowGroup();
 
     $nameColumn = $data[1]->getData();
     $nameValue = $nameColumn[0];
 
-    // TODO: implement ByteDataArrayHandler
     $this->assertEquals($expectedValue, $nameValue);
 
     // byte[][] nameColumn = (byte[][]) data[1].Data;

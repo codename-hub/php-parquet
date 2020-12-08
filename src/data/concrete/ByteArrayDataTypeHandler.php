@@ -72,15 +72,16 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
         // unpack("l", $value)[1]  is for int32
         $length = unpack("l", substr($span, $spanIdx, 4))[1];
 
-        // string s = E.GetString(allBytes, spanIdx + 4, length);
-        $s = unpack('C*',substr($span, $spanIdx + 4, $length));;
-        // $s = substr($span, $spanIdx + 4, $length); // unpack('C*',substr($span, $spanIdx + 4, $length));
+        // V1: Byte array as real array version
+        // NOTE: PHP's unpack() returns arrays on a 0-index basis
+        $s = array_values(unpack('C*',substr($span, $spanIdx + 4, $length)));
 
-        // tdest[destIdx++] = s;
+        // // V2: Byte array as string version:
+        // $s = substr($span, $spanIdx + 4, $length);
+
         $tdest[$destIdx++] = $s;
 
         $spanIdx = $spanIdx + 4 + $length;
-        // spanIdx = spanIdx + 4 + length;
       }
     }
     finally
@@ -99,10 +100,12 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
-    //length
-    if($length === -1) $length = $reader->readint32();
+    // length
+    if($length === -1) $length = $reader->readInt32();
 
-    //data
+    // data
+    // TODO: check whether this collides with the pack/unpack implementation above
+    // NOTE: the BinaryReader interface returns those bytes as a string
     return $reader->readBytes($length);
   }
 
@@ -123,8 +126,16 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
    */
   protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    $writer->writeInt32(strlen($value));
-    $writer->writeString($value); // or UTF8?
+    // V1: Byte array as real array version
+    // NOTE: we're treating ByteArray Data as it is: array of bytes
+    $writer->writeInt32(count($value));
+    $writer->writeBytes($value); // or UTF8?
+
+    // // V2: Byte array as string version:
+    // // NOTE: we're treating ByteArray Data as it is: array of bytes
+    // $writer->writeInt32(strlen($value));
+    // $writer->writeString($value); // or UTF8?
+
   }
 
   /**

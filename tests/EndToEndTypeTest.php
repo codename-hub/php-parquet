@@ -34,10 +34,10 @@ final class EndToEndTypeTest extends TestBase
         'field'           => DataField::createFromType("unicode string", 'string'),
         'expectedValue'   => "L'Oréal Paris"
       ],
-      // "byte array" => [
-      //   'field'         => DataField::createFromType("byte array", 'array', 'byte'),
-      //   'expectedValue' => /*"raw byte string", // */ unpack('C*', "raw byte string") // Encoding.UTF8.GetBytes("raw byte string")
-      // ],
+      "byte array" => [
+        'field'         => DataField::createFromType("byte array", 'array', 'byte'),
+        'expectedValue' => array_values(unpack('C*', "raw byte string"))
+      ],
       "float" => [
         'field'         => DataField::createFromType("float", 'float'),
         'expectedValue' => (float)1.23
