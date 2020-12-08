@@ -131,7 +131,9 @@ class ParquetRowGroupWriter
 
     if ($this->rowCount === null)
     {
-      $this->rowCount = $column->calculateRowCount();
+      if(count($column->getData()) > 0 || $column->getField()->maxRepetitionLevel === 0) {
+        $this->rowCount = $column->calculateRowCount();
+      }
     }
 
     // Thrift.SchemaElement tse = _thschema[_colIdx];
