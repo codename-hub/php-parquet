@@ -1,20 +1,17 @@
 language: php
 
-php:
-    - 7.1 # will fail some tests at the moment
-    - 7.2 # will fail some tests at the moment
-    - 7.3
-    - 7.4
-    - 8.0
-      # ignore platform requirements, as PHPUnit9 doesn't support PHP8 officially, yet
-      # But we install it anyway
-      env: COMPOSER_IGNORE_PLATFORM_REQS=1
-
 matrix:
     fast_finish: true
     allow_failures:
       - php: 7.1
       - php: 7.2
+    include:
+      - php: 7.1 # will fail some tests at the moment
+      - php: 7.2 # will fail some tests at the moment
+      - php: 7.3
+      - php: 7.4
+      - php: 8.0
+        env: COMPOSER_IGNORE_PLATFORM_REQS=1
 
 before_install:
     # install php-ext-snappy
