@@ -25,7 +25,9 @@ class ByteDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
-    return unpack('C', $reader->readBytes(1))[1];
+    // We're always reading INT32, see Thrift Type
+    // TODO: Check whether we'd need some unpacking magic
+    return $reader->readInt32();
   }
 
   /**
@@ -33,7 +35,8 @@ class ByteDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    $writer->writeByte($value); // ord?
+    // We're always writing INT32, see Thrift Type
+    $writer->writeInt32($value);
   }
 
 }
