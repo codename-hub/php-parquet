@@ -120,13 +120,12 @@ final class EndToEndTypeTest extends TestBase
 
       "byte min value" => [
         'field'         => DataField::createFromType("byte", 'byte'),
-        'expectedValue' => 0 // 0x00 // byte.MinValue
+        'expectedValue' => 0x00 // byte.MinValue
       ],
-      // TODO: byte reading/writing still causes errors
-      // "byte max value" => [
-      //   'field'         => DataField::createFromType("byte", 'byte'),
-      //   'expectedValue' => 255 // 0xFF
-      // ],
+      "byte max value" => [
+        'field'         => DataField::createFromType("byte", 'byte'),
+        'expectedValue' => 0xFF // 0xFF
+      ],
 
       // "signed byte min value" => [
       //   'field'         => DataField::createFromType("sbyte", 'sbyte'),

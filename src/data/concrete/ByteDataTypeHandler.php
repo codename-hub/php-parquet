@@ -25,7 +25,7 @@ class ByteDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \jocoon\parquet\format\SchemaElement $tse,
     int $length
   ) {
-    return $reader->readBytes(1);
+    return unpack('C', $reader->readBytes(1))[1];
   }
 
   /**
