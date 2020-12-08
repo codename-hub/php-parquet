@@ -191,7 +191,7 @@ class DataColumnWriter
     //   WriteLevels(writer, column.RepetitionLevels, column.RepetitionLevels.Length, maxRepetitionLevel);
     // }
     if($column->repetitionLevels !== null) {
-      $this->writeLevels($writer, $column->repetitionLevels, count($column->repetitionLevels), $maxRepetitionLevel);
+      $this->WriteLevels($writer, $column->repetitionLevels, count($column->repetitionLevels), $maxRepetitionLevel);
     }
 
 
