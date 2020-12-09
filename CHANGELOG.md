@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.0] - 2020-12-09
+### Changed
+- ByteArrayDataTypeHandler now really handles byte arrays as arrays of 'bytes' (int arrays in PHP)
+### Fixed
+- ByteDataTypeHandler improved/fixed according to protocol/specs (single unsigned byte)
+- ByteArray datatype-dependent matching
+### Added
+- PHP 8.0 test pipeline / support
+- Test for a pending issue from parquet-dotnet (https://github.com/aloneguid/parquet-dotnet/issues/87) (marked as incomplete as it fails, pending verification)
+
 ## [0.3.1] - 2020-11-18
 ### Changed
 - dropped requirement of 'ext-snappy' and made it a suggestion, as it is only required for using snappy compression.
