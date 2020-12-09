@@ -9,7 +9,8 @@ matrix:
       - php: 7.3
       - php: 7.4
       - php: 8.0
-        # ignore platform reqs as PHPUnit9 doesn't support PHP8 officially right now
+        # ignore platform reqs
+        # as some dependencies do not support PHP8 officially at the time of writing
         env: COMPOSER_IGNORE_PLATFORM_REQS=1
 
 before_install:
