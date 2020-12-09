@@ -7,10 +7,15 @@ matrix:
       - php: 7.2
     include:
       - php: 7.1 # will fail some tests at the moment
+        # ignore platform reqs as we specify PHP 7.3-8.0 in composer JSON
+        env: COMPOSER_IGNORE_PLATFORM_REQS=1
       - php: 7.2 # will fail some tests at the moment
+        # ignore platform reqs as we specify PHP 7.3-8.0 in composer JSON
+        env: COMPOSER_IGNORE_PLATFORM_REQS=1
       - php: 7.3
       - php: 7.4
       - php: 8.0
+        # ignore platform reqs as PHPUnit9 doesn't support PHP8 officially right now
         env: COMPOSER_IGNORE_PLATFORM_REQS=1
 
 before_install:
