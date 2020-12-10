@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.1] - 2020-12-10
+### Fixed
+- Invalid null count determination (parquet-dotnet issue #87) in DataColumnReader
+
 ## [0.4.0] - 2020-12-09
 ### Changed
 - ByteArrayDataTypeHandler now really handles byte arrays as arrays of 'bytes' (int arrays in PHP)
