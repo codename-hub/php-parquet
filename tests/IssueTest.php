@@ -29,8 +29,6 @@ class IssueTest extends TestBase
    */
   public function testParquetDotnetIssue87(): void
   {
-    $this->markTestIncomplete('Marked test as incomplete, need more information whether this really is an issue or not.');
-
     $reader = new ParquetReader($this->openTestFile('issues/parquet-dotnet_87_running_numbers_spark.gz.parquet'));
 
     $data = $reader->ReadEntireRowGroup();

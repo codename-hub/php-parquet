@@ -172,12 +172,48 @@ class DataColumnReader
     }
 
     //
-    // NOTE: Possible Fix from https://github.com/aloneguid/parquet-dotnet/commit/a8bfeef068ed7b29bad8a4150ed8e50362fb1720
+    // NOTE:
+    // The Possible Fix from https://github.com/aloneguid/parquet-dotnet/commit/a8bfeef068ed7b29bad8a4150ed8e50362fb1720
+    // is not suitable for this case, as it assumes the existence of Statistics (which are, in fact, optional).
     //
-    // if statistics are defined, use null count to determine the exact number of items we should read
-    // however, I don't know if all parquet files with null values have stats defined. Maybe a better solution would
-    // be using a count of defined values (from reading definitions?)
-    $maxReadCount = $ph->data_page_header->num_values - (int)($ph->data_page_header->statistics->null_count ?? 0);
+    // Original comment:
+    //
+    //    if statistics are defined, use null count to determine the exact number of items we should read
+    //    however, I don't know if all parquet files with null values have stats defined. Maybe a better solution would
+    //    be using a count of defined values (from reading definitions?)
+    //
+    // This is in fact based on a wrong assumption.
+    // In the following passage, we're determining null count by checking definition levels.
+    //
+
+    $nullCount = $ph->data_page_header->statistics->null_count ?? null;
+
+    //
+    // Statistics' null_count is an optional field
+    // if we have no data (null), we have to make sure
+    // to determine the count of null values in the current data page
+    //
+    if($nullCount === null && $cd->definitions !== null) {
+      //
+      // We're counting all maxDefinitionLevel entries (non-nulls)
+      // and subtract them from our known num_values (which include nulls)
+      //
+      // NOTE: we are only comparing the definition levels within current page bounds
+      // $cd->definitionsOffset has already been incremented at this point, so we assume the initial state
+      // start index: definitionsOffset - num_values
+      // end index:   definitionsOffset
+      //
+      $definitionCount = 0;
+      for ($i = $cd->definitionsOffset - $ph->data_page_header->num_values; $i < $cd->definitionsOffset; $i++) {
+        if($cd->definitions[$i] === $this->maxDefinitionLevel) {
+          $definitionCount++;
+        }
+      }
+
+      $nullCount = $ph->data_page_header->num_values - $definitionCount;
+    }
+
+    $maxReadCount = $ph->data_page_header->num_values - (int)($nullCount ?? 0);
     $this->readColumn($reader, $ph->data_page_header->encoding, $maxValues, $maxReadCount, $cd);
   }
 
