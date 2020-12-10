@@ -185,6 +185,18 @@ final class EndToEndTypeTest extends TestBase
   }
 
   /**
+   * To demonstrate array equality comparison
+   */
+  public function testArrayEqualityComparison() : void {
+    $expected = [ 1, 2, 3 ];
+    $this->assertTrue([ 1, 2, 3 ] === $expected);
+    $this->assertFalse([ 3, 2, 1 ] === $expected);
+    $this->assertFalse([ 2, 1 ] === $expected);
+    $this->assertFalse([ ] === $expected);
+    $this->assertFalse('123' === $expected);
+  }
+
+  /**
    * [Type_writes_and_reads_end_to_end description]
    * @param string $name [description]
    */
@@ -197,13 +209,14 @@ final class EndToEndTypeTest extends TestBase
     {
       $equal = true;
     }
-    // TODO: Tests using arrays
-    // else if (actual.GetType().IsArrayOf<byte>() && input.expectedValue != null)
-    // {
-    //   equal = ((byte[]) actual).SequenceEqual((byte[]) input.expectedValue);
-    // }
+    else if(is_array($input['expectedValue'])) {
+      // See testArrayEqualityComparison()
+      $equal = ($actual === $input['expectedValue']);
+    }
     else
     {
+      // NOTE: no identity (===) comparison, as there might be objects
+      // which are never identical
       $equal = ($actual == $input['expectedValue']);
     }
 
