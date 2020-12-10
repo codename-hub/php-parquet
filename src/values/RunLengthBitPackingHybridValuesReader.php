@@ -24,9 +24,9 @@ class RunLengthBitPackingHybridValuesReader
    * @param  BinaryReader $reader   [description]
    * @param  int          $bitWidth [description]
    * @param  int          $length   [description]
-   * @param  int[]        $dest     [description]
-   * @param  int          $offset   [description]
-   * @param  int          $pageSize [description]
+   * @param  int[]        &$dest     [description]
+   * @param  int|null     $offset   [description]
+   * @param  int|null     $pageSize [description]
    * @return int                    [description]
    */
   public static function ReadRleBitpackedHybrid(BinaryReader $reader, int $bitWidth, int $length, array &$dest, ?int $offset, ?int $pageSize) : int
