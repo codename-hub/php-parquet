@@ -3,6 +3,10 @@
 ## [0.4.2] - 2020-12-29
 ### Fixed
 - Fixed return type error during Schema Tree traversal when using StructField
+### Improved
+- EndToEndTypeTests array evaluation/comparison
+### Added
+- Tests for 'bad data'
 
 ## [0.4.1] - 2020-12-10
 ### Fixed
