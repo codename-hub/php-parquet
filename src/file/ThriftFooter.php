@@ -437,9 +437,9 @@ class ThriftSchemaTree
    * [FindInternal description]
    * @param  Node          $root [description]
    * @param  SchemaElement $tse  [description]
-   * @return Node                [description]
+   * @return Node|null           [description]
    */
-  private function FindInternal(Node $root, SchemaElement $tse):Node
+  private function FindInternal(Node $root, SchemaElement $tse): ?Node
   {
     foreach($root->children as $child)
     {

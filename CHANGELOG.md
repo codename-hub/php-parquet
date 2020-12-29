@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.2] - 2020-12-29
+### Fixed
+- Fixed return type error during Schema Tree traversal when using StructField
+
 ## [0.4.1] - 2020-12-10
 ### Fixed
 - Invalid null count determination (parquet-dotnet issue #87) in DataColumnReader
