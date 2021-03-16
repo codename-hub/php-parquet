@@ -1,6 +1,7 @@
 php-parquet
 ===
 [![Build Status](https://travis-ci.org/jocoon/php-parquet.svg)](https://travis-ci.org/jocoon/php-parquet)
+[![Build Status (Github Actions)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml)
 
 This is the first parquet file format reader/writer implementation in PHP, based on the Thrift sources provided by the Apache Foundation.
 Extensive parts of the code and concepts have been ported from parquet-dotnet (see https://github.com/elastacloud/parquet-dotnet and https://github.com/aloneguid/parquet-dotnet).
