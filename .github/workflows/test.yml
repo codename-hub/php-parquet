@@ -1,4 +1,4 @@
-name: php-parquet Test Suite
+name: Unit Tests
 
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
@@ -21,7 +21,7 @@ jobs:
           - 7.4
         phpunit-versions: ['latest']
         include:
-        - operating-system: 'ubuntu-latest'
+        - operating-system: 'ubuntu-18.04'
           php-versions: 8.0
           phpunit-versions: 'latest'
           # kick out platform reqs for PHP 8
