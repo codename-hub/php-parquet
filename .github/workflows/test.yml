@@ -1,0 +1,51 @@
+name: php-parquet Test Suite
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "v*"
+      
+jobs:
+  unit-tests:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system:
+          - 'ubuntu-18.04'
+        php-versions:
+          - 7.3
+          - 7.4
+          # - 8.0 # not added, as several packages have no official support for it, see below
+        phpunit-versions: ['latest']
+        include:
+        - operating-system: 'ubuntu-latest'
+          php-versions: 8.0
+          phpunit-versions: 'latest'
+          env:
+            # kick out platform reqs for PHP 8
+            - COMPOSER_IGNORE_PLATFORM_REQS: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.1
+          coverage: xdebug
+          tools: composer:v2, php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}
+
+      - name: Install dependencies and skip checks for platform requirements
+        if: env.COMPOSER_IGNORE_PLATFORM_REQS == '1'
+        run: composer update --ignore-platform-reqs
+
+      - name: Install dependencies
+        if: env.COMPOSER_IGNORE_PLATFORM_REQS != '1'
+        run: composer update
+
+      - name: Unit Tests
+        run: vendor/bin/phpunit tests
