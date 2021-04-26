@@ -8,7 +8,7 @@ on:
       - "!*"
     tags:
       - "v*"
-      
+
 jobs:
   unit-tests:
     runs-on: ${{ matrix.operating-system }}
@@ -19,24 +19,39 @@ jobs:
         php-versions:
           - 7.3
           - 7.4
+          - 8.0
         phpunit-versions: ['latest']
-        include:
-        - operating-system: 'ubuntu-18.04'
-          php-versions: 8.0
-          phpunit-versions: 'latest'
-          # kick out platform reqs for PHP 8
-          COMPOSER_IGNORE_PLATFORM_REQS: 1
+    env:
+      extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.1
+      key: extcache-v1
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Setup cache environment
+        id: extcache
+        uses: shivammathur/cache-extensions@v1
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: ${{ env.extensions }}
+          key: ${{ env.key }}
+
+      - name: Cache extensions
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.extcache.outputs.dir }}
+          key: ${{ steps.extcache.outputs.key }}
+          restore-keys: ${{ steps.extcache.outputs.key }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.1
-          coverage: xdebug
-          tools: composer:v2, php-cs-fixer, phpunit:${{ matrix.phpunit-versions }}
+          extensions: ${{ env.extensions }}
+          # extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.1
+          coverage: xdebug # pcov is slower and sometimes failing due to memory limitations and a possible bug
+          tools: composer:v2, php-cs-fixer, phpstan, phpunit:${{ matrix.phpunit-versions }}
 
       - name: Install dependencies and skip checks for platform requirements
         if: matrix.COMPOSER_IGNORE_PLATFORM_REQS == 1
@@ -46,5 +61,17 @@ jobs:
         if: matrix.COMPOSER_IGNORE_PLATFORM_REQS != 1
         run: composer update
 
-      - name: Unit Tests
-        run: vendor/bin/phpunit tests
+      - name: Setup problem matchers for PHP
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Setup problem matchers for PHPUnit
+        run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Unit Tests without Coverage
+        run: vendor/bin/phpunit --no-coverage tests
+
+      # - name: Unit Tests with Coverage
+      #   run: vendor/bin/phpunit --coverage-clover=coverage.xml tests
+
+      # - name: PHPStan
+      #   run: phpstan --version && phpstan analyse src
