@@ -96,7 +96,7 @@ final class ParquetReaderTest extends TestBase
     //
     // Increase memory limit for this test
     //
-    ini_set('memory_limit', '512M');
+    // ini_set('memory_limit', '512M');
 
     $reader = new ParquetReader($this->openTestFile('multi.page.parquet'));
     $data = $reader->ReadEntireRowGroup();
