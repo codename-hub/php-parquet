@@ -27,6 +27,14 @@ class WapMorganBinaryReader extends BinaryReader
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setInputString($inputString)
+  {
+    throw new \LogicException('Not implemented'); // TODO
+  }
+
+  /**
    * [protected description]
    * @var resource
    */
