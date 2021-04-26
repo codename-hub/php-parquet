@@ -311,10 +311,14 @@ class DataColumnReader
     $start = $offset;
     $bitWidth = ord($reader->readBytes(1)); // read byte?
 
-    // var_dump([$bitWidth, ord($bitWidth)]);
+    //
+    //  parquet-dotnet PR #96 port
+    //  Fix reading of plain dictionary with zero length
+    //
+    $length = static::GetRemainingLength($reader);
 
     //when bit width is zero reader must stop and just repeat zero maxValue number of times
-    if ($bitWidth === 0)
+    if ($bitWidth === 0 || $length === 0)
     {
       for ($i = 0; $i < $maxReadCount; $i++)
       {
@@ -323,9 +327,13 @@ class DataColumnReader
     }
     else
     {
-      $length = static::GetRemainingLength($reader);
-      // var_dump(['length' => $length]);
-      $offset += RunLengthBitPackingHybridValuesReader::ReadRleBitpackedHybrid($reader, $bitWidth, $length, $dest, $offset, $maxReadCount);
+      //
+      // parquet-dotnet PR #95 port
+      // Empty page handling
+      //
+      if($length !== 0) {
+        $offset += RunLengthBitPackingHybridValuesReader::ReadRleBitpackedHybrid($reader, $bitWidth, $length, $dest, $offset, $maxReadCount);
+      }
     }
 
     return $offset - $start;
