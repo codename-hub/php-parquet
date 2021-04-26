@@ -199,16 +199,6 @@ final class SchemaTest extends TestBase
   }
 
   /**
-   * [testCannotUseDotsInFieldNames description]
-   */
-  public function testCannotUseDotsInFieldNames(): void
-  {
-    // NOTE/TODO: the exception thrown might change later.
-    $this->expectException(\Exception::class);
-    DataField::createFromType('one.two', 'integer');
-  }
-
-  /**
    * [testIdenticalStructsFieldAreEqual description]
    */
   public function testIdenticalStructsFieldAreEqual(): void

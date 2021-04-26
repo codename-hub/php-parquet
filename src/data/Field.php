@@ -62,10 +62,6 @@ abstract class Field
   protected function __construct(string $name, int $schemaType)
   {
     $this->name = $name;
-    if(strpos($this->name, Schema::PathSeparator) !== false) {
-      throw new Exception('Path separator is not allowed in field name as it\'s used in Apache Parquet format as field path separator.');
-    }
-
     $this->schemaType = $schemaType;
     $this->path = $name;
   }
