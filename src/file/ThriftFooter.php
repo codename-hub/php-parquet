@@ -91,7 +91,7 @@ class ThriftFooter {
    */
   protected function AddRoot(array &$container): SchemaElement
   {
-    $root = new SchemaElement(['name' => 'php-parquet-schema']);
+    $root = new SchemaElement(['name' => 'php_parquet_schema']);
     $container[] = $root;
     return $root;
   }
