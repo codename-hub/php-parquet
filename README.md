@@ -2,6 +2,9 @@ php-parquet
 ===
 [![Build Status (Github Actions)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml)
 
+![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=push&label=release%20build)
+![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=workflow_dispatch&label=dev%20build)
+
 ![Packagist Version](https://img.shields.io/packagist/v/jocoon/parquet)
 ![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/jocoon/parquet)
 ![Packagist Downloads](https://img.shields.io/packagist/dt/jocoon/parquet?label=packagist%20installs)
