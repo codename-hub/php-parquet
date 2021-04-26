@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+### Fixed
+- parquet-dotnet PR #96 port - Fix reading of plain dictionary with zero length
+- parquet-dotnet PR #95 port - Empty page handling
+### Changed
+- Replaced dependency "apache/thrift" by "packaged/thrift" to support composer installations under PHP8 without using overrides and implicitly fix some incompatibilities.
+- Changed root schema name to `php_parquet_schema` to comply with Avro specs (https://avro.apache.org/docs/current/spec.html#names) and avoid Hadoop failing to read files (see parquet-dotnet issue #93)
+- Allow dots in field names
+- Provide a greater memory_limit (512M) in phpunit.xml defaults for unit testing
+
 ## [0.4.2] - 2020-12-29
 ### Fixed
 - Fixed return type error during Schema Tree traversal when using StructField
