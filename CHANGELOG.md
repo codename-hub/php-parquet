@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.5.0] - 2021-04-28
 ### Fixed
 - parquet-dotnet PR #96 port - Fix reading of plain dictionary with zero length
 - parquet-dotnet PR #95 port - Empty page handling
