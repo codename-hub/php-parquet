@@ -2,12 +2,12 @@ php-parquet
 ===
 [![Build Status (Github Actions)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml)
 
-![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=push&label=release%20build)
-![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=workflow_dispatch&label=dev%20build)
+[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=push&label=release%20build)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml?query=event%3Apush)
+[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=workflow_dispatch&label=dev%20build)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml?query=event%3Aworkflow_dispatch)
 
-![Packagist Version](https://img.shields.io/packagist/v/jocoon/parquet)
-![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/jocoon/parquet)
-![Packagist Downloads](https://img.shields.io/packagist/dt/jocoon/parquet?label=packagist%20installs)
+[![Packagist Version](https://img.shields.io/packagist/v/jocoon/parquet)](https://packagist.org/packages/jocoon/parquet)
+[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/jocoon/parquet)](https://packagist.org/packages/jocoon/parquet)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/jocoon/parquet?label=packagist%20installs)](https://packagist.org/packages/jocoon/parquet)
 
 This is the first parquet file format reader/writer implementation in PHP, based on the Thrift sources provided by the Apache Foundation.
 Extensive parts of the code and concepts have been ported from parquet-dotnet (see https://github.com/elastacloud/parquet-dotnet and https://github.com/aloneguid/parquet-dotnet).
