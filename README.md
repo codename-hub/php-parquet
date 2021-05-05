@@ -84,7 +84,7 @@ Alternative 3rd party binary reading/writing packages in scope:
 ## Installation
 Install this package via composer, e.g.
 ```bash
-composer require jocoon/php-parquet
+composer require jocoon/parquet
 ```
 
 The included _Dockerfile_ gives you an idea of the needed system requirements.
