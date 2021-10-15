@@ -4,6 +4,10 @@
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
 perf.*
+.serenata
+.phpunit.cache
+act
+report
 
 # Node artifact files
 node_modules/
