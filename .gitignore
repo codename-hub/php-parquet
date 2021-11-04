@@ -6,6 +6,7 @@
 perf.*
 .serenata
 .phpunit.cache
+.phpunit
 act
 report
 
@@ -16,6 +17,10 @@ dist/
 # Composer packages
 vendor/
 composer.lock
+
+# PHP-related
+.phpunit.cache
+.serenata
 
 # Compiled Java class files
 *.class
