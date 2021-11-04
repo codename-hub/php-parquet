@@ -3,6 +3,9 @@
 ## [Unreleased]
 ### Breaking Change
 - Changed namespace to `codename\parquet`
+### Added
+- DATA_PAGE_V2 (reading) support
+- RLE_DICTIONARY pages (reading) support
 ### Changed
 - Skip some tests if ext-snappy unavailable
 - Benchmark: enable snappy compression benchmark if respective extension available/loaded

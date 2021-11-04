@@ -218,6 +218,66 @@ class DataColumnReader
   }
 
   /**
+   * [readDataPageV2 description]
+   * @param PageHeader    $ph        [description]
+   * @param ColumnRawData $cd        [description]
+   * @param int           $maxValues [description]
+   */
+  protected function readDataPageV2(PageHeader $ph, ColumnRawData $cd, int $maxValues) : void {
+
+    $bytes = $this->readPageDataByPageHeader($ph);
+
+    $reader = \codename\parquet\adapter\BinaryReader::createInstance($bytes);
+
+    if($this->maxRepetitionLevel > 0) {
+      //todo: use rented buffers, but be aware that rented length can be more than requested so underlying logic relying on array length must be fixed too.
+      if($cd->repetitions === null) { // TODO/QUESTION: may they even be null?
+        $cd->repetitions = array_fill(0, $cd->maxCount, null);
+      }
+
+      $cd->repetitionsOffset += $this->readLevelsV2($reader, $ph->data_page_header_v2->repetition_levels_byte_length, $this->maxRepetitionLevel, $cd->repetitions, $cd->repetitionsOffset, $ph->data_page_header_v2->num_values);
+    }
+
+    if($this->maxDefinitionLevel > 0) {
+      if($cd->definitions === null) {
+        $cd->definitions = array_fill(0, $cd->maxCount, null);
+      }
+
+      $cd->definitionsOffset += $this->readLevelsV2($reader, $ph->data_page_header_v2->definition_levels_byte_length, $this->maxDefinitionLevel, $cd->definitions, $cd->definitionsOffset, $ph->data_page_header_v2->num_values);
+    }
+
+    if($ph->data_page_header_v2 === null) {
+      throw new \Exception('file corrupt, data page header missing');
+    }
+
+    $nullCount = $ph->data_page_header_v2->num_nulls ?? null;
+
+    if($nullCount === null && $cd->definitions !== null) {
+      //
+      // We're counting all maxDefinitionLevel entries (non-nulls)
+      // and subtract them from our known num_values (which include nulls)
+      //
+      // NOTE: we are only comparing the definition levels within current page bounds
+      // $cd->definitionsOffset has already been incremented at this point, so we assume the initial state
+      // start index: definitionsOffset - num_values
+      // end index:   definitionsOffset
+      //
+      $definitionCount = 0;
+
+      for ($i = $cd->definitionsOffset - $ph->data_page_header_v2->num_values; $i < $cd->definitionsOffset; $i++) {
+        if($cd->definitions[$i] === $this->maxDefinitionLevel) {
+          $definitionCount++;
+        }
+      }
+      $nullCount = $ph->data_page_header_v2->num_values - $definitionCount;
+    }
+
+    $maxReadCount = $ph->data_page_header_v2->num_values - (int)($nullCount ?? 0);
+
+    $this->readColumn($reader, $ph->data_page_header_v2->encoding, $maxValues, $maxReadCount, $cd);
+  }
+
+  /**
    * [readLevels description]
    * @param  BinaryReader $reader   [description]
    * @param  int          $maxLevel [description]
@@ -229,6 +289,21 @@ class DataColumnReader
   protected function readLevels(BinaryReader $reader, int $maxLevel, array &$dest, ?int $offset, ?int $pageSize) : int {
     $bitWidth = static::getBitWidth($maxLevel);
     return RunLengthBitPackingHybridValuesReader::ReadRleBitpackedHybrid($reader, $bitWidth, 0, $dest, $offset, $pageSize);
+  }
+
+  /**
+   * [readLevelsV2 description]
+   * @param  BinaryReader $reader                 [description]
+   * @param  int          $numBytes               [description]
+   * @param  int          $maxLevel               [description]
+   * @param  array        &$dest                   [description]
+   * @param  int|null     $offset                 [description]
+   * @param  int|null     $pageSize               [description]
+   * @return int
+   */
+  protected function readLevelsV2(BinaryReader $reader, int $numBytes, int $maxLevel, array &$dest, ?int $offset, ?int $pageSize) : int {
+    $bitWidth = static::getBitWidth($maxLevel);
+    return RunLengthBitPackingHybridValuesReader::ReadRleBitpackedHybrid($reader, $bitWidth, $numBytes, $dest, $offset, $pageSize);
   }
 
   /**
@@ -282,6 +357,11 @@ class DataColumnReader
           $cd->valuesOffset += $indexCount;
           break;
 
+        //
+        // CHANGED 2021-10-15: for RLE_DICTIONARY, use the same as PLAIN_DICTIONARY
+        // as we internally handle RLE
+        //
+        case Encoding::RLE_DICTIONARY:
         case Encoding::PLAIN_DICTIONARY:
           if($cd->indexes === null) {
             // QUESTION: should we pre-fill the array?
@@ -417,7 +497,14 @@ class DataColumnReader
     while(true) {
 
       // echo(chr(10)."readDataPage".chr(10));
-      $this->readDataPage($ph, $colData, $maxValues);
+      if($ph->type == PageType::DATA_PAGE) {
+        $this->readDataPage($ph, $colData, $maxValues);
+      } else if($ph->type == PageType::DATA_PAGE_V2) {
+        $this->readDataPageV2($ph, $colData, $maxValues);
+      } else {
+        // Unexpected data
+        throw new \Exception('Unexpected non-datapage');
+      }
       $pagesRead++;
 
       // int totalCount = Math.Max(
@@ -453,7 +540,7 @@ class DataColumnReader
       // $ph2 = $this->thriftStream->Read(PageHeader::class);
 
       // if (ph.Type != Thrift.PageType.DATA_PAGE) break;
-      if($ph->type != PageType::DATA_PAGE) {
+      if($ph->type != PageType::DATA_PAGE && $ph->type != PageType::DATA_PAGE_V2) {
         break; // V2 support?
       }
 
@@ -558,11 +645,32 @@ class DataColumnReader
    * @return string                 [description]
    */
   protected function readPageDataByPageHeader(PageHeader $pageHeader) {
-    return DataStreamFactory::ReadPageData(
-      $this->inputStream,
-      $this->thriftColumnChunk->meta_data->codec,
-      $pageHeader->compressed_page_size, $pageHeader->uncompressed_page_size
-    );
+    if($pageHeader->type == PageType::DATA_PAGE_V2) {
+      // The levels are not compressed in V2 format
+      // https://github.com/mathworks/arrow/blob/c0e4d31ad5ed6e99df410be0f0f8d5521d32e66a/cpp/src/parquet/column_reader.cc:397
+      $levelsByteLength = $pageHeader->data_page_header_v2->repetition_levels_byte_length + $pageHeader->data_page_header_v2->definition_levels_byte_length;
+
+      // read levels data, as it is not compressed
+      // input stream is advanced by $levelsLength
+      if($levelsByteLength > 0) {
+        $levelsData = fread($this->inputStream, $levelsByteLength);
+      } else {
+        $levelsData = null; // or empty string?
+      }
+
+      // prepend levels data we just read
+      return $levelsData . DataStreamFactory::ReadPageData(
+        $this->inputStream,
+        $this->thriftColumnChunk->meta_data->codec,
+        $pageHeader->compressed_page_size - $levelsByteLength, $pageHeader->uncompressed_page_size - $levelsByteLength
+      );
+    } else {
+      return DataStreamFactory::ReadPageData(
+        $this->inputStream,
+        $this->thriftColumnChunk->meta_data->codec,
+        $pageHeader->compressed_page_size, $pageHeader->uncompressed_page_size
+      );
+    }
   }
 
 }
