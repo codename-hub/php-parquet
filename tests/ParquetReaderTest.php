@@ -229,6 +229,9 @@ final class ParquetReaderTest extends TestBase
    * [testReadBitPackedAtPageBoundary description]
    */
   public function testReadBitPackedAtPageBoundary(): void {
+    if(!extension_loaded('snappy')) {
+      static::markTestSkipped('ext-snappy unavailable');
+    }
     $reader = new ParquetReader($this->openTestFile('special/multi_page_bit_packed_near_page_border.parquet'));
     $columns = $reader->ReadEntireRowGroup();
     $data = $columns[0]->getData();
@@ -315,6 +318,9 @@ final class ParquetReaderTest extends TestBase
    * [testReadEmptyColumn description]
    */
   public function testReadEmptyColumn(): void {
+    if(!extension_loaded('snappy')) {
+      static::markTestSkipped('ext-snappy unavailable');
+    }
     $reader = new ParquetReader($this->openTestFile('emptycolumn.parquet'));
     $columns = $reader->ReadEntireRowGroup();
     $col0 = $columns[0]->getData();

@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+### Changed
+- Skip some tests if ext-snappy unavailable
+- Benchmark: enable snappy compression benchmark if respective extension available/loaded
+
 ## [0.5.0] - 2021-04-28
 ### Fixed
 - parquet-dotnet PR #96 port - Fix reading of plain dictionary with zero length

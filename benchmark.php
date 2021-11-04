@@ -6,33 +6,36 @@ use jocoon\parquet\ParquetWriter;
 use jocoon\parquet\CompressionMethod;
 
 require_once('vendor/autoload.php');
-
 ini_set('memory_limit', '4G');
 
 $readTimes = [];
 $uwts = [];
 $gwts = [];
+$swts = [];
 
 for ($i = 0; $i < 10; $i++)
 {
   $readTime = null;
   $uwt = null;
   $gwt = null;
-  ReadLargeFile($readTime, $uwt, $gwt);
+  $swt = null;
+  ReadLargeFile($readTime, $uwt, $gwt, $swt);
   $readTimes[] = $readTime;
   if($uwt) $uwts[] = $uwt;
   if($gwt) $gwts[] = $gwt;
-  echo("iteration #{$i}: {$readTime}, uwt: {$uwt}, gwt: {$gwt}".chr(10));
+  if($swt) $swts[] = $swt;
+  echo("iteration #{$i}: {$readTime}, uwt: {$uwt}, gwt: {$gwt}, swt: {$swt}".chr(10));
 }
 
 $meanRead = array_sum($readTimes)/count($readTimes);
 $meanUw = count($uwts) > 0 ? array_sum($uwts)/count($uwts) : null;
 $meanGw = count($gwts) > 0 ? array_sum($gwts)/count($gwts) : null;
+$meanSw = count($swts) > 0 ? array_sum($swts)/count($swts) : null;
 
-echo("mean(read): {$meanRead}, mean(uw): {$meanUw}, mean(gw): {$meanGw}");
+echo("mean(read): {$meanRead}, mean(uw): {$meanUw}, mean(gw): {$meanGw}, mean(sw): {$meanSw}");
 
 
-function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
+function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime, &$snappyWriteTime)
 {
   // Schema schema;
   // DataColumn[] columns;
@@ -59,6 +62,9 @@ function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
 
   $readTime = (hrtime(true) - $start) / 1e9;
 
+  // let GC collect
+  $reader = null;
+
   //
   // Writing uncompressed data
   //
@@ -75,6 +81,9 @@ function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
   $writer->finish();
 
   $uncompressedWriteTime = (hrtime(true) - $start) / 1e9;
+
+  // let GC collect
+  $writer = null;
 
   //
   // Writing GZIP compressed data
@@ -93,4 +102,26 @@ function ReadLargeFile(&$readTime, &$uncompressedWriteTime, &$gzipWriteTime)
 
   $gzipWriteTime = (hrtime(true) - $start) / 1e9;
 
+  //
+  // Execute snappy-compression benchmark
+  // only of ext is available
+  //
+  if(extension_loaded('snappy')) {
+    //
+    // Writing Snappy compressed data
+    //
+    $dest = fopen('perf.snappy.parquet', 'w');
+    $start = hrtime(true);
+
+    $writer = new ParquetWriter($schema, $dest);
+    $writer->compressionMethod = CompressionMethod::Snappy;
+    $rg = $writer->CreateRowGroup();
+    foreach($columns as $dc) {
+      $rg->WriteColumn($dc);
+    }
+    $rg->finish();
+    $writer->finish();
+
+    $snappyWriteTime = (hrtime(true) - $start) / 1e9;
+  }
 }

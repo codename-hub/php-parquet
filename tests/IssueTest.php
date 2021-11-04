@@ -13,6 +13,10 @@ class IssueTest extends TestBase
    */
   public function testParquetDotnetIssue81(): void
   {
+    if(!extension_loaded('snappy')) {
+      $this->markTestSkipped('ext-snappy unavailable');
+    }
+
     $reader = new ParquetReader($this->openTestFile('issues/parquet-dotnet_81_floats.parquet'));
     $dataColumns = $reader->ReadEntireRowGroup();
     $values = $dataColumns[0]->getData();

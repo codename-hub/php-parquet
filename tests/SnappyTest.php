@@ -7,6 +7,16 @@ use jocoon\parquet\SnappyInMemoryStreamWrapper;
 
 final class SnappyTest extends TestBase
 {
+  /**
+   * @inheritDoc
+   */
+  protected function setUp(): void
+  {
+    if(!extension_loaded('snappy')) {
+      static::markTestSkipped('ext-snappy unavailable');
+    }
+    parent::setUp();
+  }
 
   /**
    * Simple test for a working snappy extension

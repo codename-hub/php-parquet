@@ -44,7 +44,7 @@ final class CompressionTest extends TestBase
 
 
   /**
-  * [compressionMethods description]
+  * Compression methods to be tested
   * @var array
   */
   const compressionMethods = [
@@ -54,20 +54,27 @@ final class CompressionTest extends TestBase
   ];
 
   /**
-   * [testAllCompressionMethodsSupportedForSimpleIntegers description]
+   * Data provider for test arguments
+   * @return array
    */
-  public function testAllCompressionMethodsSupportedForSimpleIntegers(): void {
-    foreach (static::compressionMethods as $compressionMethod) {
-      $this->All_compression_methods_supported_for_simple_strings($compressionMethod);
-    }
+  public function dataProviderCompressionMethods(): array {
+    return array_map(function($method) {
+      return [ $method ];
+    }, static::compressionMethods);
   }
 
   /**
-   * [All_compression_methods_supported_for_simple_integers description]
-   * @param int $compressionMethod [description]
+   * @dataProvider dataProviderCompressionMethods
+   * @param int $compressionMethod
    */
-  protected function All_compression_methods_supported_for_simple_integers(int $compressionMethod): void
+  public function testAllCompressionMethodsSupportedForSimpleIntegers(int $compressionMethod): void
   {
+    if($compressionMethod === CompressionMethod::Snappy) {
+      if(!extension_loaded('snappy')) {
+        $this->markTestSkipped('ext-snappy unavailable');
+      }
+    }
+
     $value = 5;
     $actual = $this->WriteReadSingle(DataField::createFromType('id', 'integer'), $value, $compressionMethod);
     // const int value = 5;
@@ -78,20 +85,17 @@ final class CompressionTest extends TestBase
   }
 
   /**
-   * [testAllCompressionMethodsSupportedForSimpleStrings description]
+   * @dataProvider dataProviderCompressionMethods
+   * @param int $compressionMethod
    */
-  public function testAllCompressionMethodsSupportedForSimpleStrings(): void {
-    foreach (static::compressionMethods as $compressionMethod) {
-      $this->All_compression_methods_supported_for_simple_strings($compressionMethod);
-    }
-  }
-
-  /**
-   * [All_compression_methods_supported_for_simple_strings description]
-   * @param int $compressionMethod [description]
-   */
-  protected function All_compression_methods_supported_for_simple_strings(int $compressionMethod): void
+  public function testAllCompressionMethodsSupportedForSimpleStrings(int $compressionMethod): void
   {
+    if($compressionMethod === CompressionMethod::Snappy) {
+      if(!extension_loaded('snappy')) {
+        $this->markTestSkipped('ext-snappy unavailable');
+      }
+    }
+
     /*
     * uncompressed: length - 14, levels - 6
     *
