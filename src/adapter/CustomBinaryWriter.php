@@ -146,7 +146,7 @@ class CustomBinaryWriter extends BinaryWriter
    */
   public function writeUInt32($value): void
   {
-    throw new \LogicException('Not implemented'); // TODO
+    fwrite($this->stream, pack($this->orderLittleEndian ? 'V' : 'N', $value));
   }
 
   /**
@@ -162,7 +162,7 @@ class CustomBinaryWriter extends BinaryWriter
    */
   public function writeUInt64($value): void
   {
-    throw new \LogicException('Not implemented'); // TODO
+    fwrite($this->stream, pack($this->orderLittleEndian ? 'P' : 'J', $value));
   }
 
   /**

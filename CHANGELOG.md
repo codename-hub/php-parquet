@@ -3,6 +3,8 @@
 ## [Unreleased]
 ### Breaking Change
 - Changed namespace to `codename\parquet`
+### Added
+- Supports for more data types: Int16 (Short), UInt16 (UShort), UInt32, UInt64 (as far as reasonable)
 ### Changed
 - Skip some tests if ext-snappy unavailable
 - Benchmark: enable snappy compression benchmark if respective extension available/loaded

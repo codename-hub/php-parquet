@@ -178,7 +178,7 @@ class CustomBinaryReader extends BinaryReader
    */
   public function readUInt64()
   {
-    // Nelexa doesn't support reading unsigned longs
+    // Nelexa doesn't support reading unsigned longs, PHP doesn't either.
     throw new \LogicException('Not supported');
   }
 

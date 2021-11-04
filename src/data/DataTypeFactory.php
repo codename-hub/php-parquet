@@ -8,8 +8,17 @@ use codename\parquet\data\concrete\ByteDataTypeHandler;
 use codename\parquet\data\concrete\ListDataTypeHandler;
 use codename\parquet\data\concrete\FloatDataTypeHandler;
 use codename\parquet\data\concrete\DoubleDataTypeHandler;
+use codename\parquet\data\concrete\Int16DataTypeHandler;
 use codename\parquet\data\concrete\Int32DataTypeHandler;
 use codename\parquet\data\concrete\Int64DataTypeHandler;
+
+use codename\parquet\data\concrete\UnsignedInt32DataTypeHandler;
+use codename\parquet\data\concrete\UnsignedInt16DataTypeHandler;
+
+use codename\parquet\data\concrete\ShortDataTypeHandler;
+use codename\parquet\data\concrete\UnsignedInt64DataTypeHandler;
+use codename\parquet\data\concrete\UnsignedShortDataTypeHandler;
+
 use codename\parquet\data\concrete\StringDataTypeHandler;
 use codename\parquet\data\concrete\BooleanDataTypeHandler;
 use codename\parquet\data\concrete\DecimalDataTypeHandler;
@@ -45,12 +54,22 @@ class DataTypeFactory
       // low priority types
       new BooleanDataTypeHandler(),
       new ByteDataTypeHandler(),
+      // new UnsignedByteDataTypeHandler(), // TODO
       // new SignedByteDataTypeHandler(),
-      // new Int16DataTypeHandler(),
-      // new UnsignedInt16DataTypeHandler(),
+
+      new ShortDataTypeHandler(),
+      new UnsignedShortDataTypeHandler(),
+      new Int16DataTypeHandler(),
+      new UnsignedInt16DataTypeHandler(),
+      new UnsignedInt32DataTypeHandler(),
+
       new Int32DataTypeHandler(),
+
+      new UnsignedInt64DataTypeHandler(),
       new Int64DataTypeHandler(),
       // new Int96DataTypeHandler(),
+
+
       new FloatDataTypeHandler(),
       new DoubleDataTypeHandler(),
       new StringDataTypeHandler(),

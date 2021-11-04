@@ -54,4 +54,8 @@ abstract class DataType
   const DateTimeOffset = 18;
 
   const Interval = 19;
+
+  const UnsignedInt32 = 20;
+
+  const UnsignedInt64 = 21;
 }
