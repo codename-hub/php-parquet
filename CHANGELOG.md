@@ -5,6 +5,8 @@
 - Changed namespace to `codename\parquet`
 ### Added
 - Supports for more data types: Int16 (Short), UInt16 (UShort), UInt32, UInt64 (as far as reasonable)
+### Improved
+- Some micro-optimizations (e.g. in StringDataTypeHandler)
 ### Changed
 - Skip some tests if ext-snappy unavailable
 - Benchmark: enable snappy compression benchmark if respective extension available/loaded

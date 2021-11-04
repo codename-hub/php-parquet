@@ -95,14 +95,13 @@ class StringDataTypeHandler extends BasicDataTypeHandler
     $spanIdx = 0;
     $destCount = \count($dest);
 
-    while ($spanIdx < $remLength && $destIdx < $destCount)
+    while (($spanIdx < $remLength) && ($destIdx < $destCount))
     {
       // see https://www.php.net/manual/de/function.unpack.php
       // unpack("l", $value)[1]  is for int32
       $length = \unpack('l', \substr($allBytes, $spanIdx, 4))[1];
-      $s = \substr($allBytes, $spanIdx + 4, $length);
+      $dest[$destIdx++] = \substr($allBytes, $spanIdx + 4, $length);
 
-      $dest[$destIdx++] = $s;
       $spanIdx = $spanIdx + 4 + $length;
     }
 
