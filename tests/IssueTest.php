@@ -57,4 +57,15 @@ class IssueTest extends TestBase
       }
     }
   }
+
+  /**
+   * @see https://github.com/aloneguid/parquet-dotnet/issues/107
+   */
+  public function testParquetDotnetIssue107(): void
+  {
+    $reader = new ParquetReader($this->openTestFile('issues/parquet-dotnet_107_test.parq'));
+    $dataColumns = $reader->ReadEntireRowGroup();
+    $this->assertIsFloat($dataColumns[0]->getData()[0]);
+    $this->assertEquals(40539.0, $dataColumns[0]->getData()[0]);
+  }
 }
