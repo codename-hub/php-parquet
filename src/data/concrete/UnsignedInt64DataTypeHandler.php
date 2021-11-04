@@ -8,27 +8,34 @@ use codename\parquet\data\BasicPrimitiveDataTypeHandler;
 use codename\parquet\format\Type;
 use codename\parquet\format\ConvertedType;
 
-class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
+/**
+ * This is a preliminary DataTypeHandler
+ * as PHP doesn't support 'real' UInt64 natively, no pun intended.
+ * Suprisingly, you might stumble upon huge integers being converted to a float,
+ * so this is still some kind of pun.
+ * Recommendation: do not use this at the moment.
+ */
+class UnsignedInt64DataTypeHandler extends BasicPrimitiveDataTypeHandler
 {
   /**
    */
   public function __construct()
   {
-    $this->phpType = 'integer';
-    parent::__construct(DataType::Int32, Type::INT32);
+    // NOTE: we do not set $this->phpType here, as it's not a native PHP type.
+    parent::__construct(DataType::UnsignedInt64, Type::INT64, ConvertedType::UINT_64);
   }
 
   /**
    * Maximum value for datatype
    * @var int
    */
-  const MaxValue = 2147483647;
+  const MaxValue = 18446744073709551615;
 
   /**
    * Minimum value for datatype
    * @var int
    */
-  const MinValue = -2147483648;
+  const MinValue = 0;
 
   /**
    * @inheritDoc
@@ -38,7 +45,7 @@ class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
     \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
-    return $reader->readInt32();
+    return $reader->readUInt64();
   }
 
   /**
@@ -46,14 +53,10 @@ class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   protected function WriteOne(\codename\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    //
-    // As we're dealing with integers in PHP
-    // we have to perform this extra-check to keep it inside the bounds
-    //
     if((static::MinValue <= $value) && ($value <= static::MaxValue)) {
-      $writer->writeInt32($value);
+      $writer->writeUInt64($value);
     } else {
-      throw new \Exception('Value out of Int32 bounds');
+      throw new \Exception('Value out of UInt64 bounds');
     }
   }
 }

@@ -41,7 +41,7 @@ class Schema
 
   /**
    * [getDataFields description]
-   * @return array [description]
+   * @return Field[] [description]
    */
   public function getDataFields() : array {
     $result = [];

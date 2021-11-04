@@ -6,6 +6,11 @@
 ### Added
 - DATA_PAGE_V2 (reading) support
 - RLE_DICTIONARY pages (reading) support
+- Supports for more data types: Int16 (Short), UInt16 (UShort), UInt32, UInt64 (as far as reasonable)
+### Improved
+- Some micro-optimizations (e.g. in StringDataTypeHandler)
+### Fixed
+- Port of parquet-dotnet issues/PRs #22 #23 (schema decoding bug, backward compat issue)
 ### Changed
 - Skip some tests if ext-snappy unavailable
 - Benchmark: enable snappy compression benchmark if respective extension available/loaded

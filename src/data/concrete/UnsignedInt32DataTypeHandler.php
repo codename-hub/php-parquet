@@ -1,6 +1,8 @@
 <?php
 namespace codename\parquet\data\concrete;
 
+use Nelexa\Buffer\Cast;
+
 use codename\parquet\data\DataType;
 use codename\parquet\data\BasicDataTypeHandler;
 use codename\parquet\data\BasicPrimitiveDataTypeHandler;
@@ -8,27 +10,27 @@ use codename\parquet\data\BasicPrimitiveDataTypeHandler;
 use codename\parquet\format\Type;
 use codename\parquet\format\ConvertedType;
 
-class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
+class UnsignedInt32DataTypeHandler extends BasicPrimitiveDataTypeHandler
 {
   /**
    */
   public function __construct()
   {
-    $this->phpType = 'integer';
-    parent::__construct(DataType::Int32, Type::INT32);
+    // NOTE: we do not set $this->phpType here, as it's not a native PHP type.
+    parent::__construct(DataType::UnsignedInt32, Type::INT32, ConvertedType::UINT_32);
   }
 
   /**
    * Maximum value for datatype
    * @var int
    */
-  const MaxValue = 2147483647;
+  const MaxValue = 4294967295;
 
   /**
    * Minimum value for datatype
    * @var int
    */
-  const MinValue = -2147483648;
+  const MinValue = 0;
 
   /**
    * @inheritDoc
@@ -38,7 +40,7 @@ class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
     \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
-    return $reader->readInt32();
+    return $reader->readUInt32();
   }
 
   /**
@@ -46,14 +48,10 @@ class Int32DataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   protected function WriteOne(\codename\parquet\adapter\BinaryWriter $writer, $value): void
   {
-    //
-    // As we're dealing with integers in PHP
-    // we have to perform this extra-check to keep it inside the bounds
-    //
     if((static::MinValue <= $value) && ($value <= static::MaxValue)) {
-      $writer->writeInt32($value);
+      $writer->writeUInt32($value);
     } else {
-      throw new \Exception('Value out of Int32 bounds');
+      throw new \Exception('Value out of UInt32 bounds');
     }
   }
 }

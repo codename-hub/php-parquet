@@ -4,6 +4,7 @@ namespace codename\parquet\tests;
 
 use codename\parquet\ParquetReader;
 
+use codename\parquet\data\DataType;
 use codename\parquet\data\DataField;
 use codename\parquet\data\DateTimeFormat;
 use codename\parquet\data\DecimalDataField;
@@ -12,20 +13,13 @@ use codename\parquet\data\DateTimeDataField;
 final class EndToEndTypeTest extends TestBase
 {
   /**
-   * [protected description]
-   * @var [type]
+   * Datasets as a dataProvider
+   * to be executed by methods in this class.
+   *
+   * @return array [description]
    */
-  protected static $nameToData = null;
-
-  /**
-   * [createTestData description]
-   */
-  protected static function createTestData(): void {
-    if(static::$nameToData !== null) {
-      return;
-    }
-
-    static::$nameToData = [
+  public function endToEndTestDataProvider(): array {
+    $dataset = [
       "plain string" => [
         'field'           => DataField::createFromType("plain string", 'string'),
         'expectedValue'   => "plain string"
@@ -136,22 +130,115 @@ final class EndToEndTypeTest extends TestBase
       //   'expectedValue' => sbyte.MaxValue
       // ],
       //
-      // "short min value" => [
-      //   'field'         => DataField::createFromType("short", 'short'),
-      //   'expectedValue' => short.MinValue
+      "short min value" => [
+        'field'         => new DataField("short", DataType::Short),
+        'expectedValue' => -32768
+      ],
+      "short max value" => [
+        'field'         => new DataField("short", DataType::Short),
+        'expectedValue' => 32767
+      ],
+
+      "short min value underflow" => [
+        'field'         => new DataField("short", DataType::Short),
+        'expectedValue' => -32768 - 1,
+        'expectExceptionMessage' => 'Value out of Int16 bounds'
+      ],
+      "short max value overflow" => [
+        'field'         => new DataField("short", DataType::Short),
+        'expectedValue' => 32767 + 1,
+        'expectExceptionMessage' => 'Value out of Int16 bounds'
+      ],
+
+      "unsigned short min value" => [
+        'field'         => new DataField("ushort", DataType::UnsignedShort), // DataField::createFromType("ushort", 'ushort'),
+        'expectedValue' => 0 // ushort.MinValue
+      ],
+      "unsigned short max value" => [
+        'field'         => new DataField("ushort", DataType::UnsignedShort),
+        'expectedValue' => 65535
+      ],
+      "unsigned short min value underflow" => [
+        'field'         => new DataField("ushort", DataType::UnsignedShort), // DataField::createFromType("ushort", 'ushort'),
+        'expectedValue' => 0 - 1, // ushort.MinValue
+        'expectExceptionMessage' => 'Value out of UInt16 bounds'
+      ],
+      "unsigned short max value overflow" => [
+        'field'         => new DataField("ushort", DataType::UnsignedShort),
+        'expectedValue' => 65535 + 1,
+        'expectExceptionMessage' => 'Value out of UInt16 bounds'
+      ],
+
+      "int min value" => [
+        'field'         => new DataField("int", DataType::Int32), // DataField::createFromType("int", 'integer'),
+        'expectedValue' => -2147483648
+      ],
+      "int max value" => [
+        'field'         => new DataField("int", DataType::Int32),
+        'expectedValue' => 2147483647
+      ],
+      "int min value underflow" => [
+        'field'         => new DataField("int", DataType::Int32), // DataField::createFromType("int", 'integer'),
+        'expectedValue' => -2147483648 - 1,
+        'expectExceptionMessage' => 'Value out of Int32 bounds'
+      ],
+      "int max value overflow" => [
+        'field'         => new DataField("int", DataType::Int32),
+        'expectedValue' => 2147483647 + 1,
+        'expectExceptionMessage' => 'Value out of Int32 bounds'
+      ],
+
+      "unsigned int min value" => [
+        'field'         => new DataField("int", DataType::UnsignedInt32), // DataField::createFromType("int", 'integer'),
+        'expectedValue' => 0
+      ],
+      "unsigned int max value" => [
+        'field'         => new DataField("int", DataType::UnsignedInt32),
+        'expectedValue' => 4294967295
+      ],
+      "unsigned int min value underflow" => [
+        'field'         => new DataField("int", DataType::UnsignedInt32), // DataField::createFromType("int", 'integer'),
+        'expectedValue' => 0 - 1,
+        'expectExceptionMessage' => 'Value out of UInt32 bounds'
+      ],
+      "unsigned int max value overflow" => [
+        'field'         => new DataField("int", DataType::UnsignedInt32),
+        'expectedValue' => 4294967295 + 1,
+        'expectExceptionMessage' => 'Value out of UInt32 bounds'
+      ],
+
+      "long min value" => [
+        'field'         => new DataField("long", DataType::Int64), // DataField::createFromType("int", 'integer'),
+        'expectedValue' => -9223372036854775808
+      ],
+      "long max value" => [
+        'field'         => new DataField("long", DataType::Int64), // DataField::createFromType("int", 'integer'),
+        'expectedValue' => 9223372036854775807
+      ],
+
+      //
+      // Unsigned Longs are not supported due to the nature of php
+      // you may use a regular, signed int64
+      //
+      // "unsigned long min value" => [
+      //   'field'         => new DataField("long", DataType::UnsignedInt64), // DataField::createFromType("int", 'integer'),
+      //   'expectedValue' => 0
       // ],
-      // "short max value" => [
-      //   'field'         => DataField::createFromType("short", 'short'),
-      //   'expectedValue' => short.MaxValue
+      // "unsigned long max value" => [
+      //   'field'         => new DataField("long", DataType::UnsignedInt64), // DataField::createFromType("int", 'integer'),
+      //   'expectedValue' => 18446744073709551615
       // ],
-      // "unsigned short min value" => [
-      //   'field'         => DataField::createFromType("ushort", 'ushort'),
-      //   'expectedValue' => ushort.MinValue
+
+
+      // "unsigned long max value near bound" => [
+      //   'field'         => new DataField("long", DataType::Int64), // DataField::createFromType("int", 'integer'),
+      //   'expectedValue' => 18446744073709551615 - 1
       // ],
-      // "unsigned short max value" => [
-      //   'field'         => DataField::createFromType("ushort", 'ushort'),
-      //   'expectedValue' => ushort.MaxValue
-      // ],
+
+      // ["long min value"] = (new DataField<long>("long"), long.MinValue),
+      // ["long max value"] = (new DataField<long>("long"), long.MaxValue),
+      // ["unsigned long min value"] = (new DataField<ulong>("ulong"), ulong.MinValue),
+      // ["unsigned long max value"] = (new DataField<ulong>("ulong"), ulong.MaxValue),
 
       "nullable decimal" => [
         'field'         => DecimalDataField::create("decimal?", 4, 1, true, true),
@@ -171,17 +258,12 @@ final class EndToEndTypeTest extends TestBase
       //   'expectedValue' => new bool?(true)
       // ],
     ];
-  }
 
-  /**
-   * [testTypeWritesAndReadsEndToEnd description]
-   */
-  public function testTypeWritesAndReadsEndToEnd(): void {
-    static::createTestData();
-
-    foreach(static::$nameToData as $key => $value) {
-      $this->Type_writes_and_reads_end_to_end($key);
+    $dataprovider = [];
+    foreach($dataset as $name => $data) {
+      $dataprovider[] = [ $name, $data ];
     }
+    return $dataprovider;
   }
 
   /**
@@ -197,12 +279,21 @@ final class EndToEndTypeTest extends TestBase
   }
 
   /**
-   * [Type_writes_and_reads_end_to_end description]
-   * @param string $name [description]
+   * This method executes all the tests described in the dataProvider above.
+   *
+   * @dataProvider endToEndTestDataProvider
+   * @param string  $name
+   * @param array   $data
    */
-  protected function Type_writes_and_reads_end_to_end(string $name): void
+  public function testTypeWritesAndReadsEndToEnd(string $name, array $data): void
   {
-    $input = static::$nameToData[$name];
+    $input = $data;
+
+    $expectExceptionMessage = $input['expectExceptionMessage'] ?? null;
+    if($expectExceptionMessage) {
+      $this->expectExceptionMessage($expectExceptionMessage);
+    }
+
     $actual = $this->WriteReadSingle($input['field'], $input['expectedValue']);
     $equal = null;
     if ($input['expectedValue'] === null && $actual === null)
@@ -229,5 +320,13 @@ final class EndToEndTypeTest extends TestBase
     } else {
       $this->assertTrue($equal, "{$name} | expected: [ {$expectedValueFormatted} ], actual: [ {$actualFormatted} ], schema element: {$fieldFormatted}");
     }
+
+    // For some hard-debugging purposes, comment-in
+    // if($input['debug'] ?? false) {
+    //   print_r([
+    //     'input'   => $input,
+    //     'actual'  => $actual
+    //   ]);
+    // }
   }
 }

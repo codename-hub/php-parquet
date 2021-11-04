@@ -1,12 +1,13 @@
-ARG  PHP_VERSION=7.3
+ARG  PHP_VERSION=7.3.32
 FROM php:${PHP_VERSION}-cli
 
 # get apt-get lists for the first time
 RUN apt-get update
 
-## install zip extension using debian buster repo (which is now available)
+## install zip extension using debian buster (or higher) repo (which is now available)
+## older php:7.3 images are not on buster
 ## we need zip-1.14 or higher and libzip 1.2 or higher for ZIP encryption support
-RUN apt-get update && apt-get install -t buster -y zlib1g-dev libzip-dev \
+RUN apt-get update && apt-get install -y zlib1g-dev libzip-dev \
     && pecl install zip
 
 # for PHP <= 7.3 we need to perform this step before installing

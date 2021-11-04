@@ -36,6 +36,28 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
   ) : Field {
     $tseList = $schema[$index];
     $listField = ListField::createWithNoItem($tseList->name);
+
+    // https://github.com/apache/parquet-format/blob/master/LogicalTypes.md#backward-compatibility-rules
+
+    $tseRepeated = $schema[$index + 1];
+
+    // Rule 1. If the repeated field is not a group, then its type is the element type and elements are required.
+    // not implemented
+
+    // Rule 2. If the repeated field is a group with multiple fields, then its type is the element type and elements are required.
+    // not implemented
+
+    // Rule 3. f the repeated field is a group with one field and is named either array or uses
+    // the LIST-annotated group's name with _tuple appended then the repeated type is the element
+    // type and elements are required.
+
+    if($tseList->num_children === 1 && $tseRepeated->name === 'array') {
+      $listField->path = $tseList->name;
+      $index += 1;
+      $ownedChildCount = 1;
+      return $listField;
+    }
+
     // as we are skipping elements set path hint
     // $listField->path = $"{tseList.Name}{Schema.PathSeparator}{schema[index + 1].Name}"; // TODO
     // $listField->path = "{$tseList->name}{Schema::PathSeparator}{$schema[$index + 1]->name}";
