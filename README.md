@@ -1,12 +1,20 @@
 php-parquet
 ===
 
+[![Build Status (Github Actions)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml/badge.svg?branch=master)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml)
+
+[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/codename-hub/php-parquet/Unit%20Tests?event=push&label=release%20build)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml?query=event%3Apush)
+[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/codename-hub/php-parquet/Unit%20Tests?event=workflow_dispatch&label=dev%20build)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml?query=event%3Aworkflow_dispatch)
+
 This is the first parquet file format reader/writer implementation in PHP, based on the Thrift sources provided by the Apache Foundation.
 Extensive parts of the code and concepts have been ported from parquet-dotnet (see https://github.com/elastacloud/parquet-dotnet and https://github.com/aloneguid/parquet-dotnet).
 Therefore, thanks go out to Ivan Gavryliuk (https://github.com/aloneguid).
 
 This package enables you to read and write Parquet files/streams w/o the use of exotic external extensions (except you want to use exotic compression methods).
 It has (almost?) 100% test compatibility with parquet-dotnet, regarding the core functionality, done via PHPUnit.
+
+## Important
+This repository (and associated package on Packagist) has been decoupled from the first release (https://github.com/Jocoon/php-parquet, Package `jocoon/parquet`) and re-branded under a future, fresh family name of packages.
 
 ## Preamble
 For some parts of this package, some new patterns had to be invented as I haven't found any implementation that met the requirements.
