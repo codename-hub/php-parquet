@@ -1,17 +1,17 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 use PHPUnit\Framework\TestCase;
 
-use jocoon\parquet\ParquetReader;
-use jocoon\parquet\ParquetWriter;
-use jocoon\parquet\ParquetOptions;
-use jocoon\parquet\CompressionMethod;
-use jocoon\parquet\ParquetExtensions;
+use codename\parquet\ParquetReader;
+use codename\parquet\ParquetWriter;
+use codename\parquet\ParquetOptions;
+use codename\parquet\CompressionMethod;
+use codename\parquet\ParquetExtensions;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\DataColumn;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataColumn;
 
 class TestBase extends TestCase {
 

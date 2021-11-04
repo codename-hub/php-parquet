@@ -1,19 +1,11 @@
 php-parquet
 ===
-[![Build Status (Github Actions)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml)
-
-[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=push&label=release%20build)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml?query=event%3Apush)
-[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/jocoon/php-parquet/Unit%20Tests?event=workflow_dispatch&label=dev%20build)](https://github.com/Jocoon/php-parquet/actions/workflows/test.yml?query=event%3Aworkflow_dispatch)
-
-[![Packagist Version](https://img.shields.io/packagist/v/jocoon/parquet)](https://packagist.org/packages/jocoon/parquet)
-[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/jocoon/parquet)](https://packagist.org/packages/jocoon/parquet)
-[![Packagist Downloads](https://img.shields.io/packagist/dt/jocoon/parquet?label=packagist%20installs)](https://packagist.org/packages/jocoon/parquet)
 
 This is the first parquet file format reader/writer implementation in PHP, based on the Thrift sources provided by the Apache Foundation.
 Extensive parts of the code and concepts have been ported from parquet-dotnet (see https://github.com/elastacloud/parquet-dotnet and https://github.com/aloneguid/parquet-dotnet).
 Therefore, thanks go out to Ivan Gavryliuk (https://github.com/aloneguid).
 
-This package enables you to read and write Parquet files/streams.
+This package enables you to read and write Parquet files/streams w/o the use of exotic external extensions (except you want to use exotic compression methods).
 It has (almost?) 100% test compatibility with parquet-dotnet, regarding the core functionality, done via PHPUnit.
 
 ## Preamble
@@ -84,7 +76,7 @@ Alternative 3rd party binary reading/writing packages in scope:
 ## Installation
 Install this package via composer, e.g.
 ```bash
-composer require jocoon/parquet
+composer require codename/parquet
 ```
 
 The included _Dockerfile_ gives you an idea of the needed system requirements.
@@ -137,7 +129,7 @@ It doesn't include parquet-dotnet's Table, Row, Enumerators/helpers from the C# 
 
 ### Reading files
 ```php
-use jocoon\parquet\ParquetReader;
+use codename\parquet\ParquetReader;
 
 // open file stream (in this example for reading only)
 $fileStream = fopen(__DIR__.'/test.parquet', 'r');
@@ -174,11 +166,11 @@ for($i = 0; $i < $parquetReader->getRowGroupCount(); $i++)
 
 ### Writing files
 ```php
-use jocoon\parquet\ParquetWriter;
+use codename\parquet\ParquetWriter;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\DataColumn;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataColumn;
 
 //create data columns with schema metadata and the data you need
 $idColumn = new DataColumn(

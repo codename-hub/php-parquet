@@ -1,11 +1,11 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
 use Exception;
 
-use jocoon\parquet\CompressionMethod;
+use codename\parquet\CompressionMethod;
 
-use jocoon\parquet\format\CompressionCodec;
+use codename\parquet\format\CompressionCodec;
 
 /**
  * [DataFactory description]

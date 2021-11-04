@@ -1,14 +1,14 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
 use Exception;
 
-use jocoon\parquet\adapter\BinaryReader;
-use jocoon\parquet\adapter\BinaryWriter;
+use codename\parquet\adapter\BinaryReader;
+use codename\parquet\adapter\BinaryWriter;
 
-use jocoon\parquet\format\Statistics;
-use jocoon\parquet\format\SchemaElement;
-use jocoon\parquet\format\FieldRepetitionType;
+use codename\parquet\format\Statistics;
+use codename\parquet\format\SchemaElement;
+use codename\parquet\format\FieldRepetitionType;
 
 abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
 {
@@ -121,15 +121,15 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function isMatch(
-    \jocoon\parquet\format\SchemaElement $tse,
-    ?\jocoon\parquet\ParquetOptions $formatOptions
+    \codename\parquet\format\SchemaElement $tse,
+    ?\codename\parquet\ParquetOptions $formatOptions
   ): bool {
     // NOTE: php evaluates a zero (0) to false, therefore we have to check for !== null instead of being truthy, somehow. (type == 0 => boolean)
     return ($tse->type !== null && $this->thriftType === $tse->type) &&
       ($this->convertedType === null || $tse->converted_type && $tse->converted_type === $this->convertedType);
   }
   //
-  // public function read(\jocoon\parquet\file\ThriftStream $stream) {
+  // public function read(\codename\parquet\file\ThriftStream $stream) {
   //   $stream->Read()
   // }
 
@@ -146,7 +146,7 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    */
   public function read(
     BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
   ): int {
@@ -158,7 +158,7 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    */
   public function readObject(
     BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
     return $this->readSingle($reader, $tse, $length);

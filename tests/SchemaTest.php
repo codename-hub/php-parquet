@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
 use Exception;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataType;
-use jocoon\parquet\data\MapField;
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\ListField;
-use jocoon\parquet\data\DataColumn;
-use jocoon\parquet\data\StructField;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataType;
+use codename\parquet\data\MapField;
+use codename\parquet\data\DataField;
+use codename\parquet\data\ListField;
+use codename\parquet\data\DataColumn;
+use codename\parquet\data\StructField;
 
-use jocoon\parquet\exception\NotSupportedException;
+use codename\parquet\exception\NotSupportedException;
 
 final class SchemaTest extends TestBase
 {

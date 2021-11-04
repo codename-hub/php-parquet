@@ -1,14 +1,14 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
-use jocoon\parquet\adapter\BinaryReader;
-use jocoon\parquet\adapter\BinaryWriter;
+use codename\parquet\adapter\BinaryReader;
+use codename\parquet\adapter\BinaryWriter;
 
-use jocoon\parquet\data\DataType;
-use jocoon\parquet\data\BasicDataTypeHandler;
+use codename\parquet\data\DataType;
+use codename\parquet\data\BasicDataTypeHandler;
 
-use jocoon\parquet\format\Type;
-use jocoon\parquet\format\ConvertedType;
+use codename\parquet\format\Type;
+use codename\parquet\format\ConvertedType;
 
 class StringDataTypeHandler extends BasicDataTypeHandler
 {
@@ -24,8 +24,8 @@ class StringDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function isMatch(
-    \jocoon\parquet\format\SchemaElement $tse,
-    ?\jocoon\parquet\ParquetOptions $formatOptions
+    \codename\parquet\format\SchemaElement $tse,
+    ?\codename\parquet\ParquetOptions $formatOptions
   ): bool {
 
     return $tse->type && $tse->type === Type::BYTE_ARRAY &&
@@ -39,8 +39,8 @@ class StringDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
     $this->readSingleInternal($reader, $tse, $length, true);
@@ -48,15 +48,15 @@ class StringDataTypeHandler extends BasicDataTypeHandler
 
   /**
    * [readSingleInternal description]
-   * @param  \jocoon\parquet\adapter\BinaryReader $reader          [description]
-   * @param  \jocoon\parquet\format\SchemaElement $tse             [description]
+   * @param  \codename\parquet\adapter\BinaryReader $reader          [description]
+   * @param  \codename\parquet\format\SchemaElement $tse             [description]
    * @param  int                                  $length          [description]
    * @param  bool                                 $hasLengthPrefix [description]
    * @return [type]                                            [description]
    */
   protected function readSingleInternal(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     int $length,
     bool $hasLengthPrefix
   ) {
@@ -76,8 +76,8 @@ class StringDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
   ): int {
@@ -124,7 +124,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
   /**
   * @inheritDoc
    */
-  protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
+  protected function WriteOne(\codename\parquet\adapter\BinaryWriter $writer, $value): void
   {
     $this->writeOneInternal($writer, $value, true);
   }
@@ -134,11 +134,11 @@ class StringDataTypeHandler extends BasicDataTypeHandler
    */
   /**
    * [WriteOneInternal description]
-   * @param \jocoon\parquet\adapter\BinaryWriter $writer [description]
+   * @param \codename\parquet\adapter\BinaryWriter $writer [description]
    * @param string                               $value  [description]
    * @param bool                                 $includeLengthPrefix
    */
-  protected function WriteOneInternal(\jocoon\parquet\adapter\BinaryWriter $writer, $value, bool $includeLengthPrefix): void
+  protected function WriteOneInternal(\codename\parquet\adapter\BinaryWriter $writer, $value, bool $includeLengthPrefix): void
   {
     $valueLength = null;
     if ($value === null || ($valueLength = \strlen($value)) === 0)
@@ -171,7 +171,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
   /**
    * @inheritDoc
    */
-  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  public function plainEncode(\codename\parquet\format\SchemaElement $tse, $x)
   {
     if($x === null) return null;
 
@@ -185,7 +185,7 @@ class StringDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function plainDecode(
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     $encoded
   ) {
     if ($encoded === null) return null;

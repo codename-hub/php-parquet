@@ -1,14 +1,14 @@
 <?php
-namespace jocoon\parquet\file;
+namespace codename\parquet\file;
 
 use Exception;
 
-use jocoon\parquet\GapStreamWrapper;
-use jocoon\parquet\CompressionMethod;
-use jocoon\parquet\GzipStreamWrapper;
-use jocoon\parquet\SnappyInMemoryStreamWrapper;
+use codename\parquet\GapStreamWrapper;
+use codename\parquet\CompressionMethod;
+use codename\parquet\GzipStreamWrapper;
+use codename\parquet\SnappyInMemoryStreamWrapper;
 
-use jocoon\parquet\format\CompressionCodec;
+use codename\parquet\format\CompressionCodec;
 
 class DataStreamFactory
 {

@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
-use jocoon\parquet\StreamHelper;
-use jocoon\parquet\SnappyInMemoryStreamWrapper;
+use codename\parquet\StreamHelper;
+use codename\parquet\SnappyInMemoryStreamWrapper;
 
 final class SnappyTest extends TestBase
 {

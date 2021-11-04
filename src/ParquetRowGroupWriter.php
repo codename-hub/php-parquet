@@ -1,18 +1,18 @@
 <?php
-namespace jocoon\parquet;
+namespace codename\parquet;
 
 use Exception;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataColumn;
-use jocoon\parquet\data\DataTypeFactory;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataColumn;
+use codename\parquet\data\DataTypeFactory;
 
-use jocoon\parquet\file\ThriftFooter;
-use jocoon\parquet\file\ThriftStream;
-use jocoon\parquet\file\DataColumnWriter;
+use codename\parquet\file\ThriftFooter;
+use codename\parquet\file\ThriftStream;
+use codename\parquet\file\DataColumnWriter;
 
-use jocoon\parquet\format\RowGroup;
-use jocoon\parquet\format\SchemaElement;
+use codename\parquet\format\RowGroup;
+use codename\parquet\format\SchemaElement;
 
 class ParquetRowGroupWriter
 {

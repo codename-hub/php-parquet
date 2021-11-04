@@ -8,11 +8,11 @@ require_once('vendor/autoload.php');
 //
 // The writing example:
 //
-use jocoon\parquet\ParquetWriter;
+use codename\parquet\ParquetWriter;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\DataColumn;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataColumn;
 
 //create data columns with schema metadata and the data you need
 $idColumn = new DataColumn(
@@ -51,7 +51,7 @@ $parquetWriter->finish(); // finish the parquet writer last
 // The reading example:
 //
 
-use jocoon\parquet\ParquetReader;
+use codename\parquet\ParquetReader;
 
 // open file stream (in this example for reading only)
 $fileStream = fopen(__DIR__.'/test.parquet', 'r');

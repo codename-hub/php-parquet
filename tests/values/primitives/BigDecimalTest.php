@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests\values\primitives;
+namespace codename\parquet\tests\values\primitives;
 
-use jocoon\parquet\tests\TestBase;
+use codename\parquet\tests\TestBase;
 
-use jocoon\parquet\values\primitives\BigDecimal;
+use codename\parquet\values\primitives\BigDecimal;
 
 final class BigDecimalTest extends TestBase
 {

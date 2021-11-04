@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
-use jocoon\parquet\ParquetReader;
+use codename\parquet\ParquetReader;
 
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\DateTimeFormat;
-use jocoon\parquet\data\DecimalDataField;
-use jocoon\parquet\data\DateTimeDataField;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DateTimeFormat;
+use codename\parquet\data\DecimalDataField;
+use codename\parquet\data\DateTimeDataField;
 
 final class EndToEndTypeTest extends TestBase
 {

@@ -1,25 +1,25 @@
 <?php
-namespace jocoon\parquet\file;
+namespace codename\parquet\file;
 
-use jocoon\parquet\ParquetOptions;
+use codename\parquet\ParquetOptions;
 
-use jocoon\parquet\data\Field;
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\DataFactory;
-use jocoon\parquet\data\DataTypeFactory;
+use codename\parquet\data\Field;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataFactory;
+use codename\parquet\data\DataTypeFactory;
 
-use jocoon\parquet\format\Encoding;
-use jocoon\parquet\format\PageType;
-use jocoon\parquet\format\RowGroup;
-use jocoon\parquet\format\PageHeader;
-use jocoon\parquet\format\Statistics;
-use jocoon\parquet\format\ColumnChunk;
-use jocoon\parquet\format\FileMetaData;
-use jocoon\parquet\format\SchemaElement;
-use jocoon\parquet\format\ColumnMetaData;
-use jocoon\parquet\format\DataPageHeader;
-use jocoon\parquet\format\FieldRepetitionType;
+use codename\parquet\format\Encoding;
+use codename\parquet\format\PageType;
+use codename\parquet\format\RowGroup;
+use codename\parquet\format\PageHeader;
+use codename\parquet\format\Statistics;
+use codename\parquet\format\ColumnChunk;
+use codename\parquet\format\FileMetaData;
+use codename\parquet\format\SchemaElement;
+use codename\parquet\format\ColumnMetaData;
+use codename\parquet\format\DataPageHeader;
+use codename\parquet\format\FieldRepetitionType;
 
 class ThriftFooter {
 

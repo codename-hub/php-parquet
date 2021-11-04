@@ -1,5 +1,5 @@
 <?php
-namespace jocoon\parquet;
+namespace codename\parquet;
 
 use Exception;
 
@@ -330,7 +330,7 @@ class GapStreamWrapper implements StreamWrapperInterface, MarkWriteFinishedInter
   {
     // echo("stream close of gap stream!".chr(10));
 
-    // print_r(\jocoon\parquet\GapStreamWrapper::$staticParents);
+    // print_r(\codename\parquet\GapStreamWrapper::$staticParents);
     //
     // $trace = debug_backtrace();
     // foreach($trace as $te) {

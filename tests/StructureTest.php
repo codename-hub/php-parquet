@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
-use jocoon\parquet\ParquetExtensions;
+use codename\parquet\ParquetExtensions;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\DataColumn;
-use jocoon\parquet\data\StructField;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataColumn;
+use codename\parquet\data\StructField;
 
 final class StructureTest extends TestBase {
 

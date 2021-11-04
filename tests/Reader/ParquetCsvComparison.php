@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests\Reader;
+namespace codename\parquet\tests\Reader;
 
-use jocoon\parquet\ParquetReader;
-use jocoon\parquet\ParquetOptions;
+use codename\parquet\ParquetReader;
+use codename\parquet\ParquetOptions;
 
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\DataColumn;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataColumn;
 
-use jocoon\parquet\tests\TestBase;
+use codename\parquet\tests\TestBase;
 
 class ParquetCsvComparison extends TestBase
 {

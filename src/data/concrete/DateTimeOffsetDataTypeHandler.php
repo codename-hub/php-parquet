@@ -1,22 +1,22 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
 use DateTimeImmutable;
 
-use jocoon\parquet\adapter\BinaryReader;
-use jocoon\parquet\adapter\BinaryWriter;
+use codename\parquet\adapter\BinaryReader;
+use codename\parquet\adapter\BinaryWriter;
 
-use jocoon\parquet\data\DataType;
-use jocoon\parquet\data\DateTimeFormat;
-use jocoon\parquet\data\DateTimeDataField;
-use jocoon\parquet\data\BasicPrimitiveDataTypeHandler;
+use codename\parquet\data\DataType;
+use codename\parquet\data\DateTimeFormat;
+use codename\parquet\data\DateTimeDataField;
+use codename\parquet\data\BasicPrimitiveDataTypeHandler;
 
-use jocoon\parquet\format\Type;
-use jocoon\parquet\format\ConvertedType;
+use codename\parquet\format\Type;
+use codename\parquet\format\ConvertedType;
 
-use jocoon\parquet\helper\OtherExtensions;
+use codename\parquet\helper\OtherExtensions;
 
-use jocoon\parquet\values\primitives\NanoTime;
+use codename\parquet\values\primitives\NanoTime;
 
 /**
  * [DateTimeOffsetDataTypeHandler description]
@@ -36,8 +36,8 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function isMatch(
-    \jocoon\parquet\format\SchemaElement $tse,
-    ?\jocoon\parquet\ParquetOptions $formatOptions
+    \codename\parquet\format\SchemaElement $tse,
+    ?\codename\parquet\ParquetOptions $formatOptions
   ): bool {
     return
       ($tse->type === Type::INT96 && $formatOptions->TreatBigIntegersAsDates) || // Impala
@@ -49,8 +49,8 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function createThrift(
-    \jocoon\parquet\data\Field $field,
-    \jocoon\parquet\format\SchemaElement $parent,
+    \codename\parquet\data\Field $field,
+    \codename\parquet\format\SchemaElement $parent,
     array &$container
   ): void {
     parent::createThrift($field, $parent, $container);
@@ -84,7 +84,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   public function read(
     BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
   ): int {
@@ -104,10 +104,10 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function Write(
-    \jocoon\parquet\format\SchemaElement $tse,
-    \jocoon\parquet\adapter\BinaryWriter $writer,
+    \codename\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryWriter $writer,
     array $values,
-    \jocoon\parquet\data\DataColumnStatistics $statistics = null
+    \codename\parquet\data\DataColumnStatistics $statistics = null
   ): void {
 
     switch($tse->type) {
@@ -152,10 +152,10 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
   /**
    * [WriteAsInt32 description]
-   * @param \jocoon\parquet\adapter\BinaryWriter  $writer [description]
+   * @param \codename\parquet\adapter\BinaryWriter  $writer [description]
    * @param DateTimeImmutable[]   $values [description]
    */
-  protected function WriteAsInt32(\jocoon\parquet\adapter\BinaryWriter $writer, array $values): void
+  protected function WriteAsInt32(\codename\parquet\adapter\BinaryWriter $writer, array $values): void
   {
     foreach($values as $dto) {
       $days = OtherExtensions::ToUnixDays($dto);
@@ -184,10 +184,10 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
   /**
    * [WriteAsInt64 description]
-   * @param \jocoon\parquet\adapter\BinaryWriter  $writer [description]
+   * @param \codename\parquet\adapter\BinaryWriter  $writer [description]
    * @param DateTimeImmutable[]   $values [description]
    */
-  protected function WriteAsInt64(\jocoon\parquet\adapter\BinaryWriter $writer, array $values): void
+  protected function WriteAsInt64(\codename\parquet\adapter\BinaryWriter $writer, array $values): void
   {
     foreach($values as $dto) {
       $value = OtherExtensions::ToUnixMilliseconds($dto);
@@ -216,10 +216,10 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
 
   /**
    * [WriteAsInt96 description]
-   * @param \jocoon\parquet\adapter\BinaryWriter  $writer [description]
+   * @param \codename\parquet\adapter\BinaryWriter  $writer [description]
    * @param DateTimeImmutable[]   $values [description]
    */
-  protected function WriteAsInt96(\jocoon\parquet\adapter\BinaryWriter $writer, array $values): void
+  protected function WriteAsInt96(\codename\parquet\adapter\BinaryWriter $writer, array $values): void
   {
     foreach($values as $dto) {
       $nano = NanoTime::NanoTimeFromDateTimeImmutable($dto);
@@ -232,7 +232,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   protected function readSingle(
     BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
     switch($tse->type) {
@@ -253,7 +253,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
   * @inheritDoc
   */
-  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  public function plainEncode(\codename\parquet\format\SchemaElement $tse, $x)
   {
     if($x === null) return null;
 
@@ -267,7 +267,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
   * @inheritDoc
   */
   public function plainDecode(
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     $encoded
   ) {
     if ($encoded === null) return null;

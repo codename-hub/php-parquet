@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
-use jocoon\parquet\CompressionMethod;
-use jocoon\parquet\GzipStreamWrapper;
+use codename\parquet\CompressionMethod;
+use codename\parquet\GzipStreamWrapper;
 
-use jocoon\parquet\data\DataField;
+use codename\parquet\data\DataField;
 
 final class CompressionTest extends TestBase
 {

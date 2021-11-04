@@ -1,12 +1,12 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
-use jocoon\parquet\data\DataType;
-use jocoon\parquet\data\BasicDataTypeHandler;
-use jocoon\parquet\data\BasicPrimitiveDataTypeHandler;
+use codename\parquet\data\DataType;
+use codename\parquet\data\BasicDataTypeHandler;
+use codename\parquet\data\BasicPrimitiveDataTypeHandler;
 
-use jocoon\parquet\format\Type;
-use jocoon\parquet\format\ConvertedType;
+use codename\parquet\format\Type;
+use codename\parquet\format\ConvertedType;
 
 class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
 {
@@ -22,8 +22,8 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) : bool {
     return $reader->readBytes(1) !== null; // ??
@@ -37,8 +37,8 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
   ): int {
@@ -69,10 +69,10 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function Write(
-    \jocoon\parquet\format\SchemaElement $tse,
-    \jocoon\parquet\adapter\BinaryWriter $writer,
+    \codename\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryWriter $writer,
     array $values,
-    \jocoon\parquet\data\DataColumnStatistics $statistics = null
+    \codename\parquet\data\DataColumnStatistics $statistics = null
   ): void {
     $n = 0;
     $b = 0; // byte
@@ -103,7 +103,7 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * @inheritDoc
    */
-  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  public function plainEncode(\codename\parquet\format\SchemaElement $tse, $x)
   {
     return null;
   }
@@ -112,7 +112,7 @@ class BooleanDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function plainDecode(
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     $encoded
   ) {
     return null;

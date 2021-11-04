@@ -1,9 +1,9 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
 use Exception;
 
-use jocoon\parquet\helper\OtherExtensions;
+use codename\parquet\helper\OtherExtensions;
 
 class MapField extends Field
 {
@@ -79,7 +79,7 @@ class MapField extends Field
   /**
    * @inheritDoc
    */
-  public function assign(\jocoon\parquet\data\Field $field): void
+  public function assign(\codename\parquet\data\Field $field): void
   {
     if($this->key === null) {
       $this->key = $field;

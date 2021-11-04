@@ -1,5 +1,5 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
 abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
 {
@@ -15,8 +15,8 @@ abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function read(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
   ): int {
@@ -27,8 +27,8 @@ abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function readObject(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
     throw new \LogicException('Not implemented'); // TODO
@@ -76,10 +76,10 @@ abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function write(
-    \jocoon\parquet\format\SchemaElement $tse,
-    \jocoon\parquet\adapter\BinaryWriter $writer,
+    \codename\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryWriter $writer,
     array $values,
-    \jocoon\parquet\data\DataColumnStatistics $statistics = null
+    \codename\parquet\data\DataColumnStatistics $statistics = null
   ): void {
     throw new \LogicException('Not implemented'); // TODO
   }
@@ -87,7 +87,7 @@ abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
   /**
    * @inheritDoc
    */
-  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  public function plainEncode(\codename\parquet\format\SchemaElement $tse, $x)
   {
     throw new \LogicException('Not implemented'); // TODO
   }
@@ -96,7 +96,7 @@ abstract class NonDataDataTypeHandler implements DataTypeHandlerInterface
    * @inheritDoc
    */
   public function plainDecode(
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     $encoded
   ) {
     throw new \LogicException('Not implemented'); // TODO

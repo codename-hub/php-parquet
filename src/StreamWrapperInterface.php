@@ -1,5 +1,5 @@
 <?php
-namespace jocoon\parquet;
+namespace codename\parquet;
 
 interface StreamWrapperInterface
 {

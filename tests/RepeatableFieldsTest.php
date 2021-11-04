@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
-use jocoon\parquet\ParquetReader;
+use codename\parquet\ParquetReader;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataField;
-use jocoon\parquet\data\ListField;
-use jocoon\parquet\data\DataColumn;
-use jocoon\parquet\data\StructField;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\ListField;
+use codename\parquet\data\DataColumn;
+use codename\parquet\data\StructField;
 
 class RepeatableFieldsTest extends TestBase
 {

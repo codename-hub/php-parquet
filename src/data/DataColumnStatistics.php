@@ -1,8 +1,8 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
-use jocoon\parquet\format\Statistics;
-use jocoon\parquet\format\SchemaElement;
+use codename\parquet\format\Statistics;
+use codename\parquet\format\SchemaElement;
 
 class DataColumnStatistics
 {

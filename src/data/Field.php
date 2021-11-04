@@ -1,9 +1,9 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
 use Exception;
 
-use jocoon\parquet\format\SchemaElement;
+use codename\parquet\format\SchemaElement;
 
 /**
  * [abstract description]

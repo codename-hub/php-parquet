@@ -1,18 +1,18 @@
 <?php
-namespace jocoon\parquet\file;
+namespace codename\parquet\file;
 
-use jocoon\parquet\StreamHelper;
+use codename\parquet\StreamHelper;
 
-use jocoon\parquet\data\DataColumn;
-use jocoon\parquet\data\DataTypeHandlerInterface;
+use codename\parquet\data\DataColumn;
+use codename\parquet\data\DataTypeHandlerInterface;
 
-use jocoon\parquet\format\PageHeader;
-use jocoon\parquet\format\Statistics;
-use jocoon\parquet\format\ColumnChunk;
-use jocoon\parquet\format\SchemaElement;
-use jocoon\parquet\format\DataPageHeader;
+use codename\parquet\format\PageHeader;
+use codename\parquet\format\Statistics;
+use codename\parquet\format\ColumnChunk;
+use codename\parquet\format\SchemaElement;
+use codename\parquet\format\DataPageHeader;
 
-use jocoon\parquet\values\RunLengthBitPackingHybridValuesWriter;
+use codename\parquet\values\RunLengthBitPackingHybridValuesWriter;
 
 /**
  * [PageTag description]
@@ -183,8 +183,8 @@ class DataColumnWriter
     // using (var writer = new BinaryWriter(pageStream, Encoding.UTF8, true))
     // {
     // $writer = new BinaryWriter
-    $writer = \jocoon\parquet\adapter\BinaryWriter::createInstance($pageStream);
-    // $writer->setOrder(\jocoon\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
+    $writer = \codename\parquet\adapter\BinaryWriter::createInstance($pageStream);
+    // $writer->setOrder(\codename\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
 
     // if (column.RepetitionLevels != null)
     // {
@@ -326,12 +326,12 @@ class DataColumnWriter
 
   /**
    * [WriteLevels description]
-   * @param \jocoon\parquet\adapter\BinaryWriter $writer   [description]
+   * @param \codename\parquet\adapter\BinaryWriter $writer   [description]
    * @param int[]                      $levels   [description]
    * @param int                        $count    [description]
    * @param int                        $maxLevel [description]
    */
-  protected function WriteLevels(\jocoon\parquet\adapter\BinaryWriter $writer, array $levels, int $count, int $maxLevel): void
+  protected function WriteLevels(\codename\parquet\adapter\BinaryWriter $writer, array $levels, int $count, int $maxLevel): void
   {
     // echo("WRITE LEVELS");
     $bitWidth = static::GetBitWidth($maxLevel);

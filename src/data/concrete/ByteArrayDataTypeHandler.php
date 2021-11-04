@@ -1,10 +1,10 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
-use jocoon\parquet\data\DataType;
-use jocoon\parquet\data\BasicDataTypeHandler;
+use codename\parquet\data\DataType;
+use codename\parquet\data\BasicDataTypeHandler;
 
-use jocoon\parquet\format\Type;
+use codename\parquet\format\Type;
 
 class ByteArrayDataTypeHandler extends BasicDataTypeHandler
 {
@@ -20,8 +20,8 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function isMatch(
-    \jocoon\parquet\format\SchemaElement $tse,
-    ?\jocoon\parquet\ParquetOptions $formatOptions
+    \codename\parquet\format\SchemaElement $tse,
+    ?\codename\parquet\ParquetOptions $formatOptions
   ): bool {
     return isset($tse->type)  && $tse->type === Type::BYTE_ARRAY
                               && !isset($tse->converted_type);
@@ -31,8 +31,8 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function read(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
   ): int {
@@ -96,8 +96,8 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
     // length
@@ -124,7 +124,7 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
   /**
    * @inheritDoc
    */
-  protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
+  protected function WriteOne(\codename\parquet\adapter\BinaryWriter $writer, $value): void
   {
     // V1: Byte array as real array version
     // NOTE: we're treating ByteArray Data as it is: array of bytes
@@ -149,7 +149,7 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
   /**
    * @inheritDoc
    */
-  public function plainEncode(\jocoon\parquet\format\SchemaElement $tse, $x)
+  public function plainEncode(\codename\parquet\format\SchemaElement $tse, $x)
   {
     return $x;
   }
@@ -158,7 +158,7 @@ class ByteArrayDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function plainDecode(
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     $encoded
   ) {
     return $encoded;

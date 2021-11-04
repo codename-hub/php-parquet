@@ -1,5 +1,5 @@
 <?php
-namespace jocoon\parquet\values\primitives;
+namespace codename\parquet\values\primitives;
 
 use DateTimeImmutable;
 
@@ -61,9 +61,9 @@ class NanoTime
 
   /**
    * [Write description]
-   * @param \jocoon\parquet\adapter\BinaryWriter $writer [description]
+   * @param \codename\parquet\adapter\BinaryWriter $writer [description]
    */
-  public function Write(\jocoon\parquet\adapter\BinaryWriter $writer):void {
+  public function Write(\codename\parquet\adapter\BinaryWriter $writer):void {
     $writer->writeInt64($this->timeOfDayNanos);
     $writer->writeInt32($this->julianDay);
   }

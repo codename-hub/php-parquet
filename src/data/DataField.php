@@ -1,7 +1,7 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
-use jocoon\parquet\helper\OtherExtensions;
+use codename\parquet\helper\OtherExtensions;
 
 class DataField extends Field
 {
@@ -145,9 +145,9 @@ class DataField extends Field
           $hasNulls = false;
 
           // NOTE/TODO default fallback for DateTimeDataField ?
-          return \jocoon\parquet\data\DateTimeDataField::create(
+          return \codename\parquet\data\DateTimeDataField::create(
             $name,
-            \jocoon\parquet\data\DateTimeFormat::Impala,
+            \codename\parquet\data\DateTimeFormat::Impala,
             $hasNulls,
             $isArray ?? false
           );

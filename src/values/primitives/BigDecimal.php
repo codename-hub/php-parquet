@@ -1,9 +1,9 @@
 <?php
-namespace jocoon\parquet\values\primitives;
+namespace codename\parquet\values\primitives;
 
 use Exception;
 
-use jocoon\parquet\format\SchemaElement;
+use codename\parquet\format\SchemaElement;
 
 class BigDecimal
 {

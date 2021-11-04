@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
 final class QuirksTest extends TestBase
 {

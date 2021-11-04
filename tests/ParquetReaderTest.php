@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
 use Exception;
 
-use jocoon\parquet\ParquetReader;
+use codename\parquet\ParquetReader;
 
-use jocoon\parquet\exception\ArgumentNullException;
+use codename\parquet\exception\ArgumentNullException;
 
 final class ParquetReaderTest extends TestBase
 {

@@ -1,9 +1,9 @@
 <?php
-namespace jocoon\parquet\file;
+namespace codename\parquet\file;
 
 use Thrift\Protocol\TCompactProtocol;
 
-use jocoon\parquet\transport\TStreamTransport;
+use codename\parquet\transport\TStreamTransport;
 
 class ThriftStream {
 

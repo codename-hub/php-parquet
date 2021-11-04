@@ -1,9 +1,13 @@
 # Changelog
 
 ## [Unreleased]
+### Breaking Change
+- Changed namespace to `codename\parquet`
 ### Changed
 - Skip some tests if ext-snappy unavailable
 - Benchmark: enable snappy compression benchmark if respective extension available/loaded
+
+# Legacy releases (not tagged)
 
 ## [0.5.0] - 2021-04-28
 ### Fixed

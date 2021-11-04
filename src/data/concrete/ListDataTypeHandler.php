@@ -1,18 +1,18 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
 use Exception;
 
-use jocoon\parquet\data\Field;
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\ListField;
-use jocoon\parquet\data\SchemaType;
-use jocoon\parquet\data\DataTypeFactory;
-use jocoon\parquet\data\NonDataDataTypeHandler;
+use codename\parquet\data\Field;
+use codename\parquet\data\Schema;
+use codename\parquet\data\ListField;
+use codename\parquet\data\SchemaType;
+use codename\parquet\data\DataTypeFactory;
+use codename\parquet\data\NonDataDataTypeHandler;
 
-use jocoon\parquet\format\ConvertedType;
-use jocoon\parquet\format\SchemaElement;
-use jocoon\parquet\format\FieldRepetitionType;
+use codename\parquet\format\ConvertedType;
+use codename\parquet\format\SchemaElement;
+use codename\parquet\format\FieldRepetitionType;
 
 class ListDataTypeHandler extends NonDataDataTypeHandler
 {
@@ -20,8 +20,8 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
    * @inheritDoc
    */
   public function isMatch(
-    \jocoon\parquet\format\SchemaElement $tse,
-    ?\jocoon\parquet\ParquetOptions $formatOptions
+    \codename\parquet\format\SchemaElement $tse,
+    ?\codename\parquet\ParquetOptions $formatOptions
   ): bool {
     return (isset($tse->converted_type) && $tse->converted_type === ConvertedType::LIST);
   }
@@ -57,8 +57,8 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
    * @inheritDoc
    */
   public function createThrift(
-    \jocoon\parquet\data\Field $field,
-    \jocoon\parquet\format\SchemaElement $parent,
+    \codename\parquet\data\Field $field,
+    \codename\parquet\format\SchemaElement $parent,
     array &$container
   ): void {
     $parent->num_children += 1;

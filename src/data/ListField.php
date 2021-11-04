@@ -1,9 +1,9 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
 use Exception;
 
-use jocoon\parquet\helper\OtherExtensions;
+use codename\parquet\helper\OtherExtensions;
 
 class ListField extends Field
 {
@@ -78,7 +78,7 @@ class ListField extends Field
   /**
    * @inheritDoc
    */
-  public function assign(\jocoon\parquet\data\Field $field): void
+  public function assign(\codename\parquet\data\Field $field): void
   {
     if($this->item !== null) {
       throw new Exception("item was already assigned to this list ({$this->name}), something is terribly wrong because a list can only have one item.");

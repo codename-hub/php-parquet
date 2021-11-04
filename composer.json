@@ -1,12 +1,12 @@
 {
-    "name": "jocoon/parquet",
+    "name": "codename/parquet",
     "description": "Thrift-based PHP implementation for using the Apache Parquet format",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Kevin",
-            "email": "kevin@jocoon.de"
+            "name": "Kevin Dargel",
+            "role": "Developer"
         }
     ],
     "require": {
@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "jocoon\\parquet\\": "src/"
+            "codename\\parquet\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "jocoon\\parquet\\tests\\": "tests/"
+            "codename\\parquet\\tests\\": "tests/"
         }
     },
     "require-dev": {

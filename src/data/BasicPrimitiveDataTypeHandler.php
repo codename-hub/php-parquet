@@ -1,8 +1,8 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
-use jocoon\parquet\adapter\BinaryReader;
-use jocoon\parquet\adapter\BinaryWriter;
+use codename\parquet\adapter\BinaryReader;
+use codename\parquet\adapter\BinaryWriter;
 
 abstract class BasicPrimitiveDataTypeHandler extends BasicDataTypeHandler
 {
@@ -115,7 +115,7 @@ abstract class BasicPrimitiveDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function plainEncode(
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     $x
   ) {
     if($x === null) return null;
@@ -130,7 +130,7 @@ abstract class BasicPrimitiveDataTypeHandler extends BasicDataTypeHandler
    * @inheritDoc
    */
   public function plainDecode(
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     $encoded
   ) {
     if ($encoded === null) return null;

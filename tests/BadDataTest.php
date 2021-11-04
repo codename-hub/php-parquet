@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
-use jocoon\parquet\ParquetReader;
+use codename\parquet\ParquetReader;
 
 class BadDataTest extends TestBase
 {

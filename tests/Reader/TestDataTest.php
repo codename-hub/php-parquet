@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests\Reader;
+namespace codename\parquet\tests\Reader;
 
 use DateTimeImmutable;
 use DateTimeInterface;
 
-use jocoon\parquet\tests\TestBase;
+use codename\parquet\tests\TestBase;
 
 class TestDataTest extends ParquetCsvComparison
 {

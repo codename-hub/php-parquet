@@ -1,16 +1,16 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
 use Exception;
 
-use jocoon\parquet\data\Field;
-use jocoon\parquet\data\SchemaType;
-use jocoon\parquet\data\StructField;
-use jocoon\parquet\data\DataTypeFactory;
-use jocoon\parquet\data\NonDataDataTypeHandler;
+use codename\parquet\data\Field;
+use codename\parquet\data\SchemaType;
+use codename\parquet\data\StructField;
+use codename\parquet\data\DataTypeFactory;
+use codename\parquet\data\NonDataDataTypeHandler;
 
-use jocoon\parquet\format\SchemaElement;
-use jocoon\parquet\format\FieldRepetitionType;
+use codename\parquet\format\SchemaElement;
+use codename\parquet\format\FieldRepetitionType;
 
 class StructureDataTypeHandler extends NonDataDataTypeHandler
 {
@@ -18,8 +18,8 @@ class StructureDataTypeHandler extends NonDataDataTypeHandler
    * @inheritDoc
    */
   public function isMatch(
-    \jocoon\parquet\format\SchemaElement $tse,
-    ?\jocoon\parquet\ParquetOptions $formatOptions
+    \codename\parquet\format\SchemaElement $tse,
+    ?\codename\parquet\ParquetOptions $formatOptions
   ): bool {
     return $tse->num_children > 0;
   }
@@ -51,8 +51,8 @@ class StructureDataTypeHandler extends NonDataDataTypeHandler
    * @inheritDoc
    */
   public function createThrift(
-    \jocoon\parquet\data\Field $field,
-    \jocoon\parquet\format\SchemaElement $parent,
+    \codename\parquet\data\Field $field,
+    \codename\parquet\format\SchemaElement $parent,
     array &$container
   ): void {
     $tseStruct = new SchemaElement([

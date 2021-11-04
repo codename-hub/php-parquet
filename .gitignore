@@ -62,3 +62,4 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
+.phpunit.result.cache

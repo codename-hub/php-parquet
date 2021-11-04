@@ -1,16 +1,16 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
 use DateTime;
 use DateTimeImmutable;
 
-use jocoon\parquet\adapter\BinaryReader;
+use codename\parquet\adapter\BinaryReader;
 
-use jocoon\parquet\data\DataType;
-use jocoon\parquet\data\BasicPrimitiveDataTypeHandler;
+use codename\parquet\data\DataType;
+use codename\parquet\data\BasicPrimitiveDataTypeHandler;
 
-use jocoon\parquet\format\Type;
-use jocoon\parquet\format\ConvertedType;
+use codename\parquet\format\Type;
+use codename\parquet\format\ConvertedType;
 
 /**
  * [DateTimeOffsetDataTypeHandler description]
@@ -32,8 +32,8 @@ class DateTimeDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   public function isMatch(
-    \jocoon\parquet\format\SchemaElement $tse,
-    ?\jocoon\parquet\ParquetOptions $formatOptions
+    \codename\parquet\format\SchemaElement $tse,
+    ?\codename\parquet\ParquetOptions $formatOptions
   ): bool {
     return
       ($tse->type === Type::INT96 && $formatOptions->TreatBigIntegersAsDates) || // Impala
@@ -46,7 +46,7 @@ class DateTimeDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   public function read(
     BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     array &$dest,
     int $offset
   ): int {
@@ -60,7 +60,7 @@ class DateTimeDataTypeHandler extends BasicPrimitiveDataTypeHandler
    */
   protected function readSingle(
     BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
     throw new \LogicException('this stub should never be called');

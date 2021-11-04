@@ -1,25 +1,25 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
-use jocoon\parquet\ParquetOptions;
+use codename\parquet\ParquetOptions;
 ;
-use jocoon\parquet\data\concrete\MapDataTypeHandler;
-use jocoon\parquet\data\concrete\ByteDataTypeHandler;
-use jocoon\parquet\data\concrete\ListDataTypeHandler;
-use jocoon\parquet\data\concrete\FloatDataTypeHandler;
-use jocoon\parquet\data\concrete\DoubleDataTypeHandler;
-use jocoon\parquet\data\concrete\Int32DataTypeHandler;
-use jocoon\parquet\data\concrete\Int64DataTypeHandler;
-use jocoon\parquet\data\concrete\StringDataTypeHandler;
-use jocoon\parquet\data\concrete\BooleanDataTypeHandler;
-use jocoon\parquet\data\concrete\DecimalDataTypeHandler;
-use jocoon\parquet\data\concrete\ByteArrayDataTypeHandler;
-use jocoon\parquet\data\concrete\StructureDataTypeHandler;
-use jocoon\parquet\data\concrete\DateTimeOffsetDataTypeHandler;
+use codename\parquet\data\concrete\MapDataTypeHandler;
+use codename\parquet\data\concrete\ByteDataTypeHandler;
+use codename\parquet\data\concrete\ListDataTypeHandler;
+use codename\parquet\data\concrete\FloatDataTypeHandler;
+use codename\parquet\data\concrete\DoubleDataTypeHandler;
+use codename\parquet\data\concrete\Int32DataTypeHandler;
+use codename\parquet\data\concrete\Int64DataTypeHandler;
+use codename\parquet\data\concrete\StringDataTypeHandler;
+use codename\parquet\data\concrete\BooleanDataTypeHandler;
+use codename\parquet\data\concrete\DecimalDataTypeHandler;
+use codename\parquet\data\concrete\ByteArrayDataTypeHandler;
+use codename\parquet\data\concrete\StructureDataTypeHandler;
+use codename\parquet\data\concrete\DateTimeOffsetDataTypeHandler;
 
-use jocoon\parquet\exception\NotSupportedException;
+use codename\parquet\exception\NotSupportedException;
 
-use jocoon\parquet\format\SchemaElement;
+use codename\parquet\format\SchemaElement;
 
 class DataTypeFactory
 {

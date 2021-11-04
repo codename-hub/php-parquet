@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
-namespace jocoon\parquet\tests;
+namespace codename\parquet\tests;
 
-use jocoon\parquet\ParquetReader;
+use codename\parquet\ParquetReader;
 
-use jocoon\parquet\helper\OtherExtensions;
+use codename\parquet\helper\OtherExtensions;
 
 final class ParquetReaderOnTestFilesTest extends TestBase
 {

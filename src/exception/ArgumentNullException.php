@@ -1,5 +1,5 @@
 <?php
-namespace jocoon\parquet\exception;
+namespace codename\parquet\exception;
 
 /**
  * [ArgumentNullException description]

@@ -1,5 +1,5 @@
 <?php
-namespace jocoon\parquet\adapter;
+namespace codename\parquet\adapter;
 
 class CustomBinaryWriter extends BinaryWriter
 {

@@ -1,11 +1,11 @@
 <?php
-namespace jocoon\parquet\data\concrete;
+namespace codename\parquet\data\concrete;
 
-use jocoon\parquet\data\DataType;
-use jocoon\parquet\data\BasicPrimitiveDataTypeHandler;
+use codename\parquet\data\DataType;
+use codename\parquet\data\BasicPrimitiveDataTypeHandler;
 
-use jocoon\parquet\format\Type;
-use jocoon\parquet\format\ConvertedType;
+use codename\parquet\format\Type;
+use codename\parquet\format\ConvertedType;
 
 class ByteDataTypeHandler extends BasicPrimitiveDataTypeHandler
 {
@@ -21,8 +21,8 @@ class ByteDataTypeHandler extends BasicPrimitiveDataTypeHandler
    * @inheritDoc
    */
   protected function readSingle(
-    \jocoon\parquet\adapter\BinaryReader $reader,
-    \jocoon\parquet\format\SchemaElement $tse,
+    \codename\parquet\adapter\BinaryReader $reader,
+    \codename\parquet\format\SchemaElement $tse,
     int $length
   ) {
     // We're always reading INT32, see Thrift Type
@@ -33,7 +33,7 @@ class ByteDataTypeHandler extends BasicPrimitiveDataTypeHandler
   /**
    * @inheritDoc
    */
-  protected function WriteOne(\jocoon\parquet\adapter\BinaryWriter $writer, $value): void
+  protected function WriteOne(\codename\parquet\adapter\BinaryWriter $writer, $value): void
   {
     // We're always writing INT32, see Thrift Type
     $writer->writeInt32($value);

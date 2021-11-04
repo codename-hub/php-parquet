@@ -1,13 +1,13 @@
 <?php
-namespace jocoon\parquet;
+namespace codename\parquet;
 
 use Exception;
 
-use jocoon\parquet\data\Schema;
-use jocoon\parquet\data\DataColumn;
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataColumn;
 
-use jocoon\parquet\file\ThriftFooter;
-use jocoon\parquet\file\DataStreamFactory;
+use codename\parquet\file\ThriftFooter;
+use codename\parquet\file\DataStreamFactory;
 
 /**
  * [ParquetWriter description]

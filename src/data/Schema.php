@@ -1,5 +1,5 @@
 <?php
-namespace jocoon\parquet\data;
+namespace codename\parquet\data;
 
 /**
  * [Schema description]
