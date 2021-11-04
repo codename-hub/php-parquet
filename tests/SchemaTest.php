@@ -4,12 +4,15 @@ namespace codename\parquet\tests;
 
 use Exception;
 
+use codename\parquet\ParquetReader;
+
 use codename\parquet\data\Schema;
 use codename\parquet\data\DataType;
 use codename\parquet\data\MapField;
 use codename\parquet\data\DataField;
 use codename\parquet\data\ListField;
 use codename\parquet\data\DataColumn;
+use codename\parquet\data\SchemaType;
 use codename\parquet\data\StructField;
 
 use codename\parquet\exception\NotSupportedException;
@@ -358,5 +361,27 @@ final class SchemaTest extends TestBase
 
     $this->assertEquals(1, $nameField->maxRepetitionLevel);
     $this->assertEquals(3, $nameField->maxDefinitionLevel);
+  }
+
+  /**
+   * [testBackwardCompatListWithOneArray description]
+   */
+  public function testBackwardCompatListWithOneArray(): void {
+    if(!extension_loaded('snappy')) {
+      static::markTestSkipped('ext-snappy unavailable');
+    }
+    $input = $this->openTestFile('legacy-list-onearray.parquet');
+    $reader = new ParquetReader($input);
+    $schema = $reader->schema;
+
+    // validate schema
+    $this->assertEquals('impurityStats',  $schema->fields[3]->name);
+    $this->assertEquals(SchemaType::List, $schema->fields[3]->schemaType);
+    $this->assertEquals('gain',           $schema->fields[4]->name);
+    $this->assertEquals(SchemaType::Data, $schema->fields[4]->schemaType);
+
+    // smoke test we can read it
+    $rg = $reader->OpenRowGroupReader(0);
+    $values4 = $rg->ReadColumn($schema->fields[4]);
   }
 }
