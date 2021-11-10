@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.6.0 - 2021-11-10]
 ### Breaking Change
 - Changed namespace to `codename\parquet`
 ### Added
