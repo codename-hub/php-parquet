@@ -45,7 +45,7 @@ class MapDataTypeHandler extends NonDataDataTypeHandler
     //followed by a key and a value, but we declared them as owned
 
     $map = new MapField($tseRoot->name);
-    $map->path = $tseRoot->name . Schema::PathSeparator . $tseContainer->name;
+    $map->setPath([ $tseRoot->name, $tseContainer->name ]);
 
     $index += 1;
     $ownedChildCount = 2;

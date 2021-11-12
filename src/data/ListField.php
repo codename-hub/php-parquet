@@ -35,7 +35,7 @@ class ListField extends Field
    */
   public function setPathPrefix($value)
   {
-    $this->path = OtherExtensions::AddPath($value, [ $this->name, static::ContainerName ]);
+    $this->setPath(OtherExtensions::AddPath($value, [ $this->name, static::ContainerName ]));
     // item might be null
     if($this->item) {
       $this->item->setPathPrefix($this->path);

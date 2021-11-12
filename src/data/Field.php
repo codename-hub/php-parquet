@@ -23,10 +23,18 @@ abstract class Field
   public $name;
 
   /**
-   * [public description]
-   * @var string
+   * Path to field and/or field data
+   * please use setPath() for setting
+   * @var string[]
    */
   public $path;
+
+  /**
+   * Path as string - do not set
+   * use ->setPath for setting
+   * @var string
+   */
+  public $pathString;
 
   /**
    * [public description]
@@ -42,18 +50,27 @@ abstract class Field
 
   /**
    * [public description]
-   * @var string|null
+   * @var string[]|null
    */
   protected $pathPrefix = null;
 
   /**
    * [setPathPrefix description]
-   * @param [type] $value [description]
+   * @param string[]|null $value [description]
    */
-  public function setPathPrefix($value) {
+  public function setPathPrefix(?array $value) {
     // used internally
   }
 
+  /**
+   * sets the path on the field
+   * @param string[]|null   $path  [description]
+   */
+  public function setPath(?array $path): void {
+    $this->path = $path;
+    // helper variable, path as string
+    $this->pathString = $this->path === null ? null : implode(\codename\parquet\data\Schema::PathSeparator, $this->path);
+  }
 
   /**
    * @param string     $name
@@ -63,7 +80,7 @@ abstract class Field
   {
     $this->name = $name;
     $this->schemaType = $schemaType;
-    $this->path = $name;
+    $this->setPath([ $name ]);
   }
 
   /**

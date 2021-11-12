@@ -52,7 +52,7 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
     // type and elements are required.
 
     if($tseList->num_children === 1 && $tseRepeated->name === 'array') {
-      $listField->path = $tseList->name;
+      $listField->setPath([ $tseList->name ]);
       $index += 1;
       $ownedChildCount = 1;
       return $listField;
@@ -61,7 +61,8 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
     // as we are skipping elements set path hint
     // $listField->path = $"{tseList.Name}{Schema.PathSeparator}{schema[index + 1].Name}"; // TODO
     // $listField->path = "{$tseList->name}{Schema::PathSeparator}{$schema[$index + 1]->name}";
-    $listField->path = implode(Schema::PathSeparator, [ $tseList->name, $schema[$index + 1]->name]);
+
+    $listField->setPath([ $tseList->name, $schema[$index + 1]->name ]);
     $index += 2;          //skip this element and child container
     $ownedChildCount = 1; //we should get this element assigned back
     return $listField;

@@ -276,7 +276,8 @@ final class SchemaTest extends TestBase
     $list = new ListField('List', DataField::createFromType('id', 'integer'));
     $list->setPathPrefix('Parent');
 
-    $this->assertEquals('Parent.List.list.id', $list->item->path);
+    $this->assertEquals(['Parent', 'List', 'list', 'id'], $list->item->path);
+    $this->assertEquals('Parent.List.list.id', $list->item->pathString);
   }
 
   /**
