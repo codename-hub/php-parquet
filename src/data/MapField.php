@@ -37,7 +37,7 @@ class MapField extends Field
     if($keyField && $valueField) {
       $this->key = $keyField;
       $this->value = $valueField;
-      $this->path = OtherExtensions::AddPath($name, static::ContainerName); // TODO: Check path separator in this case...
+      $this->setPath(OtherExtensions::AddPath($name, static::ContainerName));
       $this->key->setPathPrefix($this->path);
       $this->value->setPathPrefix($this->path);
     }
@@ -48,7 +48,7 @@ class MapField extends Field
    */
   public function setPathPrefix($value)
   {
-    $this->path = OtherExtensions::AddPath($value, [ $this->name, static::ContainerName ]);
+    $this->setPath(OtherExtensions::AddPath($value, [ $this->name, static::ContainerName ]));
     $this->key->setPathPrefix($this->path);
     $this->value->setPathPrefix($this->path);
   }

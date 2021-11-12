@@ -171,7 +171,16 @@ class ThriftFooter {
     return new Schema($container);
   }
 
-  protected function _CreateModelSchema(?string $path, array &$container, int $childCount, int &$si, ?ParquetOptions $formatOptions) {
+  /**
+   * [_CreateModelSchema description]
+   * @param  array|null           $path                        [description]
+   * @param  array                &$container                   [description]
+   * @param  int                  $childCount                  [description]
+   * @param  int                  &$si                          [description]
+   * @param  ParquetOptions|null  $formatOptions               [description]
+   * @return void
+   */
+  protected function _CreateModelSchema(?array $path, array &$container, int $childCount, int &$si, ?ParquetOptions $formatOptions) {
     for ($i=0; $i < $childCount && $si < count($this->fileMeta->schema); $i++) {
       $tse = $this->fileMeta->schema[$si];
 
@@ -191,7 +200,14 @@ class ThriftFooter {
       $se = $dth->createSchemaElement($this->fileMeta->schema, $si, $ownedChildCount);
 
       // set $se->path !
-      $se->path = implode(Schema::PathSeparator, array_filter([$path, $se->path ?? $se->name ]));
+      $se->setPath(array_values(
+        array_filter(
+          array_merge(
+            $path ?? [], // Fallback to empty array as path
+            $se->path ?? [ $se->name ] // NOTE: fallback to array-ified $se->name
+          )
+        )
+      ));
 
       // print_r($se);
       // die();

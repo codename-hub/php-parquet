@@ -33,7 +33,7 @@ class StructField extends Field
        }
      }
 
-     $this->path = $name;
+     $this->setPath([ $name ]);
      $this->setPathPrefix(null);
   }
 
@@ -70,8 +70,7 @@ class StructField extends Field
    */
   public function setPathPrefix($value)
   {
-    $this->path = OtherExtensions::AddPath($value, $this->name);
-
+    $this->setPath(OtherExtensions::AddPath($value, $this->name));
     foreach($this->fields as $field) {
       $field->setPathPrefix($this->path);
     }

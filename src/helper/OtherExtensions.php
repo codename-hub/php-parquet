@@ -96,14 +96,18 @@ class OtherExtensions
 
   /**
    * [AddPath description]
-   * @param  string|null    $s     [description]
+   * @param  string[]|string|null    $s     [description]
    * @param  string|array   $parts [description]
-   * @return string         [description]
+   * @return string[]
    */
-  public static function AddPath(?string $s, $parts): string {
+  public static function AddPath($s, $parts): array {
     $pathComponents = [];
     if($s !== null) {
-      $pathComponents[] = $s;
+      if(is_array($s)) {
+        $pathComponents = $s;
+      } else {
+        $pathComponents[] = $s;
+      }
     }
 
     if($parts !== null) {
@@ -114,7 +118,9 @@ class OtherExtensions
       }
     }
 
-    return implode(Schema::PathSeparator, $pathComponents);
+    // array_filter might leave keys/indices intact
+    // we're stripping them out right here.
+    return array_values($pathComponents);
   }
 }
 

@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Changed
+- `Field::path` is now an array, stringified field path is now available as `Field::pathString`, set via `Field::setPath(...)` - this is to improve support for field names containing dots and improving handling when using nested and repeated fields
+
+## [0.6.0 - 2021-11-10]
 ### Breaking Change
 - Changed namespace to `codename\parquet`
 ### Added

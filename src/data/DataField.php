@@ -187,7 +187,7 @@ class DataField extends Field
    */
   public function setPathPrefix($value)
   {
-    $this->path = OtherExtensions::AddPath($value, $this->name);
+    $this->setPath(OtherExtensions::AddPath($value, $this->name));
   }
 
   /**
