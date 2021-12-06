@@ -14,6 +14,35 @@ use codename\parquet\data\DataColumn;
 final class ParquetWriterTest extends TestBase
 {
   /**
+   * [testAppendWithDifferingSchemaFails description]
+   */
+  public function testAppendWithDifferingSchemaFails(): void {
+    $schema = new Schema([
+      $id = DataField::createFromType('id', 'integer'),
+      $id2 = DataField::createFromType('id2', 'integer'),
+    ]);
+    $handle = fopen('php://memory', 'r+');
+    $writer = new ParquetWriter($schema, $handle);
+    $rg = $writer->createRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 1 ]));
+    $rg->WriteColumn(new DataColumn($id2, [ 111 ]));
+    $rg->finish();
+    $writer->finish();
+
+    $schema = new Schema([
+      $id = DataField::createFromType('id', 'integer'),
+      $id2string = DataField::createFromType('id2', 'string'),
+    ]);
+
+    $this->expectException(\codename\parquet\ParquetException::class);
+    $this->expectExceptionMessage('passed schema does not match existing file schema, reason: [appending: id2] != [id2]');
+
+    // Writer in append mode
+    $writer = new ParquetWriter($schema, $handle, null, true);
+  }
+
+
+  /**
    * [testCannotWriteColumnsInWrongOrder description]
    */
   public function testCannotWriteColumnsInWrongOrder(): void

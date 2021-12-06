@@ -40,55 +40,13 @@ class Schema
   }
 
   /**
-   * [getDataFields description]
-   * @return Field[] [description]
+   * Returns (only) DataFields contained in the Schema
+   * This __excludes__ non-DataFields (List, Struct, Map)
+   * @return DataField[]
    */
   public function getDataFields() : array {
     $result = [];
-
-    // $analyse = function (Field $f) use (&$result) {
-    //   switch ($f->schemaType) {
-    //     case SchemaType::Data:
-    //       $result[] = $f;
-    //       // result.Add((DataField)f);
-    //       break;
-    //     case SchemaType::List:
-    //       // if($f instanceof ListField) {
-    //       //   $analyse($f->item);
-    //       // }
-    //       // $analyse(((ListField)$f));
-    //       break;
-    //     case SchemaType::Map:
-    //       if($f instanceof MapField) {
-    //         $analyse($f->key);
-    //         $analyse($f->value);
-    //       }
-    //       // MapField mf = (MapField)f;
-    //       // analyse(mf.Key);
-    //       // analyse(mf.Value);
-    //       break;
-    //     case SchemaType::Struct:
-    //       if($f instanceof StructField) {
-    //         $traverse($f->fields);
-    //       }
-    //       // StructField sf = (StructField)f;
-    //       // traverse(sf.Fields);
-    //       break;
-    //   }
-    // };
-
-    // $traverse = function(array $fields) use ($analyse) {
-    //   foreach($fields as $f) {
-    //     $analyse(
-    //       $f
-    //     );
-    //   }
-    // };
-
-    // $traverse($this->fields);
-
     static::traverse($this->fields, $result);
-
     return $result;
   }
 
@@ -103,7 +61,6 @@ class Schema
     switch ($f->schemaType) {
       case SchemaType::Data:
         $result[] = $f;
-        // result.Add((DataField)f);
         break;
       case SchemaType::List:
         if($f instanceof ListField) {
@@ -112,31 +69,43 @@ class Schema
           // error?
         }
         break;
-        // static::analyse($f);
-        // if($f instanceof ListField) {
-        //   $analyse($f->item);
-        // }
-        // $analyse(((ListField)$f));
-        break;
       case SchemaType::Map:
         if($f instanceof MapField) {
           static::analyse($f->key, $result);
           static::analyse($f->value, $result);
         }
-        // MapField mf = (MapField)f;
-        // analyse(mf.Key);
-        // analyse(mf.Value);
         break;
       case SchemaType::Struct:
         if($f instanceof StructField) {
           static::traverse($f->getFields(), $result);
         }
-        // StructField sf = (StructField)f;
-        // traverse(sf.Fields);
         break;
     }
   }
 
+  /**
+   * Compares this schema to another one and produces a human readable message describing the differences.
+   * @param  Schema $other                   [description]
+   * @param  string $thisName                [description]
+   * @param  string $otherName               [description]
+   * @return string            [description]
+   */
+  public function GetNotEqualsMessage(Schema $other, string $thisName, string $otherName): string {
+    if(count($this->fields) !== count($other->fields)) {
+      return 'different number of elements ('.count($this->fields).' != '.count($other->fields).')';
+    }
+
+    $parts = [];
+    foreach($this->fields as $i => $field) {
+      if(!$field->Equals($other->fields[$i])) {
+        $parts[] = "[{$thisName}: {$field->name}] != [{$other->fields[$i]->name}]";
+      }
+    }
+    if(count($parts) > 0) {
+      return implode(', ', $parts);
+    }
+    return 'not sure!';
+  }
 
   /**
    * [Equals description]
@@ -162,11 +131,6 @@ class Schema
       // $other is not an instance of Schema
       return false;
     }
-
-    // for(int i = 0; i < _fields.Count; i++)
-    // {
-    //   if (!_fields[i].Equals(other._fields[i])) return false;
-    // }
   }
 
 }

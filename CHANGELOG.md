@@ -17,6 +17,15 @@
 ### Fixed
 - Binary string data reading of length=0 in rare cases
 
+## [0.6.1 - 2021-12-06]
+### Fixed
+- Missing method `Schema::GetNotEqualsMessage()` and exception/error message on appending to a parquet file with schema mismatch (#3)
+### Improved
+- Improved return type annotation for `Schema::GetDataFields()` (#1)
+- Added PHP 8.1 to Github Actions workflow (Unit Tests)
+### Changed
+- Removed duplicate Github Actions workflow
+
 ## [0.6.0 - 2021-11-10]
 ### Breaking Change
 - Changed namespace to `codename\parquet`
