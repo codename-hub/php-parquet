@@ -20,6 +20,7 @@ jobs:
           - 7.3
           - 7.4
           - 8.0
+          - 8.1
         phpunit-versions: ['latest']
     env:
       extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.1

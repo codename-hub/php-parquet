@@ -133,7 +133,7 @@ class ParquetWriter extends ParquetActor {
     if (!$schema->Equals($existingSchema))
     {
       $reason = $schema->GetNotEqualsMessage($existingSchema, "appending", "existing");
-      throw new ParquetException("passed schema does not match existing file schema, reason: {reason}");
+      throw new ParquetException("passed schema does not match existing file schema, reason: {$reason}");
     }
   }
 
