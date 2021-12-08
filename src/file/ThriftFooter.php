@@ -255,6 +255,10 @@ class ThriftFooter {
           $repeated = ($se->repetition_type !== null && $se->repetition_type == FieldRepetitionType::REPEATED);
           $defined = ($se->repetition_type == FieldRepetitionType::REQUIRED);
 
+          // https://github.com/apache/arrow/blob/d0de88d8384c7593fac1b1e82b276d4a0d364767/cpp/src/parquet/schema.cc#L816
+          // Repeated fields add a definition level. This is used to distinguish
+          // between an empty list and a list with an item in it.
+
           if ($repeated) $maxRepetitionLevel += 1;
           if (!$defined) $maxDefinitionLevel += 1;
 

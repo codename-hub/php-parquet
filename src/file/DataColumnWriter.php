@@ -199,7 +199,9 @@ class DataColumnWriter
 
     if ($maxDefinitionLevel > 0)
     {
-      $definitionLevels = [];
+      // Definition levels might already be set
+      // e.g. by ArrayToDatacolumnsConverter
+      $definitionLevels = $column->definitionLevels ?? [];
       $definitionLevelsLength = 0;
       $nullCount = 0;
 
@@ -232,6 +234,7 @@ class DataColumnWriter
       {
         if ($definitionLevels !== null)
         {
+          // clear 'buffer'
           $definitionLevels = [];
           // ArrayPool<int>.Shared.Return(definitionLevels);
         }
