@@ -180,17 +180,17 @@ class DataColumnsToArrayConverter
           if($dl > $cDl && ($options['repeated_levels'][$lv] ?? false)) {
             $vPath[] = $valueIndexes[$valueIndexesIndex++];
           }
-          $cDl += $options['nullable_levels'][$lv] ? 1 : 0;
+          $cDl += ($options['nullable_levels'][$lv] ?? null) ? 1 : 0;
           if($cDl > $dl) {
             break;
           }
         }
 
-        if($options['repeated_levels'][$dl]) {
+        if($options['repeated_levels'][$dl] ?? null) {
           // TODO!!!
-          $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex], $vPath, []);
+          $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, []);
         } else {
-          $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex], $vPath, $v);
+          $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, $v);
         }
 
       }
@@ -227,12 +227,12 @@ class DataColumnsToArrayConverter
         if(count($dlPathmap) > 1) {
           // if there's more than one entry in the pathmap, we have to explicitly use it
           foreach($data as $index => $value) {
-            $result[$index] = DeepAccess::set($result[$index], $dlPathmap[$column->definitionLevels[$index]], $value);
+            $result[$index] = DeepAccess::set($result[$index] ?? null, $dlPathmap[$column->definitionLevels[$index]], $value);
           }
         } else {
           // pure run-through
           foreach($data as $index => $value) {
-            $result[$index] = DeepAccess::set($result[$index], $path, $value);
+            $result[$index] = DeepAccess::set($result[$index] ?? null, $path, $value);
           }
         }
       } else {
@@ -284,7 +284,7 @@ class DataColumnsToArrayConverter
 
     // Track the recursion level
     // to improve the overall reconstruction process
-    $options['recursion_depth']++;
+    @$options['recursion_depth']++; // Suppress errors, key might be nonexistent
 
     $path[] = null;
 
@@ -319,7 +319,7 @@ class DataColumnsToArrayConverter
 
     // Track the recursion level
     // to improve the overall reconstruction process
-    $options['recursion_depth']++;
+    @$options['recursion_depth']++; // Suppress errors, key might be nonexistent
 
     $itemResult = [];
     $itemPath = $path;
@@ -354,7 +354,7 @@ class DataColumnsToArrayConverter
 
     $options['nullable_levels'][] = $sf->hasNulls;
     $options['repeated_levels'][] = $sf->isArray;
-    $options['recursion_depth']++;
+    @$options['recursion_depth']++; // Suppress errors, key might be nonexistent
 
     foreach($fields as $field) {
       $fieldPath = $path;
