@@ -20,11 +20,18 @@ class ListField extends Field
   public $item;
 
   /**
+   * Whether the field itself can be null
+   * @var bool
+   */
+  public $hasNulls;
+
+  /**
    * @inheritDoc
    */
-  public function __construct(string $name, ?Field $item = null)
+  public function __construct(string $name, ?Field $item = null, bool $nullable = false)
   {
     parent::__construct($name, SchemaType::List);
+    $this->hasNulls = $nullable;
     $this->item = $item;
     $this->setPathPrefix(null);
     // $this->pathPrefix = null;
