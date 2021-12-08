@@ -28,7 +28,7 @@ class StructField extends Field
   /**
    * @inheritDoc
    */
-  protected function __construct(string $name, ?array $elements = null, bool $nullable, bool $isArray)
+  protected function __construct(string $name, ?array $elements, bool $nullable, bool $isArray)
   {
     parent::__construct($name, SchemaType::Struct);
 

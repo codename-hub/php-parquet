@@ -110,8 +110,8 @@ class ArrayToDataColumnsConverter
     $tMaxDl = 0;
     $tMaxRl = 0;
     for ($lv=0; $lv <= $options['max_depth']; $lv++) {
-      $tMaxDl += ($options['nullable_levels'][$lv] ? 1 : 0);
-      $tMaxRl += ($options['repeated_levels'][$lv] ? 1 : 0);
+      $tMaxDl += (($options['nullable_levels'][$lv] ?? null) ? 1 : 0);
+      $tMaxRl += (($options['repeated_levels'][$lv] ?? null) ? 1 : 0);
       $options['max_dl_per_level'][$lv] = $tMaxDl;
       $options['max_rl_per_level'][$lv] = $tMaxRl;
     }
@@ -142,11 +142,11 @@ class ArrayToDataColumnsConverter
    * @param  array      &$data                           [description]
    * @return void
    */
-  protected static function processDataRecursively(array $array, array $path, array $options, array &$definitionLevels, ?array &$repetitionLevels, int $level = 0, int $rl = 0, array &$data): void {
+  protected static function processDataRecursively(array $array, array $path, array $options, array &$definitionLevels, ?array &$repetitionLevels, int $level, int $rl, array &$data): void {
     $key = $path[$level] ?? null;
     $isMaxDepth = ($level === $options['max_depth']);
-    $nullable = $options['nullable_levels'][$level];
-    $repeated = $options['repeated_levels'][$level];
+    $nullable = $options['nullable_levels'][$level] ?? null;
+    $repeated = $options['repeated_levels'][$level] ?? null;
 
     $currentMaxDl = $options['max_dl_per_level'][$level];
     $currentMaxRl = $options['max_rl_per_level'][$level];
@@ -197,8 +197,8 @@ class ArrayToDataColumnsConverter
         //
 
         // Map field's key & value fields level handling
-        $isKeyLevel = $options['key_level'] && ($options['key_level'] === $level);
-        $isValueLevel = $options['value_level'] && ($options['value_level'] === $level);
+        $isKeyLevel = ($options['key_level'] ?? null) && ($options['key_level'] === $level);
+        $isValueLevel = ($options['value_level'] ?? null) && ($options['value_level'] === $level);
 
         // NOTE: we re-assign $array here
         if($isKeyLevel) {
