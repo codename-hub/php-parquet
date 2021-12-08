@@ -1,8 +1,18 @@
 # Changelog
 
 ## [Unreleased]
+### Added
+- **EXPERIMENTAL** `helper\ArrayToDataColumnsConverter` provides 1:1 conversion of PHP (assoc) arrays and a given schema to parquet datacolumns, including nested data - **full support** of Maps, Lists and Structs.
+- **EXPERIMENTAL** `helper\DataColumnsToArrayConverter` provides 1:1 conversion of given parquet datacolumns and a schema to PHP (assoc) arrays, including nested data
+- Compatibility support for UInt64 (partially, limited by PHP)
 ### Changed
 - `Field::path` is now an array, stringified field path is now available as `Field::pathString`, set via `Field::setPath(...)` - this is to improve support for field names containing dots and improving handling when using nested and repeated fields
+- Unsupported compression codec exception message now includes the constant (value) of the codec identifier
+- StructField now fully supports being non-null, nullable or repeated
+- ListField now fully supports being non-null or nullable
+- DataColumn now explicitly has $definitionLevels
+### Fixed
+- Binary string data reading of length=0 in rare cases
 
 ## [0.6.0 - 2021-11-10]
 ### Breaking Change
