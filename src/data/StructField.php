@@ -14,11 +14,26 @@ class StructField extends Field
   protected $fields = [];
 
   /**
+   * [public description]
+   * @var bool
+   */
+  public $hasNulls;
+
+  /**
+   * [public description]
+   * @var bool
+   */
+  public $isArray;
+
+  /**
    * @inheritDoc
    */
-  protected function __construct(string $name, ?array $elements = null)
+  protected function __construct(string $name, ?array $elements = null, bool $nullable, bool $isArray)
   {
     parent::__construct($name, SchemaType::Struct);
+
+    $this->hasNulls = $nullable;
+    $this->isArray = $isArray;
 
     if($elements && count($elements) === 0) {
       // throw new ArgumentException($"structure '{name}' requires at least one element");
@@ -49,20 +64,24 @@ class StructField extends Field
    * [createWithField description]
    * @param  string      $name  [description]
    * @param  Field       $field [description]
+   * @param  bool        $nullable
+   * @param  bool        $isArray
    * @return StructField        [description]
    */
-  public static function createWithField(string $name, Field $field): StructField {
-    return new StructField($name, [ $field ]);
+  public static function createWithField(string $name, Field $field, bool $nullable = false, bool $isArray = false): StructField {
+    return new StructField($name, [ $field ], $nullable, $isArray);
   }
 
   /**
    * [createWithFieldArray description]
    * @param  string       $name     [description]
    * @param  Field[]      $elements [description]
+   * @param  bool        $nullable
+   * @param  bool        $isArray
    * @return StructField            [description]
    */
-  public static function createWithFieldArray(string $name, array $elements): StructField {
-    return new StructField($name, $elements);
+  public static function createWithFieldArray(string $name, array $elements, bool $nullable = false, bool $isArray = false): StructField {
+    return new StructField($name, $elements, $nullable, $isArray);
   }
 
   /**
@@ -91,21 +110,37 @@ class StructField extends Field
     int $parentRepetitionLevel,
     int $parentDefinitionLevel
   ): void {
-    //struct is a container, it doesn't have any levels
+    // struct is a container, it doesn't have any levels
+    // NOTE: but it can be nullable, not-nullable or repeated
+
+    // Structs might be repeated or optional
+    // (nullable or even an array)
+    //
+    $dl = $parentDefinitionLevel;
+    $rl = $parentRepetitionLevel;
+
+    if($this->hasNulls) {
+      $dl++;
+    }
+    if($this->isArray) {
+      $rl++;
+    }
 
     foreach($this->fields as $f)
     {
-      $f->PropagateLevels($parentRepetitionLevel, $parentDefinitionLevel);
+      $f->PropagateLevels($rl, $dl);
     }
   }
 
   /**
    * [CreateWithNoElements description]
    * @param  string      $name [description]
+   * @param  bool        $nullable
+   * @param  bool        $isArray
    * @return StructField       [description]
    */
-  public static function CreateWithNoElements(string $name): StructField {
-    return new StructField($name);
+  public static function CreateWithNoElements(string $name, bool $nullable = false, bool $isArray = false): StructField {
+    return new StructField($name, null, $nullable, $isArray);
   }
 
   /**
