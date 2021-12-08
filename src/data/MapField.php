@@ -26,11 +26,43 @@ class MapField extends Field
   public $value;
 
   /**
+   * Whether the map field itself is nullable
+   * @var bool
+   */
+  public $hasNulls;
+
+  // /**
+  //  * Whether the map field itself is repeatable
+  //  * @var bool
+  //  */
+  // public $isArray;
+
+  /**
+   * Whether the map values are nullable
+   * @var bool
+   */
+  public $keyValueHasNulls;
+
+  /**
    * @inheritDoc
    */
-  public function __construct(string $name, ?DataField $keyField = null, ?DataField $valueField = null)
-  {
+  public function __construct(
+    string $name,
+    ?DataField $keyField = null,
+    ?Field $valueField = null,
+    bool $nullable = false,
+    bool $keyValueNullable = true // TODO: remove
+  ) {
     parent::__construct($name, SchemaType::Map);
+
+    $this->hasNulls = $nullable;
+    $this->keyValueHasNulls = $keyValueNullable;
+
+    if($keyField) {
+      // key is required in maps, therefore: make not-nullable internally
+      // just to make sure
+      $keyField->hasNulls = false;
+    }
 
     // keyField and valueField are optional
     // in dotnet, this is a separate constructor.
