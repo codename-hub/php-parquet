@@ -148,6 +148,7 @@ final class SchemaTest extends TestBase
    */
   public function testButICanDeclareADictionary(): void
   {
+    $this->expectNotToPerformAssertions();
     // we do not perform assertions here.
     new MapField('dictionary', new DataField('key', DataType::Int32), new DataField('value', DataType::String));
   }

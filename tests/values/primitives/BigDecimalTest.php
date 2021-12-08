@@ -12,6 +12,7 @@ final class BigDecimalTest extends TestBase
    * [testValidButMassiveBigDecimal description]
    */
   public function testValidButMassiveBigDecimal(): void {
+    $this->expectNotToPerformAssertions();
     $bd = BigDecimal::DecimalToBinary("83086059037282.54", 38, 16);
   }
 }
