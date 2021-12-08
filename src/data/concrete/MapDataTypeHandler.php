@@ -55,7 +55,7 @@ class MapDataTypeHandler extends NonDataDataTypeHandler
     // [...] MAP that contains a single field named key_value.
     // The repetition of this level must be either optional or required and determines whether the list is nullable
     //
-    $map->hasNulls = $tse->repetition_type !== FieldRepetitionType::REQUIRED; // whether map itself is nullable
+    $map->hasNulls = $tseRoot->repetition_type !== FieldRepetitionType::REQUIRED; // whether map itself is nullable
     $map->keyValueHasNulls = $tseContainer->repetition_type !== FieldRepetitionType::REQUIRED; // whether map values are nullable
 
     // QUESTION: can the map field itself can be repeated, in theory?
