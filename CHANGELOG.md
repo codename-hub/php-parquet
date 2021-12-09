@@ -15,7 +15,7 @@
 - ListField now fully supports being non-null or nullable
 - DataColumn now explicitly has $definitionLevels
 - Definition level handling now includes pre-set DLs by converters
-- Deprecated some (altetnative) leftover binary readers/writers
+- Deprecated some (alternative) leftover binary readers/writers
 ### Fixed
 - Binary string data reading of length=0 in rare cases
 
