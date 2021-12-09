@@ -7,6 +7,18 @@ namespace codename\parquet\adapter;
 abstract class BinaryWriter implements BinaryWriterInterface
 {
   /**
+   * [ENDIANESS_BIG_ENDIAN description]
+   * @var int
+   */
+  const BIG_ENDIAN = 1;
+
+  /**
+   * [ENDIANNESS_LITTLE_ENDIAN description]
+   * @var int
+   */
+  const LITTLE_ENDIAN = 2;
+
+  /**
    * [createInstance description]
    * @param  [type] $stream  [description]
    * @param  [type] $options [description]

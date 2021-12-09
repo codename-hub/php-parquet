@@ -25,6 +25,23 @@ class NelexaBufferBinaryWriter extends BinaryWriter
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setByteOrder($order)
+  {
+    switch($order) {
+      case static::LITTLE_ENDIAN:
+        $this->buffer->setOrder(Buffer::LITTLE_ENDIAN);
+        break;
+      case static::BIG_ENDIAN:
+        $this->buffer->setOrder(Buffer::BIG_ENDIAN);
+        break;
+      default:
+        throw new \Exception('Unsupported byte order '.var_export($order,true));
+    }
+  }
+
+  /**
    * [protected description]
    * @var resource
    */
@@ -97,7 +114,7 @@ class NelexaBufferBinaryWriter extends BinaryWriter
    */
   public function writeUInt16($value): void
   {
-    throw new \LogicException('Not implemented'); // TODO
+    $this->buffer->insertShort($value);
   }
 
   /**
@@ -121,7 +138,7 @@ class NelexaBufferBinaryWriter extends BinaryWriter
    */
   public function writeUInt32($value): void
   {
-    throw new \LogicException('Not implemented'); // TODO
+    $this->buffer->insertInt($value);
   }
 
   /**

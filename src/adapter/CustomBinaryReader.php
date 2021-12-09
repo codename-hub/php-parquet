@@ -61,18 +61,6 @@ class CustomBinaryReader extends BinaryReader
   }
 
   /**
-   * [ENDIANESS_BIG_ENDIAN description]
-   * @var int
-   */
-  const BIG_ENDIAN = 1;
-
-  /**
-   * [ENDIANNESS_LITTLE_ENDIAN description]
-   * @var int
-   */
-  const LITTLE_ENDIAN = 2;
-
-  /**
    * [protected description]
    * @var resource
    */
@@ -110,6 +98,14 @@ class CustomBinaryReader extends BinaryReader
     $this->position += $count;
     return fread($this->stream, $count);
     // NOTE: we might REALLY parse bytes here instead of returning the read data as string
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function readByte()
+  {
+    return unpack('c', fread($this->stream, 1))[1];
   }
 
   /**

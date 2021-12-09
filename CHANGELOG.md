@@ -7,6 +7,7 @@
 - Compatibility support for UInt64 (partially, limited by PHP)
 ### Improved
 - PHP 8.0 and 8.1 compatibility due to deprecations
+- Better test coverage for some binary readers & writers, unified interfaces
 ### Changed
 - `Field::path` is now an array, stringified field path is now available as `Field::pathString`, set via `Field::setPath(...)` - this is to improve support for field names containing dots and improving handling when using nested and repeated fields
 - Unsupported compression codec exception message now includes the constant (value) of the codec identifier
@@ -14,6 +15,7 @@
 - ListField now fully supports being non-null or nullable
 - DataColumn now explicitly has $definitionLevels
 - Definition level handling now includes pre-set DLs by converters
+- Deprecated some (altetnative) leftover binary readers/writers
 ### Fixed
 - Binary string data reading of length=0 in rare cases
 

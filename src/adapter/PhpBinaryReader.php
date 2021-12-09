@@ -3,6 +3,8 @@ namespace codename\parquet\adapter;
 
 /**
  * Adapter for mdurrant's PhpBinaryReader
+ * @deprecated legacy adapter, needs separate dependency
+ * Will fail to work, due to interface changes
  */
 class PhpBinaryReader extends BinaryReader
 {
@@ -13,6 +15,22 @@ class PhpBinaryReader extends BinaryReader
   {
     $this->binaryReader = new \PhpBinaryReader\BinaryReader($stream);
     // TODO: options
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setByteOrder($order)
+  {
+    throw new \LogicException('Not implemented'); // TODO
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function readByte()
+  {
+    throw new \LogicException('Not implemented'); // TODO
   }
 
   /**

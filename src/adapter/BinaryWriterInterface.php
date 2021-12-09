@@ -14,6 +14,12 @@ interface BinaryWriterInterface
   public function __construct($stream, $options = null);
 
   /**
+   * Set endianness via constant BinaryWriter::LITTLE_ENDIAN or BinaryWriter::BIG_ENDIAN
+   * @param int $order  [description]
+   */
+  public function setByteOrder($order);
+
+  /**
    * [getBaseStream description]
    * @return resource [description]
    */

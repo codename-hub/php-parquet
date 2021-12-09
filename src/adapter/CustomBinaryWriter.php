@@ -43,18 +43,6 @@ class CustomBinaryWriter extends BinaryWriter
   }
 
   /**
-   * [ENDIANESS_BIG_ENDIAN description]
-   * @var int
-   */
-  const BIG_ENDIAN = 1;
-
-  /**
-   * [ENDIANNESS_LITTLE_ENDIAN description]
-   * @var int
-   */
-  const LITTLE_ENDIAN = 2;
-
-  /**
    * [protected description]
    * @var resource
    */
@@ -122,7 +110,7 @@ class CustomBinaryWriter extends BinaryWriter
    */
   public function writeUInt16($value): void
   {
-    throw new \LogicException('Not implemented'); // TODO
+    fwrite($this->stream, pack($this->orderLittleEndian ? 'v' : 'n', $value));
   }
 
   /**

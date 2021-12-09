@@ -3,6 +3,8 @@ namespace codename\parquet\adapter;
 
 /**
  * Implementation for wapmorgan/binary-stream
+ * @deprecated legacy adapter, needs separate dependency
+ * Will fail to work, due to interface changes
  */
 class WapMorganBinaryReader extends BinaryReader
 {
@@ -24,6 +26,22 @@ class WapMorganBinaryReader extends BinaryReader
     }
     $this->binaryStream = new \wapmorgan\BinaryStream\BinaryStream($this->stream);
     // TODO: options
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setByteOrder($order)
+  {
+    throw new \LogicException('Not implemented'); // TODO
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function readByte()
+  {
+    throw new \LogicException('Not implemented'); // TODO
   }
 
   /**

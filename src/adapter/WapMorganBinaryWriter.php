@@ -1,6 +1,10 @@
 <?php
 namespace codename\parquet\adapter;
 
+/**
+ * @deprecated legacy adapter, needs separate dependency
+ * Will fail to work, due to interface changes
+ */
 class WapMorganBinaryWriter extends BinaryWriter
 {
   /**
@@ -23,6 +27,14 @@ class WapMorganBinaryWriter extends BinaryWriter
     $this->binaryStream->setEndian(\wapmorgan\BinaryStream\BinaryStream::LITTLE);
 
     // TODO: options
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setByteOrder($order)
+  {
+    throw new \LogicException('Not implemented'); // TODO
   }
 
   /**
