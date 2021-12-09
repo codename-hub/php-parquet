@@ -5,6 +5,13 @@ namespace codename\parquet\tests;
 use codename\parquet\ParquetReader;
 use codename\parquet\ParquetWriter;
 
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataType;
+use codename\parquet\data\MapField;
+use codename\parquet\data\DataField;
+use codename\parquet\data\ListField;
+use codename\parquet\data\StructField;
+
 use codename\parquet\helper\ArrayToDataColumnsConverter;
 use codename\parquet\helper\DataColumnsToArrayConverter;
 
@@ -34,7 +41,8 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * @dataProvider dataProviderTestFiles
-   * @param string $file  [description]
+   * @param string      $file  [description]
+   * @param array|null  $flags
    */
   public function testReadWriteFile(string $file, ?array $flags = null): void {
     // Just to workaround unavailable snappy ext for some files
@@ -80,6 +88,157 @@ final class PhpArrayConversionTest extends TestBase
     // print_r($reader2->schema);
 
     $this->assertEquals($arrayResult, $arrayResult2);
+  }
+
+  /**
+   * A single DataField that is repeated and not nullable
+   * and valid data is provided
+   */
+  public function testArrayFieldNotNullable(): void {
+    $schema = new Schema([
+      new DataField('arrayfield', DataType::Int32, false, true)
+    ]);
+    $data = [
+      [ 'arrayfield' => [ 1, 2, 3 ] ],
+      [ 'arrayfield' => [ 4, 5 ] ],
+      [ 'arrayfield' => [ 6 ] ],
+    ];
+    $written = $this->writeReadWithData($schema, $data);
+    $this->assertEquals($data, $written);
+  }
+
+  /**
+   * A single DataField that is repeated and not nullable
+   * But an empty array is provided
+   */
+  public function testArrayFieldNotNullableWithEmptyEntryWillFail(): void {
+    $schema = new Schema([
+      new DataField('arrayfield', DataType::Int32, false, true)
+    ]);
+    $data = [
+      [ 'arrayfield' => [ 1, 2, 3 ] ],
+      [ 'arrayfield' => [ 4, 5 ] ],
+      [ 'arrayfield' => [  ] ], // Not allowed
+      [ 'arrayfield' => [ 6 ] ],
+    ];
+    $this->expectExceptionMessageMatches('/Value out of Int32 bounds/');
+    $written = $this->writeReadWithData($schema, $data);
+  }
+
+  /**
+   * A single DataField that is repeated and not nullable
+   * But a NULL is provided
+   */
+  public function testArrayFieldNotNullableWithNullEntryWillFail(): void {
+    $schema = new Schema([
+      new DataField('arrayfield', DataType::Int32, false, true)
+    ]);
+    $data = [
+      [ 'arrayfield' => [ 1, 2, 3 ] ],
+      [ 'arrayfield' => [ 4, 5 ] ],
+      [ 'arrayfield' => null ], // Not allowed
+      [ 'arrayfield' => [ 6 ] ],
+    ];
+    $this->expectExceptionMessageMatches('/Malformed data: null value in not-nullable field/');
+    $written = $this->writeReadWithData($schema, $data);
+  }
+
+  /**
+   * A single DataField that is repeated and nullable
+   * And an empty array is provided
+   */
+  public function testArrayFieldNullable(): void {
+    $schema = new Schema([
+      new DataField('arrayfield', DataType::Int32, true, true)
+    ]);
+    $data = [
+      [ 'arrayfield' => [ 1, 2, 3 ] ],
+      [ 'arrayfield' => [ 4, 5 ] ],
+      [ 'arrayfield' => [  ] ],
+      [ 'arrayfield' => [ 6 ] ],
+    ];
+    $written = $this->writeReadWithData($schema, $data);
+    $this->assertEquals($data, $written);
+  }
+
+  /**
+   * A single DataField that is repeated and nullable
+   * An empty array and a NULL is provided
+   * To correctly represent this data, an intermediary field
+   * would be needed, e.g. a ListField
+   * and the field itself would lose its repetitions
+   */
+  public function testArrayFieldNullableInvalidData(): void {
+    $schema = new Schema([
+      new DataField('arrayfield', DataType::Int32, true, true)
+    ]);
+    $data = [
+      [ 'arrayfield' => [ 1, 2, 3 ] ],
+      [ 'arrayfield' => [ 4, 5 ] ],
+      [ 'arrayfield' => [  ] ],
+      [ 'arrayfield' => null ], // This should not be possible and will become []
+      [ 'arrayfield' => [ 6 ] ],
+    ];
+    //
+    // WARNING: this case does _NOT_ throw an exception
+    // but is silently transformed
+    //
+    $written = $this->writeReadWithData($schema, $data);
+    $this->assertNotEquals($data, $written);
+  }
+
+  /**
+   * [testArrayFieldNullableWrappedInList description]
+   */
+  public function testArrayFieldNullableWrappedInList(): void {
+    $schema = new Schema([
+      new ListField(
+        'arrayfield',
+        new DataField('f', DataType::Int32, true, false), // Regular field
+        true
+      )
+    ]);
+    $data = [
+      [ 'arrayfield' => [ 1, 2, 3 ] ],
+      [ 'arrayfield' => [ 4, 5 ] ],
+      [ 'arrayfield' => [  ] ],     // Empty list
+      [ 'arrayfield' => [ null ] ], // Null element
+      [ 'arrayfield' => null ],     // Null list
+      [ 'arrayfield' => [ 6 ] ],
+    ];
+    $written = $this->writeReadWithData($schema, $data);
+    $this->assertEquals($data, $written);
+  }
+
+  /**
+   * [writeReadWithData description]
+   * @param  Schema $schema
+   * @param  array  $data
+   * @return array
+   */
+  protected function writeReadWithData(Schema $schema, array $data): array {
+    $dataColumnsConverter = new ArrayToDataColumnsConverter($schema, $data);
+    $columns = $dataColumnsConverter->toDataColumns();
+
+    // create a new memory stream to write to
+    $ms = fopen('php://memory', 'r+');
+    $writer = new ParquetWriter($schema, $ms);
+    $rg = $writer->createRowGroup();
+    foreach($columns as $c) {
+      $rg->WriteColumn($c);
+    }
+    $rg->finish();
+    $writer->finish();
+    fseek($ms, 0);
+
+    $reader = new ParquetReader($ms);
+    $writtenColumns = $reader->ReadEntireRowGroup();
+
+    // read again
+    $arrayConverter2 = new DataColumnsToArrayConverter($reader->schema, $writtenColumns);
+    $arrayResult2 = $arrayConverter2->toArray();
+
+    return $arrayResult2;
   }
 
   /**

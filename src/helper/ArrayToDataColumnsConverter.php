@@ -173,9 +173,45 @@ class ArrayToDataColumnsConverter
         //
         $v = $array[$key];
         if($v !== null) {
-          // Explicit value, maximum definition level
-          $data[] = $v;
-          $definitionLevels[] = $currentMaxDl;
+          // DF-level repetition
+          if($repeated) {
+
+            if(count($v) === 0) {
+              $data[] = null;
+              $definitionLevels[] = $currentMaxDl - 1; //  -($repeated? 1 : 0);
+              // Write RLs, if applicable
+              if($repetitionLevels !== null) {
+                $repetitionLevels[] = $rl;
+              }
+              return;
+            }
+
+            $started = false;
+            foreach($v as $vv) {
+              if($vv !== null) {
+                $data[] = $vv;
+                $definitionLevels[] = $currentMaxDl; // WARNING?? $dl;
+              } else {
+                // null value...
+                $data[] = null;
+                $definitionLevels[] = $currentMaxDl-1; // WARNING?? $dl;
+
+              }
+              // Write RLs, if applicable
+              if($repetitionLevels !== null) {
+                $repetitionLevels[] = $started ? $currentMaxRl : $rl;
+              }
+
+              // track iterations start
+              $started = true;
+            }
+
+            return; // data written
+          } else {
+            // Explicit value, maximum definition level
+            $data[] = $v;
+            $definitionLevels[] = $currentMaxDl;
+          }
         } else {
           if($nullable) {
             // Nullable field, null value leads to maxDl-1

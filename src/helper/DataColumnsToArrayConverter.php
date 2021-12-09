@@ -121,8 +121,8 @@ class DataColumnsToArrayConverter
 
     if($column->hasRepetitions()) {
 
-      // The top-level DF repetition is already handled inside the DataTypeHandler
-      // $options['repeated_levels'][] = $df->isArray;
+      // The top-level DF repetition might not be handled inside the DataTypeHandler?
+      $options['repeated_levels'][] = $df->isArray;
 
       // see https://github.com/apache/parquet-cpp/blob/642da055adf009652689b20e68a198cffb857651/src/parquet/arrow/reader.cc#L798
       $valuesDefinedLevel = $df->maxDefinitionLevel;
@@ -173,6 +173,7 @@ class DataColumnsToArrayConverter
         // just to termine maximum count of levels to handle
         $maxLv = count($options['nullable_levels']);
 
+        $repeatedLevel = false;
         for ($lv=0; $lv <= $maxLv; $lv++) {
           if(isset($path[$lv])) {
             $vPath[] = $path[$lv];
@@ -180,17 +181,25 @@ class DataColumnsToArrayConverter
           if($dl > $cDl && ($options['repeated_levels'][$lv] ?? false)) {
             $vPath[] = $valueIndexes[$valueIndexesIndex++];
           }
+          $repeatedLevel = $options['repeated_levels'][$lv] ?? false;
           $cDl += ($options['nullable_levels'][$lv] ?? null) ? 1 : 0;
           if($cDl > $dl) {
             break;
           }
         }
 
-        if($options['repeated_levels'][$dl] ?? null) {
-          // TODO!!!
-          $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, []);
+        if($repeatedLevel) {
+          if($dl === $df->maxDefinitionLevel) {
+            $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, $v);
+          } else {
+            $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, []);
+          }
         } else {
-          $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, $v);
+          if($dl >= $valuesDefinedLevel) {
+            $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, $v);
+          } else {
+            $result[$currentRowIndex] = DeepAccess::set($result[$currentRowIndex] ?? null, $vPath, null);
+          }
         }
 
       }
