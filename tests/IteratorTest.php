@@ -3,6 +3,11 @@ declare(strict_types=1);
 namespace codename\parquet\tests;
 
 use codename\parquet\ParquetReader;
+use codename\parquet\ParquetWriter;
+
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataColumn;
 
 use codename\parquet\helper\ParquetDataIterator;
 use codename\parquet\helper\DataColumnsToArrayConverter;
@@ -82,6 +87,7 @@ class IteratorTest extends TestBase
     $iterator->rewind();
 
     foreach($compareData as $index => $value) {
+      $this->assertEquals($index, $iterator->key());
       $this->assertTrue($iterator->valid());
       $this->assertEquals($value, $iterator->current());
       $iterator->next();
@@ -94,6 +100,7 @@ class IteratorTest extends TestBase
     // second iteration run
     $iterator->rewind();
     foreach($compareData as $index => $value) {
+      $this->assertEquals($index, $iterator->key());
       $this->assertTrue($iterator->valid());
       $this->assertEquals($value, $iterator->current());
       $iterator->next();
@@ -108,5 +115,71 @@ class IteratorTest extends TestBase
     // $this->assertCount($reader->getThriftMetadata()->num_rows, $compareData);
     // The iterator internally uses the correct method to do it.
     $this->assertCount($calculatedRowCount, $iterator);
+  }
+
+  /**
+   * Tests behaviour equality of fromHandle and fromFile
+   */
+  public function testIteratorFromFile(): void {
+    $fromHandleIterator = ParquetDataIterator::fromHandle($this->openTestFile('postcodes.plain.parquet'));
+    $fromFileIterator = ParquetDataIterator::fromFile(__DIR__.'/data/postcodes.plain.parquet');
+
+    $this->assertEquals($fromHandleIterator->count(), $fromFileIterator->count());
+
+    $fromFileIterator->rewind();
+    foreach($fromHandleIterator as $index => $value) {
+      $this->assertTrue($fromFileIterator->valid());
+      $this->assertEquals($index, $fromFileIterator->key());
+      $this->assertEquals($value, $fromFileIterator->current());
+      $fromFileIterator->next();
+    }
+    $this->assertFalse($fromHandleIterator->valid());
+    $this->assertFalse($fromFileIterator->valid());
+  }
+
+  /**
+   * Tests reading multiple row groups
+   * by creating a sample case first
+   */
+  public function testReadMultipleRowGroups(): void {
+
+    //write a single file having 3 row groups and two fields
+    $id = DataField::createFromType('id', 'integer');
+    $name = DataField::createFromType('name', 'string');
+    $ms = fopen('php://memory', 'r+');
+
+    $writer = new ParquetWriter(new Schema([$id, $name]), $ms);
+
+    $rg = $writer->createRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 1 ]));
+    $rg->WriteColumn(new DataColumn($name, [ 'abc' ]));
+    $rg->finish();
+
+    $rg = $writer->createRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 2 ]));
+    $rg->WriteColumn(new DataColumn($name, [ 'def' ]));
+    $rg->finish();
+
+    $rg = $writer->createRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 3 ]));
+    $rg->WriteColumn(new DataColumn($name, [ 'ghi' ]));
+    $rg->finish();
+
+    $writer->finish();
+
+    fseek($ms, 0);
+
+    $iterator = ParquetDataIterator::fromHandle($ms);
+
+    $result = [];
+    foreach($iterator as $index => $value) {
+      $result[$index] = $value;
+    }
+
+    $this->assertEquals([
+      [ 'id' => 1, 'name' => 'abc' ],
+      [ 'id' => 2, 'name' => 'def' ],
+      [ 'id' => 3, 'name' => 'ghi' ],
+    ], $result);
   }
 }

@@ -109,7 +109,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   protected function read(): void {
     // If we exceed the count/index of available Row Group readers
     // we simply kill it right here.
-    if($this->currentRowGroupIndex > $this->reader->getRowGroupCount()) {
+    if($this->currentRowGroupIndex >= $this->reader->getRowGroupCount()) {
       $this->lastCount = -1;
       $this->offsetPosition = 0;
       $this->currentBuffer = null;
