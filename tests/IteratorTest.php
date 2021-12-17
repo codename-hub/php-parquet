@@ -87,8 +87,16 @@ class IteratorTest extends TestBase
     $iterator->rewind();
 
     foreach($compareData as $index => $value) {
-      $this->assertEquals($index, $iterator->key());
-      $this->assertTrue($iterator->valid());
+      if($index !== $iterator->key()) {
+        $this->fail("Index/key mismatch {$index} != {$iterator->key()}");
+      }
+      if(!$iterator->valid()) {
+        $this->fail("Iterator returned valid == false at index {$index}");
+      }
+      // We need to perform a deep equality comparison
+      // if($value !== $iterator->current()) {
+      //   $this->fail("Dataset not equal at index {$index}");
+      // }
       $this->assertEquals($value, $iterator->current());
       $iterator->next();
     }
@@ -100,8 +108,16 @@ class IteratorTest extends TestBase
     // second iteration run
     $iterator->rewind();
     foreach($compareData as $index => $value) {
-      $this->assertEquals($index, $iterator->key());
-      $this->assertTrue($iterator->valid());
+      if($index !== $iterator->key()) {
+        $this->fail("Index/key mismatch {$index} != {$iterator->key()}");
+      }
+      if(!$iterator->valid()) {
+        $this->fail("Iterator returned valid == false at index {$index}");
+      }
+      // We need to perform a deep equality comparison
+      // if($value !== $iterator->current()) {
+      //   $this->fail("Dataset not equal at index {$index}");
+      // }
       $this->assertEquals($value, $iterator->current());
       $iterator->next();
     }
@@ -128,8 +144,13 @@ class IteratorTest extends TestBase
 
     $fromFileIterator->rewind();
     foreach($fromHandleIterator as $index => $value) {
-      $this->assertTrue($fromFileIterator->valid());
-      $this->assertEquals($index, $fromFileIterator->key());
+
+      if($index !== $fromFileIterator->key()) {
+        $this->fail("Index/key mismatch {$index} != {$fromFileIterator->key()}");
+      }
+      if(!$fromFileIterator->valid()) {
+        $this->fail("Iterator returned valid == false at index {$index}");
+      }
       $this->assertEquals($value, $fromFileIterator->current());
       $fromFileIterator->next();
     }
