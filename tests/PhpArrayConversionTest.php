@@ -1474,6 +1474,38 @@ final class PhpArrayConversionTest extends TestBase
     $referenceData = json_decode(file_get_contents(__DIR__.'/data/nested_structs.parquet-mr.json'), true);
 
     $this->assertEquals($referenceData, $result);
-
   }
+
+  /**
+   * Compare the customer.impala.parquet dataset
+   * with its CSV counterpart
+   * from repo https://github.com/Parquet/parquet-compatibility
+   */
+  public function testCustomerImpalaDataset(): void {
+    ini_set('memory_limit', '4G'); // needs quite high memory w/o streaming/iterator
+    $parquetOptions = new \codename\parquet\ParquetOptions();
+    $parquetOptions->TreatByteArrayAsString = true;
+    $reader = new ParquetReader($this->openTestFile('customer.impala.parquet'), $parquetOptions);
+    $rgs = $reader->ReadEntireRowGroup();
+    $conv = new DataColumnsToArrayConverter($reader->schema, $rgs);
+    $result = $conv->toArray();
+
+    $handle = fopen(__DIR__.'/data/customer.csv', 'r');
+
+    $keys = [];
+    foreach($rgs as $dc) {
+      $keys[] = $dc->getField()->name;
+    }
+
+    foreach($result as $rowIndex => $row) {
+      $csvRow = fgetcsv($handle, 512, '|');
+      foreach($csvRow as $colIndex => $value) {
+        $compareKey = $keys[$colIndex];
+        $this->assertEquals($value, $row[$compareKey]);
+      }
+    }
+
+    fclose($handle);
+  }
+
 }
