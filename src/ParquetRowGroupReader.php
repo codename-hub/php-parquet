@@ -105,4 +105,19 @@ class ParquetRowGroupReader {
     return $columnReader->read();
   }
 
+  /**
+   * [getDataColumnReader description]
+   * @param  DataField        $field               [description]
+   * @return DataColumnReader        [description]
+   */
+  public function getDataColumnReader(DataField $field): DataColumnReader {
+    $columnChunk = $this->pathToChunk[$field->pathString] ?? null;
+
+    if($columnChunk === null) {
+      throw new ParquetException("'{$field->pathString}' does not exist in this file");
+    }
+
+    return new DataColumnReader($field, $this->stream, $columnChunk, $this->footer, $this->parquetOptions);
+  }
+
 }

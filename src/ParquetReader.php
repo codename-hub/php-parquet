@@ -87,6 +87,22 @@ class ParquetReader extends ParquetActor {
   }
 
   /**
+   * Returns the count of rows
+   * by iterating over all row groups
+   * and aggregating all counts
+   * as 'num_rows' of FileMetaData might be wrong
+   * @return int
+   */
+  public function getRowCount(): int {
+    $count = 0;
+    for ($i=0; $i < $this->getRowGroupCount(); $i++) {
+      $rgr = $this->OpenRowGroupReader($i);
+      $count += $rgr->getRowCount();
+    }
+    return $count;
+  }
+
+  /**
    * [getThriftMetadata description]
    * @return FileMetaData [description]
    */

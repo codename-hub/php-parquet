@@ -468,6 +468,87 @@ final class PhpArrayConversionTest extends TestBase
   }
 
   /**
+   * [dataProviderReadDataColumnIterable description]
+   * @return array [description]
+   */
+  public function dataProviderReadDataColumnIterable(): array {
+    return [
+      [ 'datetime_other_system.parquet' ],
+      [ 'emptycolumn.parquet', [ 'snappy' ] ],
+      [ 'customer.impala.parquet' ],
+      [ 'special/multi_data_page.parquet' ],
+      [ 'postcodes.plain.parquet' ],
+      [ 'postcodes.datapageV2.pagesize256.parquet' ],
+      [ 'single_nan.parquet', [ 'snappy' ] ],
+      [ 'special/multi_data_page.parquet' ],
+      [ 'special/multi_page_bit_packed_near_page_border.parquet', [ 'snappy' ] ],
+      [ 'special/multi_page_dictionary_with_nulls.parquet' ],
+      [ 'real/nation.plain.parquet' ],
+      [ 'nested_lists.snappy.parquet', [ 'snappy' ] ],
+      [ 'nested_maps.snappy.parquet', [ 'snappy' ] ],
+      [ 'nested_structs.parquet', [ 'snappy' ] ],
+      [ 'repeated_no_annotation.parquet', [ 'snappy' ] ]
+    ];
+  }
+
+  /**
+   * @dataProvider dataProviderReadDataColumnIterable
+   *
+   * Tests basic functionality of DataColumnIterable
+   * in conjunction with Converters
+   *
+   * @param string      $file   [description]
+   * @param array|null  $flags  [description]
+   */
+  public function testReadDataColumnIterable(string $file, ?array $flags = null): void {
+
+    // Just to workaround unavailable snappy ext for some files
+    if($flags) {
+      if(in_array('snappy', $flags)) {
+        if(!extension_loaded('snappy')) {
+          $this->markTestSkipped('ext-snappy unavailable');
+        }
+      }
+    }
+
+    $options = new \codename\parquet\ParquetOptions();
+    // By default, use this one to reduce memory usage for those tests
+    $options->TreatByteArrayAsString = true;
+
+    $reader = new ParquetReader($this->openTestFile($file), $options);
+
+    // NOTE: we only load the first row group for these tests
+    $rgr = $reader->OpenRowGroupReader(0); // TODO iterate?
+    $dataFields = $reader->schema->getDataFields();
+
+    $iterableColumns = [];
+    foreach($dataFields as $dataField) {
+      $columnReader = $rgr->getDataColumnReader($dataField);
+      $iterableColumns[] = $columnReader->getDatacolumnIterable();
+    }
+
+    $arrayConverter = new DataColumnsToArrayConverter($reader->schema, $iterableColumns);
+    $arrayResult = $arrayConverter->toArray();
+
+    // full sequential reading
+    $fullReader = new ParquetReader($this->openTestFile($file), $options);
+    $columns = $fullReader->ReadEntireRowGroup();
+    $fullConv = new DataColumnsToArrayConverter($fullReader->schema, $columns);
+    $fullArrayResult = $fullConv->toArray();
+
+    $this->assertCount(count($fullArrayResult), $arrayResult);
+
+    foreach($fullArrayResult as $i => $original) {
+      $this->assertEquals($original, $arrayResult[$i], "Inequal dataset at index {$i}");
+    }
+
+    // Iterate a second time to make sure the Iterator-methods are implemented correctly
+    foreach($fullArrayResult as $i => $original) {
+      $this->assertEquals($original, $arrayResult[$i], "Inequal dataset at index {$i}");
+    }
+  }
+
+  /**
    * Tests reading and writing of nested lists
    */
   public function testWriteNestedLists(): void {

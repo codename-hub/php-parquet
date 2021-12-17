@@ -130,8 +130,19 @@ class DataColumnsToArrayConverter
         $valuesDefinedLevel--;
       }
 
+      // Pre-determine whether we're using iteration mode or not.
+      $useIterator = $column instanceof \codename\parquet\data\DataColumnIterable;
+
       // the raw data
-      $data = $column->getData();
+      if($useIterator) {
+        $data = $column;
+      } else {
+        $data = $column->getData();
+      }
+
+      // we could also use repeated_levels
+      // just to termine maximum count of levels to handle
+      $maxLv = count($options['nullable_levels']);
 
       // the target result row index
       $currentRowIndex = -1;
@@ -140,8 +151,20 @@ class DataColumnsToArrayConverter
       $prl = -1;
 
       foreach($data as $index => $v) {
-        $dl = $column->definitionLevels[$index];
-        $rl = $column->repetitionLevels[$index];
+
+        //
+        // DLs/RLs are determined using a iteratee-specific method call
+        // on a DataColumnIterable instance
+        // We determine Iterable usage beforehand
+        // to avoid any consecutive calls to 'instanceof ...' in this foreach loop
+        //
+        if($useIterator) {
+          $dl = $column->currentDefinitionLevel();
+          $rl = $column->currentRepetitionLevel();
+        } else {
+          $dl = $column->definitionLevels[$index];
+          $rl = $column->repetitionLevels[$index];
+        }
 
         if(!$rl) {
           // start of a new record
@@ -168,11 +191,6 @@ class DataColumnsToArrayConverter
         $valueIndexesIndex = 1;
 
         $cDl = 0;
-
-        // we could also use repeated_levels
-        // just to termine maximum count of levels to handle
-        $maxLv = count($options['nullable_levels']);
-
         $repeatedLevel = false;
         for ($lv=0; $lv <= $maxLv; $lv++) {
           if(isset($path[$lv])) {
@@ -206,7 +224,11 @@ class DataColumnsToArrayConverter
 
     } else {
       // get the raw data of the column
-      $data = $column->getData();
+      if($column instanceof \codename\parquet\data\DataColumnIterable) {
+        $data = $column;
+      } else {
+        $data = $column->getData();
+      }
 
       if(count($path) > 1) {
         //
@@ -234,9 +256,16 @@ class DataColumnsToArrayConverter
         }
 
         if(count($dlPathmap) > 1) {
-          // if there's more than one entry in the pathmap, we have to explicitly use it
-          foreach($data as $index => $value) {
-            $result[$index] = DeepAccess::set($result[$index] ?? null, $dlPathmap[$column->definitionLevels[$index]], $value);
+          if($column instanceof \codename\parquet\data\DataColumnIterable) {
+            // Special API for DataColumnIterable
+            foreach($data as $index => $value) {
+              $result[$index] = DeepAccess::set($result[$index] ?? null, $dlPathmap[$column->currentDefinitionLevel()], $value);
+            }
+          } else {
+            // if there's more than one entry in the pathmap, we have to explicitly use it
+            foreach($data as $index => $value) {
+              $result[$index] = DeepAccess::set($result[$index] ?? null, $dlPathmap[$column->definitionLevels[$index]], $value);
+            }
           }
         } else {
           // pure run-through
