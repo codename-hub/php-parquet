@@ -16,58 +16,67 @@ class RunLengthBitPackingHybridValuesWriter
    * @param int    $bitWidth [description]
    * @param int[]  $data     [description]
    * @param int    $count    [description]
+   * @return int Amount of bytes written
    */
-  public static function WriteForwardOnly(BinaryWriter $writer, int $bitWidth, array $data, int $count): void
+  public static function WriteForwardOnly(BinaryWriter $writer, int $bitWidth, array $data, int $count): int
   {
+    $startPos = $writer->getPosition();
+
     //write data to a memory buffer, as we need data length to be written before the data
     // $ms = fopen('php://memory', 'r+');
-    $ms = ''; // TEST as string
-
-    // using (var ms = new MemoryStream())
-    // {
-
-    // echo("WriteForwardOnly");
-    // var_dump($data);
+    $ms = ''; // we simply use a string as target
 
     $bw = \codename\parquet\adapter\BinaryWriter::createInstance($ms);
     // $bw->setOrder(\codename\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
-    //
-    // using (var bw = new BinaryWriter(ms, Encoding.UTF8, true))
-    // {
-      //write actual data
+
+    // write actual data
     static::WriteData($bw, $data, $count, $bitWidth);
-    // }
 
     // int32 - length of data
     // writer.Write((int)ms.Length);
     // $writer->writeInt32($len = fstat($ms)['size']);
     $writer->writeInt32($bw->getEofPosition());
 
-    //actual data
+    // rewind to start for copying to main writer
     // ms.Position = 0;
     // fseek($ms, 0);
     $bw->setPosition(0);
 
+    $writer->writeString($bw->toString());
 
-    // DEBUG/TODO: do we need to reset this one?
-    // $writer->setPosition(0);
+    return $writer->getPosition() - $startPos; // return amount of bytes written
+  }
 
-    // if($writer instanceof \codename\parquet\adapter\BinaryWriter) {
-    //   $writer->insert()
-    // }
-    // $streamContent = stream_get_contents($ms);
+  /**
+   * Pure RLE without size
+   * @param  BinaryWriter $writer                 [description]
+   * @param  int          $bitWidth               [description]
+   * @param  array        $data                   [description]
+   * @param  int          $count                  [description]
+   * @return int                    [description]
+   */
+  public static function WritePureRle(BinaryWriter $writer, int $bitWidth, array $data, int $count): int
+  {
+    $startPos = $writer->getPosition();
 
-    // $writer->insert($bw);
+    //write data to a memory buffer, as we need data length to be written before the data
+    // $ms = fopen('php://memory', 'r+');
+    $ms = ''; // we simply use a string as target
 
-    // stream_copy_to_stream($ms, $writer->getBaseStream());
+    $bw = \codename\parquet\adapter\BinaryWriter::createInstance($ms);
+    // $bw->setOrder(\codename\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
 
+    // write actual data
+    static::WriteData($bw, $data, $count, $bitWidth);
+
+    // rewind to start for copying to main writer
+    // ms.Position = 0;
+    // fseek($ms, 0);
+    $bw->setPosition(0);
 
     $writer->writeString($bw->toString());
 
-    // stream_copy_to_stream($ms, $writer->)
-    // ms.CopyTo(writer.BaseStream); //warning! CopyTo performs .Flush internally
-
-    // fclose($ms);
+    return $writer->getPosition() - $startPos; // return amount of bytes written
   }
 
   /**

@@ -19,6 +19,7 @@ use codename\parquet\format\FileMetaData;
 use codename\parquet\format\SchemaElement;
 use codename\parquet\format\ColumnMetaData;
 use codename\parquet\format\DataPageHeader;
+use codename\parquet\format\DataPageHeaderV2;
 use codename\parquet\format\FieldRepetitionType;
 
 class ThriftFooter {
@@ -359,22 +360,36 @@ class ThriftFooter {
   /**
    * [CreateDataPage description]
    * @param  int        $valueCount [description]
+   * @param  bool       $v2         [create a DataPageHeaderV2]
    * @return PageHeader             [description]
    */
-  public function CreateDataPage(int $valueCount): PageHeader
+  public function CreateDataPage(int $valueCount, bool $v2 = false): PageHeader
   {
     $ph = new PageHeader([
-      'type'                    => PageType::DATA_PAGE,
+      'type'                    => $v2 ? PageType::DATA_PAGE_V2 : PageType::DATA_PAGE,
       'uncompressed_page_size'  => 0,
       'compressed_page_size'    => 0,
     ]);
-    $ph->data_page_header = new DataPageHeader([
-      'encoding' => Encoding::PLAIN,
-      'definition_level_encoding' => Encoding::RLE,
-      'repetition_level_encoding' => Encoding::RLE,
-      'num_values' => $valueCount,
-      'statistics' => new Statistics(),
-    ]);
+
+    if($v2) {
+      $ph->data_page_header_v2 = new DataPageHeaderV2([
+        'encoding' => Encoding::PLAIN, // TODO: or RLE?
+        'definition_levels_byte_length' => 0,
+        'repetition_levels_byte_length' => 0,
+        'num_values' => $valueCount,
+        'num_nulls' => 0, // to be set
+        'num_rows' => 0, // to be set
+        'statistics' => new Statistics(),
+      ]);
+    } else {
+      $ph->data_page_header = new DataPageHeader([
+        'encoding' => Encoding::PLAIN,
+        'definition_level_encoding' => Encoding::RLE,
+        'repetition_level_encoding' => Encoding::RLE,
+        'num_values' => $valueCount,
+        'statistics' => new Statistics(),
+      ]);
+    }
 
     return $ph;
   }

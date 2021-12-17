@@ -260,4 +260,39 @@ final class ParquetWriterTest extends TestBase
     $this->assertEquals(2, $rg->getRowCount());
   }
 
+
+  public function testWriteReadDataPageV2(): void {
+    $options = new \codename\parquet\ParquetOptions();
+    $options->WriteDataPageV2 = true;
+
+    $ms = fopen('php://memory', 'r+');
+    $id = DataField::createFromType('id', 'integer');
+
+    //write
+    $writer = new ParquetWriter(new Schema([$id]), $ms, $options);
+
+    $rg = $writer->CreateRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 1, 2, 3, 4 ]));
+    $rg->finish();
+
+    $rg = $writer->CreateRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 5, 6 ]));
+    $rg->finish();
+
+    $writer->finish();
+
+    //read back
+    $reader = new ParquetReader($ms);
+    $this->assertEquals(6, $reader->getThriftMetadata()->num_rows);
+    // $this->assertEquals(null, $reader->get
+
+    $rg = $reader->OpenRowGroupReader(0);
+    $col = $rg->ReadColumn($id);
+    
+    $this->assertEquals(4, $rg->getRowCount());
+
+    $rg = $reader->OpenRowGroupReader(1);
+    $this->assertEquals(2, $rg->getRowCount());
+  }
+
 }

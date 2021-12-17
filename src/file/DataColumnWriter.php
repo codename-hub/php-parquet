@@ -72,6 +72,12 @@ class DataColumnWriter
    */
   public $calculateStatistics = false;
 
+  /**
+   * Whether to write V2 Data page headers or not
+   * @var bool
+   */
+  public $writeDataPageV2 = false;
+
 
   /**
    * [__construct description]
@@ -169,7 +175,20 @@ class DataColumnWriter
 
     $ms = fopen('php://memory', 'r+');
 
-    $dataPageHeader = $this->footer->CreateDataPage(count($column->getData()));
+    // if we're writing DataPage V2 format
+    // we need a separate (uncompressed) stream for writing
+    // definition and repetition levels
+    $levelsV2ms = null;
+    if($this->writeDataPageV2) {
+      $levelsV2ms = fopen('php://memory', 'r+');
+    }
+
+    $numValues = count($column->getData());
+    $dataPageHeader = $this->footer->CreateDataPage($numValues, $this->writeDataPageV2);
+
+    if($this->writeDataPageV2) {
+      $dataPageHeader->data_page_header_v2->is_compressed = ($this->compressionMethod !== \codename\parquet\CompressionMethod::None);
+    }
 
     //chain streams together so we have real streaming instead of wasting undefraggable LOH memory
     // using (GapStream pageStream = DataStreamFactory.CreateWriter(ms, _compressionMethod, true))
@@ -184,6 +203,17 @@ class DataColumnWriter
     // {
     // $writer = new BinaryWriter
     $writer = \codename\parquet\adapter\BinaryWriter::createInstance($pageStream);
+
+    // For V1 format, the writer will stay the same
+    // as the stream of actual data
+    // as DLs and RLs are also compressed (if applicable)
+    $levelsWriter = $writer;
+    if($this->writeDataPageV2) {
+      // For V2, we simply create a non-wrapped writer on the raw stream
+      // instead of wrapping a potentially compressed or encrypted writer around it.
+      $levelsWriter = \codename\parquet\adapter\BinaryWriter::createInstance($levelsV2ms);
+    }
+
     // $writer->setOrder(\codename\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
 
     // if (column.RepetitionLevels != null)
@@ -191,7 +221,23 @@ class DataColumnWriter
     //   WriteLevels(writer, column.RepetitionLevels, column.RepetitionLevels.Length, maxRepetitionLevel);
     // }
     if($column->repetitionLevels !== null) {
-      $this->WriteLevels($writer, $column->repetitionLevels, count($column->repetitionLevels), $maxRepetitionLevel);
+      if($this->writeDataPageV2) {
+        // V2 has different required fields
+        // so we set them right here (determine count of rows by counting rl === 0 entries)
+        $rowCount = 0;
+        foreach($column->repetitionLevels as $rl) {
+          if($rl === 0) ++$rowCount;
+        }
+        $dataPageHeader->data_page_header_v2->num_rows = $rowCount;
+        $dataPageHeader->data_page_header_v2->repetition_levels_byte_length = $this->WriteLevelsV2($levelsWriter, $column->repetitionLevels, count($column->repetitionLevels), $maxRepetitionLevel);
+      } else {
+        $this->WriteLevels($levelsWriter, $column->repetitionLevels, count($column->repetitionLevels), $maxRepetitionLevel);
+      }
+    } else {
+      if($this->writeDataPageV2) {
+        // No repetitions: 1 value == 1 row
+        $dataPageHeader->data_page_header_v2->num_rows = $numValues; // Only available in V2
+      }
     }
 
 
@@ -212,24 +258,15 @@ class DataColumnWriter
 
       try
       {
-        $this->WriteLevels($writer, $definitionLevels, $definitionLevelsLength, $maxDefinitionLevel);
+        if($this->writeDataPageV2) {
+          // V2 has different required fields
+          // so we set them right here
+          $dataPageHeader->data_page_header_v2->num_nulls = $nullCount;
+          $dataPageHeader->data_page_header_v2->definition_levels_byte_length = $this->WriteLevelsV2($levelsWriter, $definitionLevels, $definitionLevelsLength, $maxDefinitionLevel);
+        } else {
+          $this->WriteLevels($levelsWriter, $definitionLevels, $definitionLevelsLength, $maxDefinitionLevel);
+        }
       }
-      // catch(\Throwable $t) {
-      //   echo("WRITE LEVELS ERROR ". $t->getMessage());
-      //   print_r([
-      //     'message' => $t->getMessage(),
-      //     'file' => $t->getFile(),
-      //     'line' => $t->getLine(),
-      //     'trace' => array_map(function($te) {
-      //       return [
-      //         'file' => $te['file'],
-      //         'line' => $te['line']
-      //       ];
-      //     }, $t->getTrace()),
-      //   ]);
-      //   // die();
-      //   // print_r($t);
-      // }
       finally
       {
         if ($definitionLevels !== null)
@@ -242,8 +279,11 @@ class DataColumnWriter
     }
     else
     {
-      //no defitions means no nulls
+      //no definitions means no nulls
       $column->statistics->nullCount = 0;
+      if($this->writeDataPageV2) {
+        $dataPageHeader->data_page_header_v2->num_nulls = 0; // do we have to set it?
+      }
     }
 
     // TODO: enable or disable statistics generation
@@ -265,6 +305,11 @@ class DataColumnWriter
     // dataPageHeader.Uncompressed_page_size = (int)pageStream.Position;
     $dataPageHeader->uncompressed_page_size = (int)ftell($pageStream);
 
+    if($this->writeDataPageV2) {
+      // for V2 we simply need to add the bytes fritten to levelsV2ms
+      $dataPageHeader->uncompressed_page_size += $dataPageHeader->data_page_header_v2->repetition_levels_byte_length + $dataPageHeader->data_page_header_v2->definition_levels_byte_length;
+    }
+
     //
     // NOTE: the GzipStreamWrapper writes out/compresses data on stream close.
     //
@@ -272,20 +317,34 @@ class DataColumnWriter
 
     $dataPageHeader->compressed_page_size = (int)ftell($ms);
 
+    if($this->writeDataPageV2) {
+      // for V2 we simply need to add the separately written bytes of DLs and RLs
+      $dataPageHeader->compressed_page_size += $dataPageHeader->data_page_header_v2->repetition_levels_byte_length + $dataPageHeader->data_page_header_v2->definition_levels_byte_length;
+    }
+
+    // apply statistics to respective DP header object
+    if($this->writeDataPageV2) {
+      $dataPageHeader->data_page_header_v2->statistics = $column->statistics->ToThriftStatistics($dataTypeHandler, $this->schemaElement);
+    } else {
+      $dataPageHeader->data_page_header->statistics = $column->statistics->ToThriftStatistics($dataTypeHandler, $this->schemaElement);
+    }
+
     //write the header in
-    $dataPageHeader->data_page_header->statistics = $column->statistics->ToThriftStatistics($dataTypeHandler, $this->schemaElement);
     $headerSize = $this->thriftStream->Write(PageHeader::class, $dataPageHeader);
 
-    // echo("DataPageHeader Written");
-    // print_r($headerSize);
-    // print_r($dataPageHeader);
+    if($this->writeDataPageV2) {
+      // Rewind the levelsV2 stream for copying
+      fseek($levelsV2ms, 0);
 
-    // ms.Position = 0;
-    fseek($ms, 0);
+      // write the separately written levels
+      $levelBytes = stream_copy_to_stream($levelsV2ms, $this->stream);
+    }
 
     // ms.CopyTo(_stream);
+
+    // Rewind the data stream for copying
+    fseek($ms, 0);
     $copiedBytes = stream_copy_to_stream($ms, $this->stream);
-    // echo("Copied bytes=".$copiedBytes.chr(10));
 
     // $stats = new Statistics(['distinct_count' => $statistics->distinct_count]);
     // {
@@ -336,10 +395,25 @@ class DataColumnWriter
    */
   protected function WriteLevels(\codename\parquet\adapter\BinaryWriter $writer, array $levels, int $count, int $maxLevel): void
   {
-    // echo("WRITE LEVELS");
     $bitWidth = static::GetBitWidth($maxLevel);
-    // echo("WriteLevels bitWidth=".$bitWidth." levels=".implode(",", $levels) ." count=".$count." maxLevel=".$maxLevel.chr(10));
     RunLengthBitPackingHybridValuesWriter::WriteForwardOnly($writer, $bitWidth, $levels, $count);
+  }
+
+  /**
+   * [WriteLevelsV2 description]
+   * @param \codename\parquet\adapter\BinaryWriter $writer    [description]
+   * @param array                              $levels    [description]
+   * @param int                                $count     [description]
+   * @param int                                $maxLevel  [description]
+   * @return int Amount of bytes written
+   */
+  protected function WriteLevelsV2(\codename\parquet\adapter\BinaryWriter $writer, array $levels, int $count, int $maxLevel): int
+  {
+    $bitWidth = static::GetBitWidth($maxLevel);
+
+    // we have to leave out size byte, as we don't need it due to the availability of lengths for DLs and RLs
+    // otherwise this would break format spec
+    return RunLengthBitPackingHybridValuesWriter::WritePureRle($writer, $bitWidth, $levels, $count);
   }
 
 }

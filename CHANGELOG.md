@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- **EXPERIMENTAL** DATA_PAGE_V2 (writing) support
 - **EXPERIMENTAL** `helper\ParquetDataIterator` provides easy access to iterate over a parquet file (read) and provides full support for nested fields and non-DataFields (Map, List, Struct)
 - **EXPERIMENTAL** `helper\ArrayToDataColumnsConverter` provides 1:1 conversion of PHP (assoc) arrays and a given schema to parquet datacolumns, including nested data - **full support** of Maps, Lists and Structs.
 - **EXPERIMENTAL** `helper\DataColumnsToArrayConverter` provides 1:1 conversion of given parquet datacolumns and a schema to PHP (assoc) arrays, including nested data
