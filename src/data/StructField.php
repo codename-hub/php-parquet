@@ -156,6 +156,7 @@ class StructField extends Field
 
       if($this->name != $other->name) return false;
       if(count($this->fields) !== count($other->fields)) return false;
+      if($this->path !== $other->path) return false;
 
       foreach($this->fields as $i => $field) {
         if(!$field->Equals($other->fields[$i])) return false;

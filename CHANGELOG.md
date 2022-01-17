@@ -18,6 +18,7 @@
 - DataColumn now explicitly has $definitionLevels
 - Definition level handling now includes pre-set DLs by converters
 - Deprecated some (alternative) leftover binary readers/writers
+- Field (in)equality checks now include the path where necessary
 - Dropped dependency `nelexa/buffer`
 ### Fixed
 - Binary string data reading of length=0 in rare cases

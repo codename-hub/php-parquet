@@ -207,6 +207,7 @@ class DataField extends Field
     if($other instanceof DataField) {
       return
         $this->name === $other->name &&
+        $this->path === $other->path &&
         $this->dataType === $other->dataType &&
         $this->hasNulls === $other->hasNulls &&
         $this->isArray  === $other->isArray;

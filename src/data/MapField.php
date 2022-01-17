@@ -122,4 +122,27 @@ class MapField extends Field
       throw new Exception("'{Name}' already has key and value assigned");
     }
   }
+
+  /**
+   * @inheritDoc
+   */
+  public function Equals($other): bool
+  {
+    if ($other === null) return false;
+    if ($other === $this) return true;
+    if (get_class($other) != get_class($this)) return false;
+    
+    if($other instanceof MapField) {
+      return
+        $this->name === $other->name &&
+        $this->path === $other->path &&
+        $this->key->Equals($other->key) &&
+        $this->value->Equals($other->value);
+        // QUESTION: nullability comparison?
+    } else {
+      return false; // TODO or TSE detail check?
+    }
+
+    return $value;
+  }
 }
