@@ -8,7 +8,7 @@
 - **EXPERIMENTAL** `helper\DataColumnsToArrayConverter` provides 1:1 conversion of given parquet datacolumns and a schema to PHP (assoc) arrays, including nested data
 - Compatibility support for UInt64 (partially, limited by PHP)
 ### Improved
-- PHP 8.0 and 8.1 compatibility due to deprecations
+- PHP 8.0 and 8.1 compatibility due to deprecations (e.g. via `#[\ReturnTypeWillChange]` for Iterator::current() implementations)
 - Better test coverage for some binary readers & writers, unified interfaces
 ### Changed
 - `Field::$path` is now an array, stringified field path is now available as `Field::$pathString`, set via `Field::setPath(...)` - this is to improve support for field names containing dots and improving handling when using nested and repeated fields

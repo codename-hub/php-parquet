@@ -121,6 +121,7 @@ class DataColumnIterable extends DataColumn implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
+  #[\ReturnTypeWillChange]
   public function current()
   {
     return $this->data[$this->offsetPosition];
@@ -178,7 +179,7 @@ class DataColumnIterable extends DataColumn implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
-  public function key()
+  public function key(): int
   {
     return $this->position;
   }

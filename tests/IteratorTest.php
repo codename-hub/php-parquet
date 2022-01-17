@@ -8,8 +8,10 @@ use codename\parquet\ParquetWriter;
 use codename\parquet\data\Schema;
 use codename\parquet\data\DataField;
 use codename\parquet\data\DataColumn;
+use codename\parquet\data\StructField;
 
 use codename\parquet\helper\ParquetDataIterator;
+use codename\parquet\helper\ArrayToDataColumnsConverter;
 use codename\parquet\helper\DataColumnsToArrayConverter;
 
 class IteratorTest extends TestBase
@@ -156,6 +158,71 @@ class IteratorTest extends TestBase
     }
     $this->assertFalse($fromHandleIterator->valid());
     $this->assertFalse($fromFileIterator->valid());
+  }
+
+  /**
+   * [testDeeperPathmapUsingDataColumnIterable description]
+   */
+  public function testDeeperPathmapUsingDataColumnIterable(): void {
+    $schema = new Schema([
+      //
+      // By using a struct with nested elements
+      // we implicitly have a deeper DL pathmap internally
+      // As we're using ParquetDataIterator, this implicitly leverages
+      // DataColumnIterable.
+      // Therefore, this covers
+      // DataColumnIterable, non-repeated field and a deeper DL/nesting level
+      //
+      StructField::createWithFieldArray('struct1', [
+          DataField::createFromType('id', 'integer'),
+          DataField::createFromType('name', 'string'),
+        ],
+        true // nullable struct
+      )
+    ]);
+
+    $data = [
+      // entry 0
+      [
+        'struct1' => [
+          'id' => 1,
+          'name' => 'abc'
+        ]
+      ],
+      // entry 1
+      [
+        'struct1' => [
+          'id' => 2,
+          'name' => 'def'
+        ]
+      ]
+    ];
+
+    // write stuff
+    $dataColumnsConverter = new ArrayToDataColumnsConverter($schema, $data);
+    $columns = $dataColumnsConverter->toDataColumns();
+
+    // create a new memory stream to write to
+    $ms = fopen('php://memory', 'r+');
+    $writer = new ParquetWriter($schema, $ms);
+    $rg = $writer->createRowGroup();
+    foreach($columns as $c) {
+      $rg->WriteColumn($c);
+    }
+    $rg->finish();
+    $writer->finish();
+    fseek($ms, 0);
+
+    // Read again using ParquetDataIterator
+    // which uses DataColumnIterable internally
+    $fromHandleIterator = ParquetDataIterator::fromHandle($ms);
+
+    $compareData = [];
+    foreach($fromHandleIterator as $index => $value) {
+      $compareData[$index] = $value;
+    }
+
+    $this->assertEquals($data, $compareData);
   }
 
   /**

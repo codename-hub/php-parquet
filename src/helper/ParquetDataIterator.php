@@ -92,6 +92,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
+  #[\ReturnTypeWillChange] 
   public function current()
   {
     return $this->currentBuffer[$this->offsetPosition];
@@ -158,7 +159,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
-  public function next()
+  public function next(): void
   {
     $this->position++;
     $this->offsetPosition++;
@@ -178,7 +179,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
-  public function key()
+  public function key(): int
   {
     return $this->position;
   }
@@ -186,7 +187,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
-  public function valid()
+  public function valid(): bool
   {
     return $this->offsetPosition < $this->lastCount;
   }
@@ -194,7 +195,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
-  public function rewind()
+  public function rewind(): void
   {
     $this->position = 0;
     $this->offsetPosition = 0;
@@ -207,7 +208,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
-  public function count()
+  public function count(): int
   {
     // NOTE: never trust this value, as it may be invalid.
     // return $this->reader->getThriftMetadata()->num_rows;
