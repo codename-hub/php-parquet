@@ -91,6 +91,146 @@ final class PhpArrayConversionTest extends TestBase
   }
 
   /**
+   * [testDataColumnFieldNotInProvidedSchemaWillFail description]
+   */
+  public function testDataColumnFieldNotInProvidedSchemaWillFail(): void {
+    $schema = new Schema([
+      \codename\parquet\data\DataField::createFromType('id1', 'integer')
+    ]);
+    $columns = [
+      // just a blank instance, same DataField name, but different type
+      new \codename\parquet\data\DataColumn(\codename\parquet\data\DataField::createFromType('id1', 'string'), [])
+    ];
+
+    $this->expectExceptionMessage('expected a different DataField at position 0');
+    $conv = new DataColumnsToArrayConverter($schema, $columns);
+  }
+
+  /**
+   * [testDifferingFieldCountsSchemaDefinesLessWillFail description]
+   */
+  public function testDifferingFieldCountsSchemaDefinesLessWillFail(): void {
+    $schema = new Schema([
+      \codename\parquet\data\DataField::createFromType('id1', 'integer')
+    ]);
+
+    $columns = [
+      // two fields instead of one
+      new \codename\parquet\data\DataColumn(\codename\parquet\data\DataField::createFromType('id1', 'integer'), []),
+      new \codename\parquet\data\DataColumn(\codename\parquet\data\DataField::createFromType('id2', 'integer'), [])
+    ];
+
+    $this->expectExceptionMessage('schema has 1 fields, but only 2 are passed');
+    $conv = new DataColumnsToArrayConverter($schema, $columns);
+  }
+
+  /**
+   * [testDifferingFieldCountsSchemaDefinesMoreWillFail description]
+   */
+  public function testDifferingFieldCountsSchemaDefinesMoreWillFail(): void {
+    $schema = new Schema([
+      \codename\parquet\data\DataField::createFromType('id1', 'integer'),
+      \codename\parquet\data\DataField::createFromType('id2', 'integer'),
+    ]);
+
+    $columns = [
+      // one fields instead of one
+      new \codename\parquet\data\DataColumn(\codename\parquet\data\DataField::createFromType('id1', 'integer'), []),
+    ];
+
+    $this->expectExceptionMessage('schema has 2 fields, but only 1 are passed');
+    $conv = new DataColumnsToArrayConverter($schema, $columns);
+  }
+
+  /**
+   * Tries to inject a bad map field
+   */
+  public function testInvalidMapKeyFieldProvided(): void {
+    //
+    // Bad practice, do not ever try this at home ;-)
+    //
+    $mapField = new \codename\parquet\data\MapField('someMapField');
+    $mapField->key = \codename\parquet\data\StructField::createWithField('structFieldAsMapKeyField', \codename\parquet\data\DataField::createFromType('someIntField', 'integer'));
+    $mapField->value = \codename\parquet\data\DataField::createFromType('mapValueField', 'integer');
+
+    $schema = new Schema([
+      $mapField
+    ]);
+
+    $columns = [
+      new \codename\parquet\data\DataColumn(\codename\parquet\data\DataField::createFromType('someIntField', 'integer'), []),
+      new \codename\parquet\data\DataColumn(\codename\parquet\data\DataField::createFromType('mapValueField', 'integer'), []),
+    ];
+
+    $this->expectExceptionMessage('expected a different DataField at position 0');
+    $conv = new DataColumnsToArrayConverter($schema, $columns);
+
+    // Due to changes in Field::Equals (and overridden methods) this is no longer the expected exception:
+    // $this->expectExceptionMessage('Map key field being a non-DataField is not supported');
+    // $conv->toArray();
+  }
+
+  /**
+   * [testDifferingDataFieldPathSchemaNestedMoreDeeplyWillFail description]
+   */
+  public function testDifferingDataFieldPathSchemaNestedMoreDeeplyWillFail(): void {
+    $schema = new Schema([
+      // Nested one level
+      \codename\parquet\data\StructField::createWithField('someStruct',
+        $schemaDataField = \codename\parquet\data\DataField::createFromType('id1', 'integer')
+      )
+    ]);
+
+    $columnDataField = \codename\parquet\data\DataField::createFromType('id1', 'integer');
+
+    $this->assertNotEquals($schemaDataField->path, $columnDataField->path);
+
+    $columns = [
+      // not nested, but same data field name
+      // (paths differ)
+      new \codename\parquet\data\DataColumn($columnDataField, []),
+    ];
+
+    $this->expectExceptionMessage('expected a different DataField at position 0');
+    $conv = new DataColumnsToArrayConverter($schema, $columns);
+
+    // Due to changes in Field::Equals (and overridden methods) this is no longer the expected exception:
+    // $this->expectExceptionMessage('DataColumn not found for field: id1');
+    // $conv->toArray();
+  }
+
+  /**
+   * [testDifferingDataFieldPathSchemaNestedLessDeeplyWillFail description]
+   */
+  public function testDifferingDataFieldPathSchemaNestedLessDeeplyWillFail(): void {
+    $schema = new Schema([
+      // Nested one level
+      $schemaDataField = \codename\parquet\data\DataField::createFromType('id1', 'integer')
+    ]);
+
+    // Build an arbitrary struct field
+    // Doesnt matter after creation, just for propagating levels
+    $arbitraryStructField = \codename\parquet\data\StructField::createWithField('someStruct',
+      $columnDataField = \codename\parquet\data\DataField::createFromType('id1', 'integer')
+    );
+
+    $this->assertNotEquals($schemaDataField->path, $columnDataField->path);
+
+    $columns = [
+      // not nested, but same data field name
+      // (paths differ)
+      new \codename\parquet\data\DataColumn($columnDataField, []),
+    ];
+
+    $this->expectExceptionMessage('expected a different DataField at position 0');
+    $conv = new DataColumnsToArrayConverter($schema, $columns);
+
+    // Due to changes in Field::Equals (and overridden methods) this is no longer the expected exception:
+    // $this->expectExceptionMessage('DataColumn not found for field: id1');
+    // $conv->toArray();
+  }
+
+  /**
    * A single DataField that is repeated and not nullable
    * and valid data is provided
    */
@@ -305,7 +445,14 @@ final class PhpArrayConversionTest extends TestBase
     $conv = new DataColumnsToArrayConverter($reader->schema, $rgs);
     $dataOriginal = $conv->toArray();
 
+    // Secondary spark result, exported to JSON
+    // NOTE: this has to be exported using
+    // spark.conf.set("spark.sql.jsonGenerator.ignoreNullFields", False)
+    // or similar, as Spark will kick out keys of NULL values otherwise
+    $jsonData = json_decode(file_get_contents(__DIR__.'/data/custom/supercomplex1.spark.json'), true);
+
     $this->assertEquals($dataOriginal, $dataSpark);
+    $this->assertEquals($dataOriginal, $jsonData);
 
     foreach($rgs as $idx => $dc) {
       $dcSpark = $rgsSpark[$idx];
@@ -373,7 +520,14 @@ final class PhpArrayConversionTest extends TestBase
     $conv = new DataColumnsToArrayConverter($reader->schema, $rgs);
     $dataOriginal = $conv->toArray();
 
+    // Secondary spark result, exported to JSON
+    // NOTE: this has to be exported using
+    // spark.conf.set("spark.sql.jsonGenerator.ignoreNullFields", False)
+    // or similar, as Spark will kick out keys of NULL values otherwise
+    $jsonData = json_decode(file_get_contents(__DIR__.'/data/custom/complex_structs1.spark.json'), true);
+
     $this->assertEquals($dataOriginal, $dataSpark);
+    $this->assertEquals($dataOriginal, $jsonData);
 
     foreach($rgs as $idx => $dc) {
       $dcSpark = $rgsSpark[$idx];

@@ -1,0 +1,162 @@
+[
+  {
+    "some_map_field": {
+      "key0": [
+        {
+          "a": "v1",
+          "b": "v2"
+        },
+        {
+          "c": "v3",
+          "d": "v4"
+        }
+      ],
+      "key1": [
+        {
+          "a": "v5"
+        },
+        {
+          "b": "v6"
+        },
+        {
+          "c": "v7",
+          "d": "v8"
+        }
+      ]
+    },
+    "list_with_map": [
+      {
+        "x": [
+          {
+            "y": "a",
+            "z": "b"
+          }
+        ]
+      }
+    ],
+    "struct_outer": {
+      "map_in_struct": {
+        "mapkey1": [
+          "string1",
+          "string2",
+          "string3"
+        ],
+        "mapkey2": [
+          "string4",
+          null,
+          "string5"
+        ],
+        "mapkey3": [
+          null
+        ],
+        "mapkey4": [],
+        "mapkey5": null
+      },
+      "list_in_struct": null
+    }
+  },
+  {
+    "some_map_field": {
+      "key0": [
+        {
+          "e": "v9",
+          "f": "v10"
+        },
+        {
+          "g": "v11",
+          "h": "v12"
+        }
+      ],
+      "key1": [],
+      "key2": null,
+      "key3": [
+        {
+          "i": "v13"
+        },
+        {
+          "j": "v14"
+        },
+        {
+          "k": "v15",
+          "l": "v16"
+        }
+      ]
+    },
+    "list_with_map": [
+      {
+        "y": [
+          {
+            "z": "c",
+            "a": "d"
+          },
+          {},
+          null,
+          {}
+        ],
+        "z": []
+      },
+      null,
+      {},
+      {
+        "a": [
+          null,
+          {},
+          {
+            "bbb": null,
+            "ccc": ""
+          },
+          null,
+          {
+            "g": "h",
+            "last": "the very last"
+          }
+        ]
+      }
+    ],
+    "struct_outer": {
+      "map_in_struct": null,
+      "list_in_struct": []
+    }
+  },
+  {
+    "some_map_field": null,
+    "list_with_map": null,
+    "struct_outer": {
+      "map_in_struct": null,
+      "list_in_struct": null
+    }
+  },
+  {
+    "some_map_field": null,
+    "list_with_map": null,
+    "struct_outer": null
+  },
+  {
+    "some_map_field": null,
+    "list_with_map": null,
+    "struct_outer": {
+      "map_in_struct": {},
+      "list_in_struct": [
+        {
+          "inner-struct-data": "abc",
+          "map_in_struct_in_list_in_struct": {
+            "foo": "bar",
+            "baz": "qux"
+          }
+        },
+        null,
+        {
+          "inner-struct-data": null,
+          "map_in_struct_in_list_in_struct": null
+        },
+        {
+          "inner-struct-data": "def",
+          "map_in_struct_in_list_in_struct": {
+            "bar": "baz",
+            "qux": "quz"
+          }
+        }
+      ]
+    }
+  }
+]

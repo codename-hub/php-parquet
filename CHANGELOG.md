@@ -7,6 +7,7 @@
 - **EXPERIMENTAL** `helper\ArrayToDataColumnsConverter` provides 1:1 conversion of PHP (assoc) arrays and a given schema to parquet datacolumns, including nested data - **full support** of Maps, Lists and Structs.
 - **EXPERIMENTAL** `helper\DataColumnsToArrayConverter` provides 1:1 conversion of given parquet datacolumns and a schema to PHP (assoc) arrays, including nested data
 - Compatibility support for UInt64 (partially, limited by PHP)
+- 1:1 spark compatibility comparison data and tests for complex schemas
 ### Improved
 - PHP 8.0 and 8.1 compatibility due to deprecations (e.g. via `#[\ReturnTypeWillChange]` for Iterator::current() implementations)
 - Better test coverage for some binary readers & writers, unified interfaces
