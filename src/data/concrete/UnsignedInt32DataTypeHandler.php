@@ -1,8 +1,6 @@
 <?php
 namespace codename\parquet\data\concrete;
 
-use Nelexa\Buffer\Cast;
-
 use codename\parquet\data\DataType;
 use codename\parquet\data\BasicDataTypeHandler;
 use codename\parquet\data\BasicPrimitiveDataTypeHandler;

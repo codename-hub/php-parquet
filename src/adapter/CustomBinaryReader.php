@@ -1,8 +1,6 @@
 <?php
 namespace codename\parquet\adapter;
 
-use Nelexa\Buffer\Cast;
-
 class CustomBinaryReader extends BinaryReader
 {
   /**
