@@ -21,6 +21,7 @@
 - Deprecated some (alternative) leftover binary readers/writers
 - Field (in)equality checks now include the path where necessary
 - Dropped dependency `nelexa/buffer`
+- Reduce package size by exluding test files via .gitattributes for archives
 ### Fixed
 - Binary string data reading of length=0 in rare cases
 
