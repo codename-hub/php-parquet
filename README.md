@@ -6,6 +6,10 @@ php-parquet
 [![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/codename-hub/php-parquet/Unit%20Tests?event=push&label=release%20build)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml?query=event%3Apush)
 [![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/codename-hub/php-parquet/Unit%20Tests?event=workflow_dispatch&label=dev%20build)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml?query=event%3Aworkflow_dispatch)
 
+[![Packagist Version](https://img.shields.io/packagist/v/codename/parquet)](https://packagist.org/packages/codename/parquet)
+[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/codename/parquet)](https://packagist.org/packages/codename/parquet)
+[![Packagist Downloads](https://img.shields.io/packagist/dt/codename/parquet?label=packagist%20installs)](https://packagist.org/packages/codename/parquet)
+
 This is the first parquet file format reader/writer implementation in PHP, based on the Thrift sources provided by the Apache Foundation.
 Extensive parts of the code and concepts have been ported from parquet-dotnet (see https://github.com/elastacloud/parquet-dotnet and https://github.com/aloneguid/parquet-dotnet).
 Therefore, thanks go out to Ivan Gavryliuk (https://github.com/aloneguid).
