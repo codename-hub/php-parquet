@@ -41,7 +41,7 @@ class RunLengthBitPackingHybridValuesReader
 
      // echo("base stream position=".ftell($reader->getInputHandle())." ".chr(10));
 
-     while($reader->getPosition() - $start < $length) {
+     while(($reader->getPosition() - $start) < $length) {
        $header = static::ReadUnsignedVarInt($reader);
        $isRle = ($header & 1) == 0;
 
@@ -198,20 +198,20 @@ class RunLengthBitPackingHybridValuesReader
 
   private static function ReadIntOnBytes($data)
   {
-     switch (\strlen($data))
+     switch ($byteWidth = \strlen($data))
      {
         case 0:
            return 0;
         case 1:
            return \ord($data[0]);
         case 2:
-           return \ord($data[1]) << 8 + \ord($data[0]);
+           return (\ord($data[1]) << 8) + \ord($data[0]);
         case 3:
-           return \ord($data[2]) << 16 + \ord($data[1]) << 8 + \ord($data[0]);
+           return (\ord($data[2]) << 16) + (\ord($data[1]) << 8) + \ord($data[0]);
         case 4:
-           return \ord($data[3]) << 32 + \ord($data[2]) << 16 + \ord($data[1]) << 8 + \ord($data[0]); // BitConverter.ToInt32(data, 0); // ????
+           return (\ord($data[3]) << 32) + (\ord($data[2]) << 16) + (\ord($data[1]) << 8) + \ord($data[0]); // BitConverter.ToInt32(data, 0); // ????
         default:
-           throw new \Exception("encountered byte width (---) that requires more than 4 bytes.");
+           throw new \Exception("encountered byte width ($byteWidth) that requires more than 4 bytes.");
      }
   }
 

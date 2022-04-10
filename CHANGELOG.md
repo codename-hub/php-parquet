@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.2 - 2022-04-10]
+### Fixed
+- Issue #6, wrong bitshift in ReadIntOnBytes due to syntax misinterpretation
+
 ## [0.6.1 - 2021-12-06]
 ### Fixed
 - Missing method `Schema::GetNotEqualsMessage()` and exception/error message on appending to a parquet file with schema mismatch (#3)
