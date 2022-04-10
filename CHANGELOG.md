@@ -2,7 +2,7 @@
 
 ## [0.6.2 - 2022-04-10]
 ### Fixed
-- Issue #6, wrong bitshift in ReadIntOnBytes due to syntax misinterpretation
+- Issue #6, wrong bitshift in RLE Reader's ReadIntOnBytes due to syntax misinterpretation
 
 ## [0.6.1 - 2021-12-06]
 ### Fixed
