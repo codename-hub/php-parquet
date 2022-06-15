@@ -270,7 +270,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \codename\parquet\format\SchemaElement $tse,
     $encoded
   ) {
-    if ($encoded === null) return null;
+    if (empty($encoded)) return null;
     $ms = fopen('php://memory', 'r+');
     fwrite($ms, $encoded);
     $reader = BinaryReader::createInstance($ms);
