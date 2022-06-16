@@ -94,7 +94,7 @@ class CustomBinaryReader extends BinaryReader
   public function readBytes($count)
   {
     $this->position += $count;
-    return fread($this->stream, $count);
+    return $count > 0 ? fread($this->stream, $count) : ''; // Same behaviour as BinaryReader
     // NOTE: we might REALLY parse bytes here instead of returning the read data as string
   }
 
@@ -204,7 +204,7 @@ class CustomBinaryReader extends BinaryReader
   public function readString($length)
   {
     $this->position += $length; // ?
-    return fread($this->stream, $length);
+    return $length > 0 ? fread($this->stream, $length) : '';
   }
 
   /**

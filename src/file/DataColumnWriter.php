@@ -378,6 +378,7 @@ class DataColumnWriter
    */
   public static function getBitWidth(int $value) : int
   {
+     $value = \codename\parquet\adapter\Cast::toUnsignedInt($value);
      for ($i = 0; $i < 64; $i++)
      {
         if ($value === 0) return $i;

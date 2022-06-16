@@ -43,6 +43,11 @@ abstract class AbstractBinaryReadingWritingTest extends \PHPUnit\Framework\TestC
         'write'   => function(BinaryWriterInterface $writer, $v) { $writer->writeByte($v); },
         'read'    => function(BinaryReaderInterface $reader) { return $reader->readByte(); },
       ],
+      'NoBytes' => [
+        'values'  => [ '' ],
+        'write'   => function(BinaryWriterInterface $writer, $v) { /* nothing */ },
+        'read'    => function(BinaryReaderInterface $reader) { return $reader->readBytes(0); },
+      ],
 
       // Byte-reading and -writing using CustomBinary* is inconsistent by design
       // 'Bytes' => [
@@ -101,7 +106,7 @@ abstract class AbstractBinaryReadingWritingTest extends \PHPUnit\Framework\TestC
         'read'    => function(BinaryReaderInterface $reader) { return $reader->readDouble(); },
       ],
       'String' => [
-        'values'  => [ ' ', 'A', '\\', chr(127), chr(0) ],
+        'values'  => [ ' ', 'A', '\\', chr(127), chr(0), '' ],
         'write'   => function(BinaryWriterInterface $writer, $v) { $writer->writeString($v); },
         'read'    => function(BinaryReaderInterface $reader, $v) { return $reader->readString(strlen($v)); },
       ]
