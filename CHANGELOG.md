@@ -24,6 +24,8 @@
 - Reduce package size by exluding test files via .gitattributes for archives
 ### Fixed
 - Binary string data reading of length=0 in rare cases
+- RLE Reader's ReadIntOnBytes (now contained in BytesUtils) to fully comply with the standard, wrong bitshift for 32-bit integers
+- WriteIntBytes using full 4-byte-int and unsigned right shift operator
 
 ## [0.6.2 - 2022-04-10]
 ### Fixed
