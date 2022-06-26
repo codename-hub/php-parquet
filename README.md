@@ -18,7 +18,19 @@ This package enables you to read and write Parquet files/streams w/o the use of 
 It has (almost?) 100% test compatibility with parquet-dotnet, regarding the core functionality, done via PHPUnit.
 
 ## Important
-This repository (and associated package on Packagist) has been decoupled from the first release (https://github.com/Jocoon/php-parquet, Package `jocoon/parquet`) and re-branded under a future, fresh family name of packages.
+This repository (and associated package on Packagist) is the official project continuation of `jocoon/parquet`. Due to various improvements and essential bugfixes, here in `codename/parquet`, using the legacy package is highly discouraged.
+
+## Index
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [General Remarks](#general-remarks)
+* [Usage / API](#api)
+  * [Reading files](#reading-files)
+  * [Writing files](#writing-files)
+* [Simplified usage](#simplified-usage)
+  * [Reading using ParquetDataIterator](#reading)
+  * [Writing using ParquetDataWriter](#writing)
+* [Complex data handling](#complex-data)
 
 ## Preamble
 For some parts of this package, some new patterns had to be invented as I haven't found any implementation that met the requirements.
@@ -65,8 +77,7 @@ Tests fully pass on PHP 7.3 and 7.4. At the time of writing also 8.0.0 RC2 is pe
 
 This library highly depends on
 
-* __apache/thrift__ for working with the Thrift-related objects and data
-* __nelexa/buffer__ for reading and writing binary data (I decided not to do a C# BinaryWriter clone. (UPDATE 2020-11-04: I just did my own clone, see below.)
+* __packaged/thrift__ for working with the Thrift-related objects and data (stripped-down version of apache/thrift)
 * __pear/Math_BigInteger__ for working with binary stored arbitrary-precision decimals (paradox, I know)
 
 As of v0.2, I've also switched to an implementation-agnostic approach of using readers and writers.
@@ -216,6 +227,147 @@ $groupWriter->finish();   // finish inner writer(s)
 $parquetWriter->finish(); // finish the parquet writer last
 ```
 
+## Simplified Usage
+
+You can also use `ParquetDataIterator` and `ParquetDataWriter` for working even with highly complex schemas (f.e. nested data). Though experimental at the time of writing, unit- and integration tests indicate we have a 100% compatibility with Spark, as most of the other Parquet implementations lack certain features or cases of super-complex nesting.
+
+`ParquetDataIterator` and `ParquetDataWriter` leverage the 'dynamic-ness' of the PHP type system and (associative) arrays - which only comes to a halt when fully using unsigned 64-bit integers - those can only be partially supported due to the nature of PHP.
+
+### Reading
+
+`ParquetDataIterator` automatically iterates over all row groups and data pages, over all columns of the parquet file in the most memory-efficient way possible. This means, it doesn't load all datasets into memory, but does it on a per-datapage/per-row-group basis.
+
+Under the hood, it leverages the functionality of `DataColumnsToArrayConverter` which ultimately does all the 'heavy lifting' regarding **Definition and Repetition Levels**.
+
+```php
+use codename\parquet\helper\ParquetDataIterator;
+
+$iterateMe = ParquetDataIterator::fromFile('your-parquet-file.parquet');
+
+foreach($iterateMe as $dataset) {
+  // $dataset is an associative array
+  // and already combines data of all columns
+  // back to a row-like structure
+}
+```
+
+### Writing
+
+Vice-versa, `ParquetDataWriter` allows you two write a Parquet file (in-memory or on disk) by passing PHP associative array data, either one at a time or in batches. Internally, it uses `ArrayToDataColumnsConverter` to produce data, dictionaries, definition and repetition levels.
+
+```php
+use codename\parquet\helper\ParquetDataWriter;
+
+$schema = new Schema([
+  DataField::createFromType('id', 'integer'),
+  DataField::createFromType('name', 'string'),
+]);
+
+$handle = fopen('sample.parquet', 'r+');
+$dataWriter = new ParquetDataWriter($handle, $schema);
+
+// add two records at once
+$dataToWrite = [
+  [ 'id' => 1, 'name' => 'abc' ],
+  [ 'id' => 2, 'name' => 'def' ],
+];
+$dataWriter->putBatch($dataToWrite);
+
+// we add a third, single one
+$dataWriter->put([ 'id' => 3, 'name' => 'ghi' ]);
+
+$dataWriter->finish(); // Don't forget to finish at some point.
+fclose($handle); // You may close the handle, if you have to.
+```
+
+### Complex data
+
+**php-parquet** supports the full nesting capabilities of the Parquet format.
+You may notice, depending on what field types you're nesting, you'll somehow 'lose' key names. This is by design:
+* List elements don't have a key - they're array elements
+* A Map's value field itself has no key in an associative array - the key is provided by the Map's key column
+* A repeated field is implicitly converted to an array-like structure
+
+Generally speaking, here are the PHP equivalents of the Logical Types of the Parquet Format:
+
+Parquet   |PHP               |JSON      |Note
+----------|------------------|----------|-------
+DataField |primitive         |primitive |f.e. string, integer, etc.
+ListField |array             |array `[]`|element type can be a primitive or even a List, Struct or Map
+StructField|associative array|object `{}`|Keys of the assoc. array are the field names inside the StructField
+MapField|associative array|object `{}`|Simplified: `array_keys($data['someField'])` and `array_values($data['someField'])`, but for each row
+
+The format is compatible to JSON export data generated by Spark configured with `spark.conf.set("spark.sql.jsonGenerator.ignoreNullFields", False)`. By default, Spark strips out `null` values completely when exporting to JSON.
+
+**Please note:**
+All those field types **can** be made nullable or non-nullable/required on every nesting level (affects definition levels). Some nullabilities are used f.e. to represent empty lists and distinguish them from a `null` value for a list.
+
+
+```php
+use codename\parquet\helper\ParquetDataIterator;
+use codename\parquet\helper\ParquetDataWriter;
+
+$schema = new Schema([
+  DataField::createFromType('id', 'integer'),
+  new MapField(
+    'aMapField',
+    DataField::createFromType('someKey', 'string'),
+    StructField::createWithFieldArray(
+      'aStructField'
+      [
+        DataField::createFromType('anInteger', 'integer'),
+        DataField::createFromType('aString', 'string'),
+      ]
+    )
+  ),
+  StructField::createWithFieldArray(
+    'rootLevelStructField'
+    [
+      DataField::createFromType('anotherInteger', 'integer'),
+      DataField::createFromType('anotherString', 'string'),
+    ]
+  ),
+  new ListField(
+    'aListField',
+    DataField::createFromType('someInteger', 'integer'),
+  )
+]);
+
+$handle = fopen('complex.parquet', 'r+');
+$dataWriter = new ParquetDataWriter($handle, $schema);
+
+$dataToWrite = [
+  // This is a single dataset:
+  [
+    'id' => 1,
+    'aMapField' => [
+      'key1' => [ 'anInteger' => 123, 'aString' => 'abc' ],
+      'key2' => [ 'anInteger' => 456, 'aString' => 'def' ],
+    ],
+    'rootLevelStructField' => [
+      'anotherInteger' => 7,
+      'anotherString' => 'in paradise'
+    ],
+    'aListField' => [ 1, 2, 3 ]
+  ],
+  // ... add more datasets as you wish.
+];
+$dataWriter->putBatch($dataToWrite);
+$dataWriter->finish();
+
+$iterateMe = ParquetDataIterator::fromFile('complex.parquet');
+
+// f.e. write back into a full-blown php array:
+$readData = [];
+foreach($iterateMe as $dataset) {
+  $readData[] = $dataset;
+}
+
+// and now compare this to the original data supplied.
+// manually, by print_r, var_dump, assertions, comparisons or whatever you like.
+
+```
+
 ## Performance
 This package also provides the same benchmark as parquet-dotnet. These are the results on __my machine__:
 
@@ -248,5 +400,5 @@ Some code parts and concepts have been ported from C#/.NET, see:
 php-parquet is licensed under the MIT license. See file LICENSE.
 
 ## Contributing
-You might do a PR, if you want.
-Info on how to contribute is coming soon.
+Feel free to do a PR, if you want. As this is a spare-time OSS project, contributions will help all users of this package, including yourself.
+Please apply a pinch of common sense when creating PRs and/or issues, there's no template.
