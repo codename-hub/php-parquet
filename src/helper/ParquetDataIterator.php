@@ -55,6 +55,14 @@ class ParquetDataIterator implements \Iterator, \Countable
   }
 
   /**
+   * [getUnderlyingParquetReader description]
+   * @return ParquetReader [description]
+   */
+  public function getUnderlyingParquetReader(): ParquetReader {
+    return $this->reader;
+  }
+
+  /**
    * [protected description]
    * @var int
    */
@@ -92,7 +100,7 @@ class ParquetDataIterator implements \Iterator, \Countable
   /**
    * @inheritDoc
    */
-  #[\ReturnTypeWillChange] 
+  #[\ReturnTypeWillChange]
   public function current()
   {
     return $this->currentBuffer[$this->offsetPosition];
