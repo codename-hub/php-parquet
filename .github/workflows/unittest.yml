@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         operating-system:
-          - 'ubuntu-18.04'
+          - 'ubuntu-20.04'
         php-versions:
           - 7.3
           - 7.4
