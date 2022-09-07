@@ -330,5 +330,19 @@ final class ParquetReaderTest extends TestBase
       $this->assertNull($value);
     }
   }
+  /**
+   * [testReadEmptyColumn description]
+   */
+  public function testReadFileWithRLEDictionaryEncoding(): void {
+    $reader = new ParquetReader($this->openTestFile('movies_pyarrow.parquet'));
+    // Before throw Exception : encoding 8 (RLE_DICTIONARY) is not supported.
+    $columns = $reader->ReadEntireRowGroup();
+    $col0 = $columns[0]->getData();
+
+    $this->assertCount(2, $col0);
+    foreach($col0 as $value) {
+      $this->assertNotEmpty($value);
+    }
+  }
 
 }

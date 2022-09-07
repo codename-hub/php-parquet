@@ -282,7 +282,9 @@ class DataColumnReader
           $cd->valuesOffset += $indexCount;
           break;
 
+        // PLAIN_DICTIONARY encoding is deprecated in parquet 2.0
         case Encoding::PLAIN_DICTIONARY:
+        case Encoding::RLE_DICTIONARY:
           if($cd->indexes === null) {
             // QUESTION: should we pre-fill the array?
             $cd->indexes = array_fill(0, $totalValues, null);
@@ -294,7 +296,8 @@ class DataColumnReader
           break;
 
         default:
-           throw new \Exception("encoding {$encoding} is not supported.");
+           $encodingName = Encoding::$__names[$encoding]??'undefined';
+           throw new \Exception("encoding {$encoding} ({$encodingName}) is not supported.");
      }
   }
 
