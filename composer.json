@@ -31,6 +31,9 @@
             "codename\\parquet\\tests\\": "tests/"
         }
     },
+    "archive": {
+        "exclude": [ "tests" ]
+    },
     "require-dev": {
         "phpunit/phpunit": "^9.0",
         "phpunit/php-code-coverage": "^9.2"
