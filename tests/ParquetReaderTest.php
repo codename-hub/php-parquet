@@ -334,8 +334,9 @@ final class ParquetReaderTest extends TestBase
    * [testReadEmptyColumn description]
    */
   public function testReadFileWithRLEDictionaryEncoding(): void {
+    // test file created in python arrow implementation
     $reader = new ParquetReader($this->openTestFile('movies_pyarrow.parquet'));
-    // Before throw Exception : encoding 8 (RLE_DICTIONARY) is not supported.
+    // Before, reader fails with exception: encoding 8 (RLE_DICTIONARY) is not supported.
     $columns = $reader->ReadEntireRowGroup();
     $col0 = $columns[0]->getData();
 
