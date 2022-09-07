@@ -14,6 +14,12 @@ interface BinaryReaderInterface
   public function __construct($stream, $options = null);
 
   /**
+   * Set endianness via constant BinaryReader::LITTLE_ENDIAN or BinaryReader::BIG_ENDIAN
+   * @param int $order  [description]
+   */
+  public function setByteOrder($order);
+
+  /**
    * @return bool
    */
   public function isEof(): bool;
@@ -35,6 +41,11 @@ interface BinaryReaderInterface
    * @return int
    */
   public function readBytes($count);
+
+  /**
+   * @return int
+   */
+  public function readByte();
 
   /**
    * @return int

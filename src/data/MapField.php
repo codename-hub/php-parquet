@@ -26,18 +26,50 @@ class MapField extends Field
   public $value;
 
   /**
+   * Whether the map field itself is nullable
+   * @var bool
+   */
+  public $hasNulls;
+
+  // /**
+  //  * Whether the map field itself is repeatable
+  //  * @var bool
+  //  */
+  // public $isArray;
+
+  /**
+   * Whether the map values are nullable
+   * @var bool
+   */
+  public $keyValueHasNulls;
+
+  /**
    * @inheritDoc
    */
-  public function __construct(string $name, ?DataField $keyField = null, ?DataField $valueField = null)
-  {
+  public function __construct(
+    string $name,
+    ?DataField $keyField = null,
+    ?Field $valueField = null,
+    bool $nullable = false,
+    bool $keyValueNullable = true // TODO: remove
+  ) {
     parent::__construct($name, SchemaType::Map);
+
+    $this->hasNulls = $nullable;
+    $this->keyValueHasNulls = $keyValueNullable;
+
+    if($keyField) {
+      // key is required in maps, therefore: make not-nullable internally
+      // just to make sure
+      $keyField->hasNulls = false;
+    }
 
     // keyField and valueField are optional
     // in dotnet, this is a separate constructor.
     if($keyField && $valueField) {
       $this->key = $keyField;
       $this->value = $valueField;
-      $this->path = OtherExtensions::AddPath($name, static::ContainerName); // TODO: Check path separator in this case...
+      $this->setPath(OtherExtensions::AddPath($name, static::ContainerName));
       $this->key->setPathPrefix($this->path);
       $this->value->setPathPrefix($this->path);
     }
@@ -48,7 +80,7 @@ class MapField extends Field
    */
   public function setPathPrefix($value)
   {
-    $this->path = OtherExtensions::AddPath($value, [ $this->name, static::ContainerName ]);
+    $this->setPath(OtherExtensions::AddPath($value, [ $this->name, static::ContainerName ]));
     $this->key->setPathPrefix($this->path);
     $this->value->setPathPrefix($this->path);
   }
@@ -89,5 +121,28 @@ class MapField extends Field
       // throw new InvalidOperationException($"'{Name}' already has key and value assigned");
       throw new Exception("'{Name}' already has key and value assigned");
     }
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function Equals($other): bool
+  {
+    if ($other === null) return false;
+    if ($other === $this) return true;
+    if (get_class($other) != get_class($this)) return false;
+    
+    if($other instanceof MapField) {
+      return
+        $this->name === $other->name &&
+        $this->path === $other->path &&
+        $this->key->Equals($other->key) &&
+        $this->value->Equals($other->value);
+        // QUESTION: nullability comparison?
+    } else {
+      return false; // TODO or TSE detail check?
+    }
+
+    return $value;
   }
 }

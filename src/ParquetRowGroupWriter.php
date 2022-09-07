@@ -156,6 +156,7 @@ class ParquetRowGroupWriter
 
     // Set configuration to enable/disable statistics generation
     $writer->calculateStatistics = $this->formatOptions->CalculateStatistics;
+    $writer->writeDataPageV2 = $this->formatOptions->WriteDataPageV2;
 
     // Thrift.ColumnChunk chunk = writer.Write(path, column, dataTypeHandler);
     $chunk = $writer->write($path, $column, $dataTypeHandler);

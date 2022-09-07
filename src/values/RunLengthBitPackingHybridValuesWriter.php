@@ -1,8 +1,6 @@
 <?php
 namespace codename\parquet\values;
 
-use Exception;
-
 use codename\parquet\adapter\BinaryWriter;
 
 /**
@@ -16,58 +14,67 @@ class RunLengthBitPackingHybridValuesWriter
    * @param int    $bitWidth [description]
    * @param int[]  $data     [description]
    * @param int    $count    [description]
+   * @return int Amount of bytes written
    */
-  public static function WriteForwardOnly(BinaryWriter $writer, int $bitWidth, array $data, int $count): void
+  public static function WriteForwardOnly(BinaryWriter $writer, int $bitWidth, array $data, int $count): int
   {
+    $startPos = $writer->getPosition();
+
     //write data to a memory buffer, as we need data length to be written before the data
     // $ms = fopen('php://memory', 'r+');
-    $ms = ''; // TEST as string
-
-    // using (var ms = new MemoryStream())
-    // {
-
-    // echo("WriteForwardOnly");
-    // var_dump($data);
+    $ms = ''; // we simply use a string as target
 
     $bw = \codename\parquet\adapter\BinaryWriter::createInstance($ms);
     // $bw->setOrder(\codename\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
-    //
-    // using (var bw = new BinaryWriter(ms, Encoding.UTF8, true))
-    // {
-      //write actual data
+
+    // write actual data
     static::WriteData($bw, $data, $count, $bitWidth);
-    // }
 
     // int32 - length of data
     // writer.Write((int)ms.Length);
     // $writer->writeInt32($len = fstat($ms)['size']);
     $writer->writeInt32($bw->getEofPosition());
 
-    //actual data
+    // rewind to start for copying to main writer
     // ms.Position = 0;
     // fseek($ms, 0);
     $bw->setPosition(0);
 
+    $writer->writeString($bw->toString());
 
-    // DEBUG/TODO: do we need to reset this one?
-    // $writer->setPosition(0);
+    return $writer->getPosition() - $startPos; // return amount of bytes written
+  }
 
-    // if($writer instanceof \codename\parquet\adapter\BinaryWriter) {
-    //   $writer->insert()
-    // }
-    // $streamContent = stream_get_contents($ms);
+  /**
+   * Pure RLE without size
+   * @param  BinaryWriter $writer                 [description]
+   * @param  int          $bitWidth               [description]
+   * @param  array        $data                   [description]
+   * @param  int          $count                  [description]
+   * @return int                    [description]
+   */
+  public static function WritePureRle(BinaryWriter $writer, int $bitWidth, array $data, int $count): int
+  {
+    $startPos = $writer->getPosition();
 
-    // $writer->insert($bw);
+    //write data to a memory buffer, as we need data length to be written before the data
+    // $ms = fopen('php://memory', 'r+');
+    $ms = ''; // we simply use a string as target
 
-    // stream_copy_to_stream($ms, $writer->getBaseStream());
+    $bw = \codename\parquet\adapter\BinaryWriter::createInstance($ms);
+    // $bw->setOrder(\codename\parquet\adapter\BinaryWriter::LITTLE_ENDIAN); // enforce little endian
 
+    // write actual data
+    static::WriteData($bw, $data, $count, $bitWidth);
+
+    // rewind to start for copying to main writer
+    // ms.Position = 0;
+    // fseek($ms, 0);
+    $bw->setPosition(0);
 
     $writer->writeString($bw->toString());
 
-    // stream_copy_to_stream($ms, $writer->)
-    // ms.CopyTo(writer.BaseStream); //warning! CopyTo performs .Flush internally
-
-    // fclose($ms);
+    return $writer->getPosition() - $startPos; // return amount of bytes written
   }
 
   /**
@@ -80,8 +87,8 @@ class RunLengthBitPackingHybridValuesWriter
   private static function WriteData(BinaryWriter $writer, array $data, int $count, int $bitWidth): void
   {
     //for simplicity, we're only going to write RLE, however bitpacking needs to be implemented as well
-    $maxCount = PHP_INT_MAX >> 1;  //max count for an integer with one lost bit
-    // TODO/NOTE: change to 32-bit int??
+    $maxCount = 2147483647 >> 1;  //max count for a (signed?) 32-bit integer with one lost bit
+
 
     // echo(chr(10)." RLE::WriteData ************************************************* ".chr(10));
     // var_dump([
@@ -175,82 +182,8 @@ class RunLengthBitPackingHybridValuesWriter
     //   'value' => $value,
     // ]);
 
-    static::WriteUnsignedVarInt($writer, $header);
-    static::WriteIntBytes($writer, $value, $byteWidth);
-  }
-
-  /**
-   * [WriteIntBytes description]
-   * @param BinaryWriter $writer    [description]
-   * @param int    $value     [description]
-   * @param int    $byteWidth [description]
-   */
-  private static function WriteIntBytes(BinaryWriter $writer, int $value, int $byteWidth): void
-  {
-    // byte[] dataBytes = BitConverter.GetBytes(value);
-
-    // see https://stackoverflow.com/questions/11544821/how-to-convert-integer-to-byte-array-in-php
-    // $dataBytes = pack("L", $value); // unpack("C*", pack("L", $value));
-    // $dataBytes = pack('l', $value);
-    $dataBytes = unpack("C*", pack("L", $value));
-
-    // echo("_______DATABYTES______".chr(10));
-    // echo(" byteWidth=$byteWidth ");
-    // var_dump($value);
-    // var_dump($dataBytes);
-    // // foreach(str_split($dataBytes) as $byte) {
-    // //   // code...
-    // //   var_dump([$byte, ord($byte)]);
-    // // }
-    // echo("_______DATABYTES______".chr(10));
-
-    //
-    // IMPORTANT NOTE: PHP's unpack/pack functions usually return 1-based index arrays
-    // We simply add 1+ in front of each...
-    //
-    switch($byteWidth)
-    {
-      case 0:
-        break;
-      case 1:
-        $writer->writeByte($dataBytes[1+0]);
-        break;
-      case 2:
-        $writer->writeByte($dataBytes[1+1]);
-        $writer->writeByte($dataBytes[1+0]);
-        break;
-      case 3:
-        $writer->writeByte($dataBytes[1+2]);
-        $writer->writeByte($dataBytes[1+1]);
-        $writer->writeByte($dataBytes[1+0]);
-        break;
-      case 4:
-        // TODO: Test...
-        echo(chr(10)."################################################################################# insertArrayBytes".chr(10));
-        $writer->writeBytes($dataBytes);
-        break;
-      default:
-      throw new Exception("encountered bit width ({$byteWidth}) that requires more than 4 bytes.");
-    }
-  }
-
-  /**
-   * [WriteUnsignedVarInt description]
-   * @param BinaryWriter $writer [description]
-   * @param int    $value  [description]
-   */
-  private static function WriteUnsignedVarInt(BinaryWriter $writer, int $value): void
-  {
-    while($value > 127)
-    {
-      $b = (($value & 0x7F) | 0x80);
-
-      $writer->writeByte($b);
-
-      $value >>= 7;
-    }
-
-    $writer->writeByte($value);
+    BytesUtils::WriteUnsignedVarInt($writer, $header);
+    BytesUtils::WriteIntBytes($writer, $value, $byteWidth);
   }
 
 }

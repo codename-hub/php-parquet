@@ -21,4 +21,10 @@ class ParquetOptions {
    * @var bool
    */
   public $CalculateStatistics = false;
+
+  /**
+   * Whether to write DataPages using V2 header
+   * @var bool
+   */
+  public $WriteDataPageV2 = false;
 }

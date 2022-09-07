@@ -67,9 +67,13 @@ class StringDataTypeHandler extends BasicDataTypeHandler
         $length = $reader->getEofPosition();
       }
     }
-
     // NOTE: possible UTF8 handling needed.
-    return $reader->readString($length);
+
+    // CHANGED 2021-12-08: specialty due to fread() limitations
+    // we cannot read a string with the length of 0
+    // so we have to either return '' or NULL
+    // See below in WriteOneInternal()
+    return ($length > 0) ? $reader->readString($length) : '';
   }
 
   /**

@@ -15,8 +15,7 @@
         "ext-bcmath" : "*",
         "ext-zlib": "*",
         "pear/math_biginteger" : "^1.0",
-        "packaged/thrift": "^0.13.0",
-        "nelexa/buffer": "^1.3"
+        "packaged/thrift": "^0.13.0"
     },
     "suggest" : {
       "ext-snappy" : "Install/compile snappy extension to get support for snappy compression reading/writing"

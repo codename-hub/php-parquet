@@ -91,8 +91,8 @@ class RunLengthBitPackingHybridValuesReader
      //   'width' => $width,
      // ]);
 
-     $data = $reader->readBytes($width);
-     $value = static::ReadIntOnBytes($data);
+     $data = $width > 0 ? $reader->readBytes($width) : '';
+     $value = BytesUtils::ReadIntOnBytes($data);
 
      // echo("ReadIntOnBytes=".ord($value).chr(10));
 
@@ -194,25 +194,6 @@ class RunLengthBitPackingHybridValuesReader
   private static function MaskForBits(int $width) : int
   {
      return (1 << $width) - 1;
-  }
-
-  private static function ReadIntOnBytes($data)
-  {
-     switch ($byteWidth = \strlen($data))
-     {
-        case 0:
-           return 0;
-        case 1:
-           return \ord($data[0]);
-        case 2:
-           return (\ord($data[1]) << 8) + \ord($data[0]);
-        case 3:
-           return (\ord($data[2]) << 16) + (\ord($data[1]) << 8) + \ord($data[0]);
-        case 4:
-           return (\ord($data[3]) << 32) + (\ord($data[2]) << 16) + (\ord($data[1]) << 8) + \ord($data[0]); // BitConverter.ToInt32(data, 0); // ????
-        default:
-           throw new \Exception("encountered byte width ($byteWidth) that requires more than 4 bytes.");
-     }
   }
 
   /**

@@ -19,6 +19,7 @@ use codename\parquet\format\FileMetaData;
 use codename\parquet\format\SchemaElement;
 use codename\parquet\format\ColumnMetaData;
 use codename\parquet\format\DataPageHeader;
+use codename\parquet\format\DataPageHeaderV2;
 use codename\parquet\format\FieldRepetitionType;
 
 class ThriftFooter {
@@ -171,7 +172,16 @@ class ThriftFooter {
     return new Schema($container);
   }
 
-  protected function _CreateModelSchema(?string $path, array &$container, int $childCount, int &$si, ?ParquetOptions $formatOptions) {
+  /**
+   * [_CreateModelSchema description]
+   * @param  array|null           $path                        [description]
+   * @param  array                &$container                   [description]
+   * @param  int                  $childCount                  [description]
+   * @param  int                  &$si                          [description]
+   * @param  ParquetOptions|null  $formatOptions               [description]
+   * @return void
+   */
+  protected function _CreateModelSchema(?array $path, array &$container, int $childCount, int &$si, ?ParquetOptions $formatOptions) {
     for ($i=0; $i < $childCount && $si < count($this->fileMeta->schema); $i++) {
       $tse = $this->fileMeta->schema[$si];
 
@@ -191,7 +201,14 @@ class ThriftFooter {
       $se = $dth->createSchemaElement($this->fileMeta->schema, $si, $ownedChildCount);
 
       // set $se->path !
-      $se->path = implode(Schema::PathSeparator, array_filter([$path, $se->path ?? $se->name ]));
+      $se->setPath(array_values(
+        array_filter(
+          array_merge(
+            $path ?? [], // Fallback to empty array as path
+            $se->path ?? [ $se->name ] // NOTE: fallback to array-ified $se->name
+          )
+        )
+      ));
 
       // print_r($se);
       // die();
@@ -238,6 +255,10 @@ class ThriftFooter {
 
           $repeated = ($se->repetition_type !== null && $se->repetition_type == FieldRepetitionType::REPEATED);
           $defined = ($se->repetition_type == FieldRepetitionType::REQUIRED);
+
+          // https://github.com/apache/arrow/blob/d0de88d8384c7593fac1b1e82b276d4a0d364767/cpp/src/parquet/schema.cc#L816
+          // Repeated fields add a definition level. This is used to distinguish
+          // between an empty list and a list with an item in it.
 
           if ($repeated) $maxRepetitionLevel += 1;
           if (!$defined) $maxDefinitionLevel += 1;
@@ -339,22 +360,36 @@ class ThriftFooter {
   /**
    * [CreateDataPage description]
    * @param  int        $valueCount [description]
+   * @param  bool       $v2         [create a DataPageHeaderV2]
    * @return PageHeader             [description]
    */
-  public function CreateDataPage(int $valueCount): PageHeader
+  public function CreateDataPage(int $valueCount, bool $v2 = false): PageHeader
   {
     $ph = new PageHeader([
-      'type'                    => PageType::DATA_PAGE,
+      'type'                    => $v2 ? PageType::DATA_PAGE_V2 : PageType::DATA_PAGE,
       'uncompressed_page_size'  => 0,
       'compressed_page_size'    => 0,
     ]);
-    $ph->data_page_header = new DataPageHeader([
-      'encoding' => Encoding::PLAIN,
-      'definition_level_encoding' => Encoding::RLE,
-      'repetition_level_encoding' => Encoding::RLE,
-      'num_values' => $valueCount,
-      'statistics' => new Statistics(),
-    ]);
+
+    if($v2) {
+      $ph->data_page_header_v2 = new DataPageHeaderV2([
+        'encoding' => Encoding::PLAIN, // TODO: or RLE?
+        'definition_levels_byte_length' => 0,
+        'repetition_levels_byte_length' => 0,
+        'num_values' => $valueCount,
+        'num_nulls' => 0, // to be set
+        'num_rows' => 0, // to be set
+        'statistics' => new Statistics(),
+      ]);
+    } else {
+      $ph->data_page_header = new DataPageHeader([
+        'encoding' => Encoding::PLAIN,
+        'definition_level_encoding' => Encoding::RLE,
+        'repetition_level_encoding' => Encoding::RLE,
+        'num_values' => $valueCount,
+        'statistics' => new Statistics(),
+      ]);
+    }
 
     return $ph;
   }

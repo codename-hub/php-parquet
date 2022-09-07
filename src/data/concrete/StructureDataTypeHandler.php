@@ -36,6 +36,12 @@ class StructureDataTypeHandler extends NonDataDataTypeHandler
 
     $ownedChildCount = $container->num_children; //make then owned to receive in .Assign()
     $f = StructField::CreateWithNoElements($container->name);
+
+    // NOTE:
+    // In fact, StructFields CAN be repeated, required or even not-null (OPTIONAL)
+    $f->hasNulls = $container->repetition_type !== FieldRepetitionType::REQUIRED;
+    $f->isArray = $container->repetition_type === FieldRepetitionType::REPEATED;
+
     return $f;
   }
 
@@ -57,7 +63,8 @@ class StructureDataTypeHandler extends NonDataDataTypeHandler
   ): void {
     $tseStruct = new SchemaElement([
       'name' => $field->name,
-      'repetition_type' => FieldRepetitionType::OPTIONAL,
+      // NOTE: struct fields CAN be repeated!
+      'repetition_type' => $field->isArray ? FieldRepetitionType::REPEATED : ($field->hasNulls ? FieldRepetitionType::OPTIONAL : FieldRepetitionType::REQUIRED),
     ]);
 
     $container[] = $tseStruct;

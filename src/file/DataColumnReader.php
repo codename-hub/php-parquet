@@ -139,6 +139,14 @@ class DataColumnReader
   }
 
   /**
+   * [getThriftColumnChunk description]
+   * @return \codename\parquet\format\ColumnChunk [description]
+   */
+  public function getThriftColumnChunk(): \codename\parquet\format\ColumnChunk {
+    return $this->thriftColumnChunk;
+  }
+
+  /**
    * [readDataPage description]
    * @param PageHeader    $ph        [description]
    * @param ColumnRawData $cd        [description]
@@ -218,6 +226,66 @@ class DataColumnReader
   }
 
   /**
+   * [readDataPageV2 description]
+   * @param PageHeader    $ph        [description]
+   * @param ColumnRawData $cd        [description]
+   * @param int           $maxValues [description]
+   */
+  protected function readDataPageV2(PageHeader $ph, ColumnRawData $cd, int $maxValues) : void {
+
+    $bytes = $this->readPageDataByPageHeader($ph);
+
+    $reader = \codename\parquet\adapter\BinaryReader::createInstance($bytes);
+
+    if($this->maxRepetitionLevel > 0) {
+      //todo: use rented buffers, but be aware that rented length can be more than requested so underlying logic relying on array length must be fixed too.
+      if($cd->repetitions === null) { // TODO/QUESTION: may they even be null?
+        $cd->repetitions = array_fill(0, $cd->maxCount, null);
+      }
+
+      $cd->repetitionsOffset += $this->readLevelsV2($reader, $ph->data_page_header_v2->repetition_levels_byte_length, $this->maxRepetitionLevel, $cd->repetitions, $cd->repetitionsOffset, $ph->data_page_header_v2->num_values);
+    }
+
+    if($this->maxDefinitionLevel > 0) {
+      if($cd->definitions === null) {
+        $cd->definitions = array_fill(0, $cd->maxCount, null);
+      }
+
+      $cd->definitionsOffset += $this->readLevelsV2($reader, $ph->data_page_header_v2->definition_levels_byte_length, $this->maxDefinitionLevel, $cd->definitions, $cd->definitionsOffset, $ph->data_page_header_v2->num_values);
+    }
+
+    if($ph->data_page_header_v2 === null) {
+      throw new \Exception('file corrupt, data page header missing');
+    }
+
+    $nullCount = $ph->data_page_header_v2->num_nulls ?? null;
+
+    if($nullCount === null && $cd->definitions !== null) {
+      //
+      // We're counting all maxDefinitionLevel entries (non-nulls)
+      // and subtract them from our known num_values (which include nulls)
+      //
+      // NOTE: we are only comparing the definition levels within current page bounds
+      // $cd->definitionsOffset has already been incremented at this point, so we assume the initial state
+      // start index: definitionsOffset - num_values
+      // end index:   definitionsOffset
+      //
+      $definitionCount = 0;
+
+      for ($i = $cd->definitionsOffset - $ph->data_page_header_v2->num_values; $i < $cd->definitionsOffset; $i++) {
+        if($cd->definitions[$i] === $this->maxDefinitionLevel) {
+          $definitionCount++;
+        }
+      }
+      $nullCount = $ph->data_page_header_v2->num_values - $definitionCount;
+    }
+
+    $maxReadCount = $ph->data_page_header_v2->num_values - (int)($nullCount ?? 0);
+
+    $this->readColumn($reader, $ph->data_page_header_v2->encoding, $maxValues, $maxReadCount, $cd);
+  }
+
+  /**
    * [readLevels description]
    * @param  BinaryReader $reader   [description]
    * @param  int          $maxLevel [description]
@@ -229,6 +297,21 @@ class DataColumnReader
   protected function readLevels(BinaryReader $reader, int $maxLevel, array &$dest, ?int $offset, ?int $pageSize) : int {
     $bitWidth = static::getBitWidth($maxLevel);
     return RunLengthBitPackingHybridValuesReader::ReadRleBitpackedHybrid($reader, $bitWidth, 0, $dest, $offset, $pageSize);
+  }
+
+  /**
+   * [readLevelsV2 description]
+   * @param  BinaryReader $reader                 [description]
+   * @param  int          $numBytes               [description]
+   * @param  int          $maxLevel               [description]
+   * @param  array        &$dest                   [description]
+   * @param  int|null     $offset                 [description]
+   * @param  int|null     $pageSize               [description]
+   * @return int
+   */
+  protected function readLevelsV2(BinaryReader $reader, int $numBytes, int $maxLevel, array &$dest, ?int $offset, ?int $pageSize) : int {
+    $bitWidth = static::getBitWidth($maxLevel);
+    return RunLengthBitPackingHybridValuesReader::ReadRleBitpackedHybrid($reader, $bitWidth, $numBytes, $dest, $offset, $pageSize);
   }
 
   /**
@@ -282,6 +365,11 @@ class DataColumnReader
           $cd->valuesOffset += $indexCount;
           break;
 
+        //
+        // CHANGED 2021-10-15: for RLE_DICTIONARY, use the same as PLAIN_DICTIONARY
+        // as we internally handle RLE
+        //
+        case Encoding::RLE_DICTIONARY:
         case Encoding::PLAIN_DICTIONARY:
           if($cd->indexes === null) {
             // QUESTION: should we pre-fill the array?
@@ -351,112 +439,169 @@ class DataColumnReader
   }
 
   /**
-   * [read description]
-   * @return DataColumn [description]
+   * Returns an iterable instance of a DataColumn
+   * Which internally uses this reader
+   * @return \codename\parquet\data\DataColumnIterable [description]
+   */
+  public function getDatacolumnIterable(): \codename\parquet\data\DataColumnIterable {
+    return new \codename\parquet\data\DataColumnIterable($this->dataField, $this);
+  }
+
+  /**
+   * Dictionary during single page read
+   * As the dictionary data itself is only present in/below the *initial* header for this column
+   * @var array|null
+   */
+  protected $cachedDictionary = null;
+
+  /**
+   * See ->cachedDictionary
+   * @var int
+   */
+  protected $cachedDictionaryOffset = null;
+
+  /**
+   * Reads a single data page
+   * @param  int        $currentFileOffset
+   * @param  array      &$data
+   * @param  array      &$definitionLevels
+   * @param  array|null &$repetitionLevels
+   * @return int
+   */
+  public function readOneDataPage(int $currentFileOffset, array &$data, array &$definitionLevels, ?array &$repetitionLevels): int {
+
+    // Construct a ColumnRawData instance
+    // as the DataColumnReader expects one to work with
+    // though we discard this later and just use the data we read.
+    $colData = new ColumnRawData();
+
+    // originally, we'd set max value count of column (all data pages)
+    // but we're only reading a single data page
+    // $colData->maxCount = $this->thriftColumnChunk->meta_data->num_values;
+    // So we'll only use the count of values
+    // of the respective data page currently handled
+
+    if($currentFileOffset === 0) {
+      //
+      // No data pages read
+      // we assume $currentFileOffset to symbolize no existing current offset in DataColumn
+      //
+      $fileOffset = $this->getFileOffset();
+      fseek($this->inputStream, $fileOffset, SEEK_SET);
+
+      $ph = $this->thriftStream->Read(PageHeader::class);
+
+      $dictionary = [];
+      $dictionaryOffset = 0;
+      if($this->TryReadDictionaryPage($ph, $dictionary, $dictionaryOffset)) {
+        $ph = $this->thriftStream->Read(PageHeader::class);
+      }
+
+      // Set cached values for dictionary
+      // as we can only retrieve them right here
+      // and use them in followup reads
+      $this->cachedDictionary = $dictionary;
+      $this->cachedDictionaryOffset = $dictionaryOffset;
+
+    } else {
+      //
+      // Continue reading at a specific stream position
+      // We have to seek, as the stream might have been repositioned from outside
+      // (e.g. other iterators, readers, manual intervention, etc.)
+      //
+      $fileOffset = $currentFileOffset;
+      fseek($this->inputStream, $fileOffset, SEEK_SET);
+      $ph = $this->thriftStream->Read(PageHeader::class);
+    }
+
+    $colData->dictionary = $this->cachedDictionary;
+    $colData->dictionaryOffset = $this->cachedDictionaryOffset;
+
+    if($ph->type !== PageType::DATA_PAGE && $ph->type !== PageType::DATA_PAGE_V2) {
+      // Non-data page, stop right here
+      // We do NOT return a valid file offset here
+      return -1;
+    }
+
+    if($ph->type === PageType::DATA_PAGE) {
+      $maxValues = $ph->data_page_header->num_values; // only number of entries from data page
+      // We only want to read as many values as there are
+      // in the current data page (not column chunk overall)
+      $colData->maxCount = $maxValues;
+      $this->readDataPage($ph, $colData, $maxValues);
+    } else if($ph->type === PageType::DATA_PAGE_V2) {
+      $maxValues = $ph->data_page_header_v2->num_values; // only number of entries from data page
+      // We only want to read as many values as there are
+      // in the current data page (not column chunk overall)
+      $colData->maxCount = $maxValues;
+      $this->readDataPageV2($ph, $colData, $maxValues);
+    } else {
+      // Unexpected data
+      throw new \Exception('Unexpected non-datapage');
+    }
+
+    // Set the variables that have been passed by-ref
+    $data = $colData->values;
+    $definitionLevels = $colData->definitions;
+    $repetitionLevels = $colData->repetitions;
+
+    // return the latest position in the file stream
+    return ftell($this->inputStream);
+  }
+
+  /**
+   * Reads a whole column chunk's data (all data pages)
+   * @return DataColumn
    */
   public function read() : DataColumn {
-
     $fileOffset = $this->getFileOffset();
     $maxValues = $this->thriftColumnChunk->meta_data->num_values;
 
-    // print_r("fileOffset=".$fileOffset);
-    // print_r([
-    //   '$fileOffset' => $fileOffset,
-    //   'ftell' => ftell($this->inputStream),
-    //   'columnChunkFileOffset' => $this->thriftColumnChunk->file_offset
-    // ]);
-
     fseek($this->inputStream, $fileOffset, SEEK_SET);
-
-    // print_r([
-    //   '$fileOffset' => $fileOffset,
-    //   'ftell' => ftell($this->inputStream),
-    //   'columnChunkFileOffset' => $this->thriftColumnChunk->file_offset
-    // ]);
-
 
     $colData = new ColumnRawData();
     $colData->maxCount = $this->thriftColumnChunk->meta_data->num_values;
 
-    // $ph = new PageHeader();
-    // NOTE: we have to read it at this point!
-    // $ph = $ph->Read($this->thriftStream);
-    // $this->thriftStream->ReadByInstance($ph);
+    // Read the first PageHeader
     $ph = $this->thriftStream->Read(PageHeader::class);
 
     $dictionary = [];
     $dictionaryOffset = 0;
 
+    // Try to read a Dictionary Page, if any.
     if($this->TryReadDictionaryPage($ph, $dictionary, $dictionaryOffset)) {
       $ph = $this->thriftStream->Read(PageHeader::class);
-
-      // echo("DictionaryPage!");
-      // var_dump($ph);
-      // $ph = $ph->Read($this->thriftStream);
-    } else {
-      // JUST DEBUG
-      // echo(chr(10).chr(10).chr(10)."*** DBG ***".chr(10).chr(10).chr(10));
-      // print_r($ph);
-      // echo(chr(10).chr(10).chr(10)."*** DBG ***".chr(10).chr(10).chr(10));
-      // die();
     }
 
     $colData->dictionary = $dictionary;
     $colData->dictionaryOffset = $dictionaryOffset;
-    // if (TryReadDictionaryPage(ph, out colData.dictionary, out colData.dictionaryOffset))
-    //      {
-    //         ph = _thriftStream.Read<Thrift.PageHeader>();
-    //      }
-    // ->>> $ph->read($this->thriftStream);
-
-    // print_r($colData);
-    // print_r($ph);
-
-    $pagesRead = 0;
 
     while(true) {
 
-      // echo(chr(10)."readDataPage".chr(10));
-      $this->readDataPage($ph, $colData, $maxValues);
-      $pagesRead++;
-
-      // int totalCount = Math.Max(
-      //    (colData.values == null ? 0 : colData.valuesOffset),
-      //    (colData.definitions == null ? 0 : colData.definitionsOffset));
+      if($ph->type === PageType::DATA_PAGE) {
+        $this->readDataPage($ph, $colData, $maxValues);
+      } else if($ph->type === PageType::DATA_PAGE_V2) {
+        $this->readDataPageV2($ph, $colData, $maxValues);
+      } else {
+        // Unexpected data
+        throw new \Exception('Unexpected non-datapage');
+      }
 
       $totalCount = max(
         ($colData->values === null ? 0 : $colData->valuesOffset),
         ($colData->definitions === null ? 0 : $colData->definitionsOffset)
       );
 
-      // if (totalCount >= maxValues) break; //limit reached
       if($totalCount >= $maxValues) {
-        // var_dump(
-        //   [
-        //     '$colData->values === null' => $colData->values === null,
-        //     '$colData->definitions === null' => $colData->definitions === null,
-        //     '$colData->valuesOffset' => $colData->valuesOffset,
-        //     '$colData->definitionsOffset' => $colData->definitionsOffset,
-        //   ]
-        // );
-        // echo("Breaking out due to $totalCount >= $maxValues");
-
         break;
       }
 
-      // ph = _thriftStream.Read<Thrift.PageHeader>();
-      // $ph->read($this->thriftStream);
-
-      // $res = $this->thriftStream->ReadByInstance($ph);
+      // Try to read one more Data page
+      // And stop if it is something else.
       $ph = $this->thriftStream->Read(PageHeader::class);
-
-      // $ph2 = $this->thriftStream->Read(PageHeader::class);
-
-      // if (ph.Type != Thrift.PageType.DATA_PAGE) break;
-      if($ph->type != PageType::DATA_PAGE) {
-        break; // V2 support?
+      if($ph->type !== PageType::DATA_PAGE && $ph->type !== PageType::DATA_PAGE_V2) {
+        break;
       }
-
     }
 
     // all the data is available here!
@@ -476,9 +621,6 @@ class DataColumnReader
       $colData->indexes
     );
 
-    // DEBUG
-    // print_r($this->thriftColumnChunk->meta_data);
-
     if($this->thriftColumnChunk->meta_data->statistics) {
       $finalColumn->statistics = new DataColumnStatistics(
         $this->thriftColumnChunk->meta_data->statistics->null_count,
@@ -489,7 +631,6 @@ class DataColumnReader
     }
 
     return $finalColumn;
-
   }
 
   /**
@@ -501,7 +642,7 @@ class DataColumnReader
    */
   private function TryReadDictionaryPage(PageHeader $ph, ?array &$dictionary, ?int &$dictionaryOffset) : bool
   {
-    if ($ph->type != PageType::DICTIONARY_PAGE)
+    if ($ph->type !== PageType::DICTIONARY_PAGE)
     {
       $dictionary = null;
       $dictionaryOffset = 0;
@@ -558,11 +699,32 @@ class DataColumnReader
    * @return string                 [description]
    */
   protected function readPageDataByPageHeader(PageHeader $pageHeader) {
-    return DataStreamFactory::ReadPageData(
-      $this->inputStream,
-      $this->thriftColumnChunk->meta_data->codec,
-      $pageHeader->compressed_page_size, $pageHeader->uncompressed_page_size
-    );
+    if($pageHeader->type === PageType::DATA_PAGE_V2) {
+      // The levels are not compressed in V2 format
+      // https://github.com/mathworks/arrow/blob/c0e4d31ad5ed6e99df410be0f0f8d5521d32e66a/cpp/src/parquet/column_reader.cc:397
+      $levelsByteLength = $pageHeader->data_page_header_v2->repetition_levels_byte_length + $pageHeader->data_page_header_v2->definition_levels_byte_length;
+
+      // read levels data, as it is not compressed
+      // input stream is advanced by $levelsLength
+      if($levelsByteLength > 0) {
+        $levelsData = fread($this->inputStream, $levelsByteLength);
+      } else {
+        $levelsData = null; // or empty string?
+      }
+
+      // prepend levels data we just read
+      return $levelsData . DataStreamFactory::ReadPageData(
+        $this->inputStream,
+        $this->thriftColumnChunk->meta_data->codec,
+        $pageHeader->compressed_page_size - $levelsByteLength, $pageHeader->uncompressed_page_size - $levelsByteLength
+      );
+    } else {
+      return DataStreamFactory::ReadPageData(
+        $this->inputStream,
+        $this->thriftColumnChunk->meta_data->codec,
+        $pageHeader->compressed_page_size, $pageHeader->uncompressed_page_size
+      );
+    }
   }
 
 }

@@ -18,6 +18,8 @@ class ListTest extends TestBase
    */
   public function testListOfStructuresWritesReads():void
   {
+    $this->expectNotToPerformAssertions();
+
     $idsch = DataField::createFromType('id', 'integer');
     $cnamech = DataField::createFromType('name', 'string');
     $ccountrych = DataField::createFromType('country', 'string');

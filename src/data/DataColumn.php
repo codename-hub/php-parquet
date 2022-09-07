@@ -13,6 +13,12 @@ class DataColumn
   public $repetitionLevels;
 
   /**
+   * [public description]
+   * @var int[]|null
+   */
+  public $definitionLevels;
+
+  /**
    * [protected description]
    * @var DataField
    */
@@ -107,6 +113,14 @@ class DataColumn
     // 2. Apply repetitions
     $instance->repetitionLevels = $repetitionLevels;
 
+    // We now passthrough definition levels
+    // right into the data column
+    // to allow handling nested (and repeated) data in a better way
+    // Mostly, meant to be used in DataColumnsToArrayConverter
+    //
+    // NOTE: this induces a greater memory requirement
+    $instance->definitionLevels = $definitionLevels;
+
     return $instance;
   }
 
@@ -152,13 +166,16 @@ class DataColumn
    */
   public function PackDefinitions(int $maxDefinitionLevel, array &$pooledDefinitionLevels, int &$definitionLevelCount, int &$nullCount): array
   {
-    $pooledDefinitionLevels = array_fill(0, count($this->data), 0); //  ArrayPool<int>.Shared.Rent(Data.Length);
+    $presetDefinitionLevels = count($pooledDefinitionLevels) > 0;
+    if(!$presetDefinitionLevels) {
+      $pooledDefinitionLevels = array_fill(0, count($this->data), 0); //  ArrayPool<int>.Shared.Rent(Data.Length);
+    }
     $definitionLevelCount = count($this->data);
 
     // bool isNullable = Field.ClrType.IsNullable() || Data.GetType().GetElementType().IsNullable();
     $isNullable = true; // ?
 
-    if (!$this->field->hasNulls || !$isNullable)
+    if (!$presetDefinitionLevels && (!$this->field->hasNulls || !$isNullable))
     {
       $this->SetPooledDefinitionLevels($maxDefinitionLevel, $pooledDefinitionLevels);
       $nullCount = 0; //definitely no nulls here

@@ -1,0 +1,85 @@
+[
+  {
+    "non_nullable_struct1": {
+      "non_nullable_struct2": {
+        "non_nullable_struct3": {
+          "nullable_string": "ABC",
+          "non_nullable_string": "ABC",
+          "nullable_int": 123,
+          "non_nullable_int": 123
+        }
+      }
+    },
+    "non_nullable_struct4": {
+      "nullable_struct5": {
+        "non_nullable_struct6": {
+          "nullable_string2": "ABC",
+          "non_nullable_string2": "ABC",
+          "nullable_int2": 123,
+          "non_nullable_int2": 123
+        }
+      }
+    },
+    "nullable_struct7": null
+  },
+  {
+    "non_nullable_struct1": {
+      "non_nullable_struct2": {
+        "non_nullable_struct3": {
+          "nullable_string": null,
+          "non_nullable_string": "DEF",
+          "nullable_int": null,
+          "non_nullable_int": 456
+        }
+      }
+    },
+    "non_nullable_struct4": {
+      "nullable_struct5": null
+    },
+    "nullable_struct7": {
+      "non_nullable_struct8": {
+        "nullable_string3": "XYZ",
+        "non_nullable_string3": "XYZ",
+        "nullable_int3": 987,
+        "non_nullable_int3": 987
+      },
+      "nullable_struct9": null
+    }
+  },
+  {
+    "non_nullable_struct1": {
+      "non_nullable_struct2": {
+        "non_nullable_struct3": {
+          "nullable_string": "GHI",
+          "non_nullable_string": "GHI",
+          "nullable_int": 789,
+          "non_nullable_int": 789
+        }
+      }
+    },
+    "non_nullable_struct4": {
+      "nullable_struct5": {
+        "non_nullable_struct6": {
+          "nullable_string2": "GHI",
+          "non_nullable_string2": "GHI",
+          "nullable_int2": 789,
+          "non_nullable_int2": 789
+        }
+      }
+    },
+    "nullable_struct7": {
+      "non_nullable_struct8": {
+        "nullable_string3": null,
+        "non_nullable_string3": "VWU",
+        "nullable_int3": null,
+        "non_nullable_int3": 654
+      },
+      "nullable_struct9": {
+        "nullable_string4": null,
+        "non_nullable_string4": "VWU",
+        "nullable_int4": null,
+        "non_nullable_int4": 654
+      }
+    }
+  }
+]

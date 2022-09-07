@@ -35,6 +35,23 @@ class NelexaBufferBinaryReader extends BinaryReader
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setByteOrder($order)
+  {
+    switch($order) {
+      case static::LITTLE_ENDIAN:
+        $this->buffer->setOrder(Buffer::LITTLE_ENDIAN);
+        break;
+      case static::BIG_ENDIAN:
+        $this->buffer->setOrder(Buffer::BIG_ENDIAN);
+        break;
+      default:
+        throw new \Exception('Unsupported byte order');
+    }
+  }
+
+  /**
    * [protected description]
    * @var resource
    */
@@ -79,6 +96,14 @@ class NelexaBufferBinaryReader extends BinaryReader
   public function readBytes($count)
   {
     return $this->buffer->getString($count);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function readByte()
+  {
+    return $this->buffer->getByte();
   }
 
   /**

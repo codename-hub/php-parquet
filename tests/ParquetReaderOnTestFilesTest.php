@@ -38,6 +38,9 @@ final class ParquetReaderOnTestFilesTest extends TestBase
    */
   public function testFixedLenByteArrayDictionary(): void
   {
+    // Smoke test
+    $this->expectNotToPerformAssertions();
+
     $r = new ParquetReader($this->openTestFile('fixedlenbytearray.parquet'));
     $columns = $r->ReadEntireRowGroup();
   }

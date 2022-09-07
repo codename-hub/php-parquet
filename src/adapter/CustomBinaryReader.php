@@ -1,8 +1,6 @@
 <?php
 namespace codename\parquet\adapter;
 
-use Nelexa\Buffer\Cast;
-
 class CustomBinaryReader extends BinaryReader
 {
   /**
@@ -61,18 +59,6 @@ class CustomBinaryReader extends BinaryReader
   }
 
   /**
-   * [ENDIANESS_BIG_ENDIAN description]
-   * @var int
-   */
-  const BIG_ENDIAN = 1;
-
-  /**
-   * [ENDIANNESS_LITTLE_ENDIAN description]
-   * @var int
-   */
-  const LITTLE_ENDIAN = 2;
-
-  /**
    * [protected description]
    * @var resource
    */
@@ -108,8 +94,16 @@ class CustomBinaryReader extends BinaryReader
   public function readBytes($count)
   {
     $this->position += $count;
-    return fread($this->stream, $count);
+    return $count > 0 ? fread($this->stream, $count) : ''; // Same behaviour as BinaryReader
     // NOTE: we might REALLY parse bytes here instead of returning the read data as string
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function readByte()
+  {
+    return unpack('c', fread($this->stream, 1))[1];
   }
 
   /**
@@ -179,7 +173,11 @@ class CustomBinaryReader extends BinaryReader
   public function readUInt64()
   {
     // Nelexa doesn't support reading unsigned longs, PHP doesn't either.
-    throw new \LogicException('Not supported');
+    // But for the sake of compatibility, we try to read it somehow.
+    // Actually, we'd have to check for Int64 overflow
+    // throw new \LogicException('Not supported');
+    $this->position += 8;
+    return unpack($this->orderLittleEndian ? 'P' : 'J', fread($this->stream, 8))[1];
   }
 
   /**
@@ -206,7 +204,7 @@ class CustomBinaryReader extends BinaryReader
   public function readString($length)
   {
     $this->position += $length; // ?
-    return fread($this->stream, $length);
+    return $length > 0 ? fread($this->stream, $length) : '';
   }
 
   /**

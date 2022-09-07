@@ -87,7 +87,7 @@ class DataStreamFactory
   ) {
     $compressionMethod = static::codecToCompressionMethod[$compressionCodec] ?? null;
     if($compressionMethod === null) {
-      throw new \Exception('not supported compressionCodec');
+      throw new \Exception('not supported compressionCodec '.$compressionCodec);
     }
 
     $totalBytesRead = 0;

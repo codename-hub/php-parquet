@@ -41,6 +41,9 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
 
     $tseRepeated = $schema[$index + 1];
 
+    // The field itself can be nullable, in theory
+    $listField->hasNulls = $tseList->repetition_type !== FieldRepetitionType::REQUIRED;
+
     // Rule 1. If the repeated field is not a group, then its type is the element type and elements are required.
     // not implemented
 
@@ -52,7 +55,7 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
     // type and elements are required.
 
     if($tseList->num_children === 1 && $tseRepeated->name === 'array') {
-      $listField->path = $tseList->name;
+      $listField->setPath([ $tseList->name ]);
       $index += 1;
       $ownedChildCount = 1;
       return $listField;
@@ -61,7 +64,8 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
     // as we are skipping elements set path hint
     // $listField->path = $"{tseList.Name}{Schema.PathSeparator}{schema[index + 1].Name}"; // TODO
     // $listField->path = "{$tseList->name}{Schema::PathSeparator}{$schema[$index + 1]->name}";
-    $listField->path = implode(Schema::PathSeparator, [ $tseList->name, $schema[$index + 1]->name]);
+
+    $listField->setPath([ $tseList->name, $schema[$index + 1]->name ]);
     $index += 2;          //skip this element and child container
     $ownedChildCount = 1; //we should get this element assigned back
     return $listField;
@@ -89,7 +93,8 @@ class ListDataTypeHandler extends NonDataDataTypeHandler
     $root = new SchemaElement([
       'name'            => $field->name,
       'converted_type'  => ConvertedType::LIST,
-      'repetition_type' => FieldRepetitionType::OPTIONAL,
+      // WARNING: Lists can be enforced to be not null!
+      'repetition_type' => $field->hasNulls ? FieldRepetitionType::OPTIONAL : FieldRepetitionType::REQUIRED,
       'num_children'    => 1,
     ]);
 

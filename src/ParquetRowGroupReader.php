@@ -94,15 +94,30 @@ class ParquetRowGroupReader {
   {
     // if ($field == null) throw new ArgumentNullException(nameof(field));
 
-    $columnChunk = $this->pathToChunk[$field->path] ?? null;
+    $columnChunk = $this->pathToChunk[$field->pathString] ?? null;
 
     if($columnChunk === null) {
-      throw new ParquetException("'{$field->path}' does not exist in this file");
+      throw new ParquetException("'{$field->pathString}' does not exist in this file");
     }
 
     $columnReader = new DataColumnReader($field, $this->stream, $columnChunk, $this->footer, $this->parquetOptions);
 
     return $columnReader->read();
+  }
+
+  /**
+   * [getDataColumnReader description]
+   * @param  DataField        $field               [description]
+   * @return DataColumnReader        [description]
+   */
+  public function getDataColumnReader(DataField $field): DataColumnReader {
+    $columnChunk = $this->pathToChunk[$field->pathString] ?? null;
+
+    if($columnChunk === null) {
+      throw new ParquetException("'{$field->pathString}' does not exist in this file");
+    }
+
+    return new DataColumnReader($field, $this->stream, $columnChunk, $this->footer, $this->parquetOptions);
   }
 
 }

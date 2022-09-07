@@ -1,5 +1,33 @@
 # Changelog
 
+## [Unreleased]
+### Added
+- **EXPERIMENTAL** DATA_PAGE_V2 (writing) support
+- **EXPERIMENTAL** `helper\ParquetDataIterator` provides easy access to iterate over a parquet file (read) and provides full support for nested fields and non-DataFields (Map, List, Struct)
+- **EXPERIMENTAL** `helper\ParquetDataWriter` provides a simplified dataset/row-based writer with buffering support
+- **EXPERIMENTAL** `helper\ArrayToDataColumnsConverter` provides 1:1 conversion of PHP (assoc) arrays and a given schema to parquet datacolumns, including nested data - **full support** of Maps, Lists and Structs.
+- **EXPERIMENTAL** `helper\DataColumnsToArrayConverter` provides 1:1 conversion of given parquet datacolumns and a schema to PHP (assoc) arrays, including nested data
+- Compatibility support for UInt64 (partially, limited by PHP)
+- 1:1 spark compatibility comparison data and tests for complex schemas
+### Improved
+- PHP 8.0 and 8.1 compatibility due to deprecations (e.g. via `#[\ReturnTypeWillChange]` for Iterator::current() implementations)
+- Better test coverage for some binary readers & writers, unified interfaces
+### Changed
+- `Field::$path` is now an array, stringified field path is now available as `Field::$pathString`, set via `Field::setPath(...)` - this is to improve support for field names containing dots and improving handling when using nested and repeated fields
+- Unsupported compression codec exception message now includes the constant (value) of the codec identifier
+- StructField now fully supports being non-null, nullable or repeated
+- ListField now fully supports being non-null or nullable
+- DataColumn now explicitly has $definitionLevels
+- Definition level handling now includes pre-set DLs by converters
+- Deprecated some (alternative) leftover binary readers/writers
+- Field (in)equality checks now include the path where necessary
+- Dropped dependency `nelexa/buffer`
+- Reduce package size by exluding test files via .gitattributes for archives
+### Fixed
+- Binary string data reading of length=0 in rare cases
+- RLE Reader's ReadIntOnBytes (now contained in BytesUtils) to fully comply with the standard, wrong bitshift for 32-bit integers
+- WriteIntBytes using full 4-byte-int and unsigned right shift operator
+
 ## [0.6.2 - 2022-04-10]
 ### Fixed
 - Issue #6, wrong bitshift in RLE Reader's ReadIntOnBytes due to syntax misinterpretation
@@ -17,6 +45,8 @@
 ### Breaking Change
 - Changed namespace to `codename\parquet`
 ### Added
+- DATA_PAGE_V2 (reading) support
+- RLE_DICTIONARY pages (reading) support
 - Supports for more data types: Int16 (Short), UInt16 (UShort), UInt32, UInt64 (as far as reasonable)
 ### Improved
 - Some micro-optimizations (e.g. in StringDataTypeHandler)

@@ -187,7 +187,7 @@ class DataField extends Field
    */
   public function setPathPrefix($value)
   {
-    $this->path = OtherExtensions::AddPath($value, $this->name);
+    $this->setPath(OtherExtensions::AddPath($value, $this->name));
   }
 
   /**
@@ -207,6 +207,7 @@ class DataField extends Field
     if($other instanceof DataField) {
       return
         $this->name === $other->name &&
+        $this->path === $other->path &&
         $this->dataType === $other->dataType &&
         $this->hasNulls === $other->hasNulls &&
         $this->isArray  === $other->isArray;

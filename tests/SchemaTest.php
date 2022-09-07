@@ -148,6 +148,7 @@ final class SchemaTest extends TestBase
    */
   public function testButICanDeclareADictionary(): void
   {
+    $this->expectNotToPerformAssertions();
     // we do not perform assertions here.
     new MapField('dictionary', new DataField('key', DataType::Int32), new DataField('value', DataType::String));
   }
@@ -276,7 +277,8 @@ final class SchemaTest extends TestBase
     $list = new ListField('List', DataField::createFromType('id', 'integer'));
     $list->setPathPrefix('Parent');
 
-    $this->assertEquals('Parent.List.list.id', $list->item->path);
+    $this->assertEquals(['Parent', 'List', 'list', 'id'], $list->item->path);
+    $this->assertEquals('Parent.List.list.id', $list->item->pathString);
   }
 
   /**

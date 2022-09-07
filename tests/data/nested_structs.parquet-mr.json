@@ -1,0 +1,292 @@
+[
+  {
+    "roll_num": {
+      "min": 190406409000602,
+      "max": 190407175004000,
+      "mean": 190406671229999,
+      "count": 495,
+      "sum": 94251302258849568,
+      "variance": 0
+    },
+    "PC_CUR": {
+      "min": 115,
+      "max": 742,
+      "mean": 416,
+      "count": 495,
+      "sum": 206195,
+      "variance": 10374
+    },
+    "CVA_2012": {
+      "min": 737,
+      "max": 32150509,
+      "mean": 2401239,
+      "count": 495,
+      "sum": 1188613496,
+      "variance": 12977533288261
+    },
+    "CVA_2016": {
+      "min": 1000,
+      "max": 35195000,
+      "mean": 3519838,
+      "count": 495,
+      "sum": 1742320297,
+      "variance": 24581100553044
+    },
+    "BIA_3": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 0,
+      "sum": 0,
+      "variance": 0
+    },
+    "BIA_4": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 0,
+      "sum": 0,
+      "variance": 0
+    },
+    "ACTUAL_FRONTAGE": {
+      "min": 0,
+      "max": 658.63,
+      "mean": 57.76452991452993,
+      "count": 351,
+      "sum": 20275.350000000006,
+      "variance": 6310.500499135526
+    },
+    "ACTUAL_DEPTH": {
+      "min": 0,
+      "max": 312.16,
+      "mean": 49.40901785714286,
+      "count": 336,
+      "sum": 16601.43,
+      "variance": 3214.842695450431
+    },
+    "ACTUAL_LOT_SIZE": {
+      "min": 0,
+      "max": 74136,
+      "mean": 6162.133196721318,
+      "count": 366,
+      "sum": 2255340.7500000023,
+      "variance": 104255249.59826614
+    },
+    "GLA": {
+      "min": 0,
+      "max": 523800,
+      "mean": 19484.146706586827,
+      "count": 334,
+      "sum": 6507705,
+      "variance": 3563198650.906335
+    },
+    "SOURCE_GLA": {
+      "min": 2628,
+      "max": 16085,
+      "mean": 6698.8,
+      "count": 10,
+      "sum": 66988,
+      "variance": 28540252.400000002
+    },
+    "IPS_GLA": {
+      "min": 288,
+      "max": 1985,
+      "mean": 1285,
+      "count": 4,
+      "sum": 5140,
+      "variance": 509875.3333333333
+    },
+    "GLA_ALL": {
+      "min": 0,
+      "max": 523800,
+      "mean": 18907.566091954024,
+      "count": 348,
+      "sum": 6579833,
+      "variance": 3428378496.7881336
+    },
+    "bia": {
+      "min": 0,
+      "max": 1,
+      "mean": 0,
+      "count": 495,
+      "sum": 452,
+      "variance": 0
+    },
+    "EFFECTIVE_LOT_SIZE": {
+      "min": 0,
+      "max": 64749.63000000001,
+      "mean": 4951.024888352274,
+      "count": 352,
+      "sum": 1742760.7607000005,
+      "variance": 81195383.98823886
+    },
+    "effective_lot_area": {
+      "min": 0,
+      "max": 2.8000000000000003,
+      "mean": 0.14237550619122732,
+      "count": 352,
+      "sum": 50.11617817931202,
+      "variance": 0.07516922114035923
+    },
+    "EFFECTIVE_FRONTAGE": {
+      "min": 0,
+      "max": 658063,
+      "mean": 1991.3067846607655,
+      "count": 339,
+      "sum": 675052.9999999995,
+      "variance": 1277234044.0126908
+    },
+    "EFFECTIVE_DEPTH": {
+      "min": 0,
+      "max": 300.7,
+      "mean": 65.32364985163204,
+      "count": 337,
+      "sum": 22014.069999999996,
+      "variance": 3904.805190507992
+    },
+    "rw_area_tot": {
+      "min": 0,
+      "max": 18169,
+      "mean": 1528.077097505669,
+      "count": 441,
+      "sum": 673882,
+      "variance": 6122348.621315204
+    },
+    "effective_lot_sqft": {
+      "min": 0,
+      "max": 121968,
+      "mean": 6201.877049689864,
+      "count": 352,
+      "sum": 2183060.721490832,
+      "variance": 142631612.6463931
+    },
+    "dup": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "nonCTXT": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "vacantland": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "parkingbillboard": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "cvalte10": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "condootherhotel": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "calculated_lot_size": {
+      "min": 0,
+      "max": 100,
+      "mean": 1.2345679012345678,
+      "count": 81,
+      "sum": 100,
+      "variance": 123.45679012345684
+    },
+    "calculated_efflot_size": {
+      "min": 0,
+      "max": 4172.084000000002,
+      "mean": 42.29786138613863,
+      "count": 101,
+      "sum": 4272.084000000002,
+      "variance": 172355.84886194076
+    },
+    "missingsite": {
+      "min": 0,
+      "max": 1,
+      "mean": 0,
+      "count": 495,
+      "sum": 208,
+      "variance": 0
+    },
+    "missinggla": {
+      "min": 0,
+      "max": 1,
+      "mean": 0,
+      "count": 495,
+      "sum": 44,
+      "variance": 0
+    },
+    "missingsitegla": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "actual_lot_size_sqft": {
+      "min": 0,
+      "max": 121968,
+      "mean": 8685.222814207653,
+      "count": 366,
+      "sum": 3178791.550000001,
+      "variance": 243347757.98270744
+    },
+    "lotsize_sqft": {
+      "min": 0,
+      "max": 121968,
+      "mean": 8841.174394454862,
+      "count": 364,
+      "sum": 3218187.4795815693,
+      "variance": 244563632.41811454
+    },
+    "count": {
+      "min": 1,
+      "max": 1,
+      "mean": 1,
+      "count": 495,
+      "sum": 495,
+      "variance": 0
+    },
+    "ul_observation_date": {
+      "min": 1608822900000000000,
+      "max": 1608822900000000000,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    },
+    "ul_tz_offset_minutes_ul_observation_date": {
+      "min": 0,
+      "max": 0,
+      "mean": 0,
+      "count": 495,
+      "sum": 0,
+      "variance": 0
+    }
+  }
+]

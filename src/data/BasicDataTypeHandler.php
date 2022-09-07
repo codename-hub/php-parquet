@@ -226,17 +226,16 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
     // Micro-Optimization
     $dataCount = \count($data);
 
-    $definitionLevels = \array_fill(0, $dataCount, 0); // QUESTION/TODO: fill with null or 0?
+    if(count($definitionLevels) === 0) {
+      // By default, fill-in all 0 def-levels
+      $definitionLevels = \array_fill(0, $dataCount, 0);
+    }
     $definitionsLength = $dataCount;
 
-    // $nullCount = count(array_filter($data, function($i) { return $i === null; }));
+    // We now count the null values OTF in the iteration below.
     $nullCount = 0;
-    foreach($data as $i) {
-      if($i === null) {
-        $nullCount++;
-      }
-    }
-    $result = \array_fill(0, $dataCount - $nullCount, null);
+
+    $result = \array_fill(0, $dataCount, null);
 
     $ir = 0;
     for ($i = 0; $i < $dataCount; $i++)
@@ -245,7 +244,8 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
 
       if ($value === null)
       {
-        $definitionLevels[$i] = 0;
+        $definitionLevels[$i] = $definitionLevels[$i] ?? $maxDefinitionLevel-1;
+        $nullCount++;
       }
       else
       {
@@ -254,7 +254,7 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
       }
     }
 
-    return $result;
+    return array_slice($result, 0, $ir); // return only the defined/'set' parts of the array
   }
 
 
