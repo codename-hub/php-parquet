@@ -1,6 +1,8 @@
 <?php
 namespace codename\parquet;
 
+use codename\parquet\format\FileMetaData;
+use codename\parquet\format\KeyValue;
 use Exception;
 
 use codename\parquet\data\Schema;
@@ -83,6 +85,31 @@ class ParquetWriter extends ParquetActor {
     $this->PrepareFile($append);
   }
 
+
+  private function convertAssocToKeyValues(array $customMeta): array{
+    return array_map(function($key, $value){
+      if($value instanceof KeyValue){
+        return $value;
+      }
+
+      if(!empty($value) && is_string($value)){
+        return new KeyValue(['key'=>(string) $key, 'value'=>$value]);
+      }
+
+      throw new ParquetException('Only string values are allowed, not empty values');
+    }, array_keys($customMeta), $customMeta);
+  }
+
+  /**
+   * Sets custom key-value pairs for metadata
+   * @param KeyValue[] $customMeta
+   * @throws ParquetException
+   */
+  public function setCustomMetadata(array $customMeta){
+    $keyValueMetadata = $this->convertAssocToKeyValues($customMeta);
+    $this->_footer->getThriftMetadata()->key_value_metadata = empty($keyValueMetadata)?null:$keyValueMetadata;
+  }
+
   /**
    * [PrepareFile description]
    * @param bool $append [description]
@@ -119,6 +146,7 @@ class ParquetWriter extends ParquetActor {
         $this->_footer->add(0 /* todo: don't forget to set the total row count at the end!!! */);
       }
     }
+
   }
 
   /**

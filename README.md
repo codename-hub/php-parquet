@@ -149,6 +149,9 @@ $fileStream = fopen(__DIR__.'/test.parquet', 'r');
 // open parquet file reader
 $parquetReader = new ParquetReader($fileStream);
 
+ // Print custom metadata or do other stuff with it
+ print_r($parquetReader->getCustomMetadata());  
+
 // get file schema (available straight after opening parquet reader)
 // however, get only data fields as only they contain data values
 $dataFields = $parquetReader->schema->GetDataFields();
@@ -195,6 +198,7 @@ $cityColumn = new DataColumn(
   [ "London", "Derby" ]
 );
 
+
 // create file schema
 $schema = new Schema([$idColumn->getField(), $cityColumn->getField()]);
 
@@ -202,6 +206,10 @@ $schema = new Schema([$idColumn->getField(), $cityColumn->getField()]);
 $fileStream = fopen(__DIR__.'/test.parquet', 'w+');
 
 $parquetWriter = new ParquetWriter($schema, $fileStream);
+
+// optional, write custom metadata
+$metadata = ['author'=>'santa', 'date'=>'2020-01-01'];
+$parquetWriter->setCustomMetadata($metadata);
 
 // create a new row group in the file
 $groupWriter = $parquetWriter->CreateRowGroup();
@@ -215,6 +223,7 @@ $groupWriter->WriteColumn($cityColumn);
 $groupWriter->finish();   // finish inner writer(s)
 $parquetWriter->finish(); // finish the parquet writer last
 ```
+ 
 
 ## Performance
 This package also provides the same benchmark as parquet-dotnet. These are the results on __my machine__:
