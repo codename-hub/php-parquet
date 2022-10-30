@@ -89,6 +89,7 @@ class ThriftFooter {
   {
     return $this->fileMeta;
   }
+  
   /**
    * [AddRoot description]
    * @param  SchemaElement[]         &$container [description]

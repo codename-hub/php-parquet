@@ -119,9 +119,14 @@ class ParquetReader extends ParquetActor {
     return $this->convertKeyValuesToAssoc($this->getThriftMetadata()->key_value_metadata ?? []);
   }
 
+  /**
+   * Converts KeyValue pairs from custom metadata to PHP assoc arrays
+   * @param  array $customMeta               [description]
+   * @return array             [description]
+   */
   private function convertKeyValuesToAssoc(array $customMeta): array{
     $dataset = [];
-    foreach ($customMeta as $keyValue){
+    foreach ($customMeta as $keyValue) {
       $dataset[$keyValue->key] = $keyValue->value;
     }
     return  $dataset;

@@ -14,18 +14,29 @@ use codename\parquet\data\DataColumn;
 
 final class MetadataTest extends TestBase
 {
+  public function getGoodMetadataProvider() {
+    return [
+      [['author' => 'santa', 'date' => '2020-01-01',    ]], // regular string value
+      [['author' => '',      'date' => '2020-01-01',    ]], // empty value
+      [['author' => null,    'date' => '2020-01-01',    ]], // null value
+      [['author' => ' ',     'date' => '2020-01-01',    ]], // whitespace value
+      [['theOnlyKey' => null]], // single null key
+      [['theOnlyKey' => '']], // single empty string KV
+      [['theOnlyKey' => ' ']], // single whitespace string KV
+      [['' => 'ABC']], // empty string key
+      [[' ' => ' ']], // whitespace for KV
+      [['' => '']], // empty string for KV
+    ];
+  }
+
   /**
    * Test Write/Read custom metadata
+   * @dataProvider getGoodMetadataProvider
    */
-  public function testStoreMetadata(): void
+  public function testStoreMetadata($metadata): void
   {
     $ms = fopen('php://memory', 'r+');
-
     $id = DataField::createFromType('id', 'integer');
-    $metadata = [
-      'author'=>'santa',
-      'date'=>'2020-01-01',
-    ];
 
     //write
     $writer = new ParquetWriter(new Schema([$id]), $ms);
@@ -40,16 +51,14 @@ final class MetadataTest extends TestBase
     $reader = new ParquetReader($ms);
     $this->assertEquals(4, $reader->getThriftMetadata()->num_rows);
 
-    $this->assertEquals($metadata,   $reader->getCustomMetadata());
+    $this->assertEquals($metadata, $reader->getCustomMetadata());
   }
 
   public function getBadMetadataProvider(): array{
     return [
-      [['author'=>'','date'=>'2020-01-01',]], // empty value
-      [['author'=>null,'date'=>'2020-01-01',]], // null value
-      [['author'=>true,'date'=>'2020-01-01',]], // boolean value
-      [['author'=>123,'date'=>'2020-01-01',]], // number value
-      [['author'=>'test','date'=>new \DateTime(),]], // object value
+      [['author' => true,    'date' => '2020-01-01',    ]], // boolean value
+      [['author' => 123,     'date' => '2020-01-01',    ]], // number value
+      [['author' => 'test',  'date' => new \DateTime(), ]], // object value
     ];
   }
 
@@ -63,7 +72,7 @@ final class MetadataTest extends TestBase
     $id = DataField::createFromType('id', 'integer');
 
     $this->expectException(ParquetException::class);
-    $this->expectExceptionMessage('Only string values are allowed, not empty values');
+    $this->expectExceptionMessage('Invalid KeyValue pair provided in CustomMetadata');
 
     (new ParquetWriter(new Schema([$id]), $ms))->setCustomMetadata($metadata);
   }
@@ -74,8 +83,8 @@ final class MetadataTest extends TestBase
   public function testReadMetadata(): void {
     $reader = new ParquetReader($this->openTestFile('movies_pyarrow.parquet'));
     $metadata = $reader->getCustomMetadata();
-    $this->assertArrayHasKey( 'great_music', $metadata);
-    $this->assertEquals( 'reggaeton', $metadata['great_music']);
+    $this->assertArrayHasKey('great_music', $metadata);
+    $this->assertEquals('reggaeton', $metadata['great_music']);
   }
 
 }

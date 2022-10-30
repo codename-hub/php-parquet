@@ -85,18 +85,22 @@ class ParquetWriter extends ParquetActor {
     $this->PrepareFile($append);
   }
 
-
-  private function convertAssocToKeyValues(array $customMeta): array{
+  /**
+   * Converts a regular PHP assoc array to KeyValue pairs to be stored as custom metadata.
+   * @param  array $customMeta               [description]
+   * @return array             [description]
+   */
+  private function convertAssocToKeyValues(array $customMeta): array {
     return array_map(function($key, $value){
       if($value instanceof KeyValue){
         return $value;
       }
 
-      if(!empty($value) && is_string($value)){
+      if($value === null || is_string($value)){
         return new KeyValue(['key'=>(string) $key, 'value'=>$value]);
       }
 
-      throw new ParquetException('Only string values are allowed, not empty values');
+      throw new ParquetException('Invalid KeyValue pair provided in CustomMetadata');
     }, array_keys($customMeta), $customMeta);
   }
 
@@ -105,9 +109,9 @@ class ParquetWriter extends ParquetActor {
    * @param KeyValue[] $customMeta
    * @throws ParquetException
    */
-  public function setCustomMetadata(array $customMeta){
+  public function setCustomMetadata(array $customMeta) {
     $keyValueMetadata = $this->convertAssocToKeyValues($customMeta);
-    $this->_footer->getThriftMetadata()->key_value_metadata = empty($keyValueMetadata)?null:$keyValueMetadata;
+    $this->_footer->getThriftMetadata()->key_value_metadata = empty($keyValueMetadata) ? null : $keyValueMetadata;
   }
 
   /**
