@@ -85,6 +85,10 @@ class ThriftFooter {
      return $meta;
   }
 
+  public function getThriftMetadata(): ?FileMetaData
+  {
+    return $this->fileMeta;
+  }
   /**
    * [AddRoot description]
    * @param  SchemaElement[]         &$container [description]

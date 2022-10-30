@@ -111,6 +111,23 @@ class ParquetReader extends ParquetActor {
   }
 
   /**
+   * Get custom key-value pairs for metadata
+   * @return string[]
+   */
+  public function getCustomMetadata(): array
+  {
+    return $this->convertKeyValuesToAssoc($this->getThriftMetadata()->key_value_metadata ?? []);
+  }
+
+  private function convertKeyValuesToAssoc(array $customMeta): array{
+    $dataset = [];
+    foreach ($customMeta as $keyValue){
+      $dataset[$keyValue->key] = $keyValue->value;
+    }
+    return  $dataset;
+  }
+
+  /**
    * [public description]
    * @var Schema
    */
