@@ -1525,16 +1525,18 @@ final class PhpArrayConversionTest extends TestBase
     // THIS IS WRONG!
     // $this->assertCount(24, $result[6]['split']['leftCategoriesOrThreshold']);
 
-    $this->assertEquals([ 0    ], $result[0]['split']['leftCategoriesOrThreshold']);
-    $this->assertEquals([ 5.05 ], $result[1]['split']['leftCategoriesOrThreshold']);
-    $this->assertEquals([ 4.45 ], $result[2]['split']['leftCategoriesOrThreshold']);
-    $this->assertEquals([      ], $result[3]['split']['leftCategoriesOrThreshold']);
-    $this->assertEquals([ 4.95 ], $result[4]['split']['leftCategoriesOrThreshold']);
-    $this->assertEquals([ 4.7  ], $result[5]['split']['leftCategoriesOrThreshold']);
-    $this->assertEquals([      ], $result[6]['split']['leftCategoriesOrThreshold']);
+    $this->assertEqualsWithDelta([ 0    ], $result[0]['split']['leftCategoriesOrThreshold'], static::FP_DELTA);
+    $this->assertEqualsWithDelta([ 5.05 ], $result[1]['split']['leftCategoriesOrThreshold'], static::FP_DELTA);
+    $this->assertEqualsWithDelta([ 4.45 ], $result[2]['split']['leftCategoriesOrThreshold'], static::FP_DELTA);
+    $this->assertEqualsWithDelta([      ], $result[3]['split']['leftCategoriesOrThreshold'], static::FP_DELTA);
+    $this->assertEqualsWithDelta([ 4.95 ], $result[4]['split']['leftCategoriesOrThreshold'], static::FP_DELTA);
+    $this->assertEqualsWithDelta([ 4.7  ], $result[5]['split']['leftCategoriesOrThreshold'], static::FP_DELTA);
+    $this->assertEqualsWithDelta([      ], $result[6]['split']['leftCategoriesOrThreshold'], static::FP_DELTA);
 
     // print_r($result); // DEBUG
   }
+
+  const FP_DELTA = 0.00001;
 
   /**
    * Tests some list columns w/ and w/o nulls

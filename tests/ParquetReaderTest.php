@@ -184,10 +184,11 @@ final class ParquetReaderTest extends TestBase
     // double matching is fuzzy, but matching strings is enough for this test
     // ground truth was computed using Spark
 
-    $this->assertEquals("26706.6185312147", array_sum($pv));
-    $this->assertEquals("0.808287234987281", array_sum($pv)/count($pv));
-    $this->assertEquals("0.71523915461624", min($pv));
-    $this->assertEquals("0.867111980015206", max($pv));
+    // As we're might have floats/doubles contained, we need to take care for FP arithmetic quirks
+    $this->assertEqualsWithDelta("26706.6185312147", array_sum($pv), 0.00001);
+    $this->assertEqualsWithDelta("0.808287234987281", array_sum($pv)/count($pv), 0.00001);
+    $this->assertEqualsWithDelta("0.71523915461624", min($pv), 0.00001);
+    $this->assertEqualsWithDelta("0.867111980015206", max($pv), 0.00001);
 
     // Assert.Equal("26706.6185312147", seq.Sum(p => p.v).ToString(CultureInfo.InvariantCulture));
     // Assert.Equal("0.808287234987281", seq.Average(p => p.v).ToString(CultureInfo.InvariantCulture));
