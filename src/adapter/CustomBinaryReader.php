@@ -50,6 +50,12 @@ class CustomBinaryReader extends BinaryReader
   protected $orderLittleEndian = false;
 
   /**
+   * [protected description]
+   * @var int
+   */
+  protected $byteOrder;
+
+  /**
    * [setByteOrder description]
    * @param [type] $order [description]
    */
