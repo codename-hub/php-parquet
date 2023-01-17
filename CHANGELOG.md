@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.7.0 - 2023-01-17]
 ### Added
 - PHP 8.2 Support
 - Ability to read/write custom metadata (FileMetaData->key_value_metadata) (special thanks to @eisberg for the base work!)
