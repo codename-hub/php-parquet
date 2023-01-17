@@ -3,8 +3,8 @@ php-parquet
 
 [![Build Status (Github Actions)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml/badge.svg?branch=master)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml)
 
-[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/codename-hub/php-parquet/Unit%20Tests?event=push&label=release%20build)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml?query=event%3Apush)
-[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/codename-hub/php-parquet/Unit%20Tests?event=workflow_dispatch&label=dev%20build)](https://github.com/codename-hub/php-parquet/actions/workflows/unittest.yml?query=event%3Aworkflow_dispatch)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/codename-hub/php-parquet/unittest.yml?event=push&label=Release%20Build)
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/codename-hub/php-parquet/unittest.yml?event=workflow_dispatch&label=Dev%20Build)
 
 [![Packagist Version](https://img.shields.io/packagist/v/codename/parquet)](https://packagist.org/packages/codename/parquet)
 [![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/codename/parquet)](https://packagist.org/packages/codename/parquet)

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+- PHP 8.2 Support
 - Ability to read/write custom metadata (FileMetaData->key_value_metadata) (special thanks to @eisberg for the base work!)
 - **EXPERIMENTAL** DATA_PAGE_V2 (writing) support
 - **EXPERIMENTAL** `helper\ParquetDataIterator` provides easy access to iterate over a parquet file (read) and provides full support for nested fields and non-DataFields (Map, List, Struct)
