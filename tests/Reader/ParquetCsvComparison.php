@@ -241,10 +241,10 @@ class ParquetCsvComparison extends TestBase
     $fs = $this->openTestFile($name);
 
     // header
-    $columnNames = fgetcsv($fs);
+    $columnNames = fgetcsv($fs, null, ',', '"', '\\');
 
     // values
-    while($values = fgetcsv($fs)) {
+    while($values = fgetcsv($fs, null, ',', '"', '\\')) {
       foreach ($values as $i => $value) {
         $column = &$columns[$i];
         $column[] = $value;

@@ -107,7 +107,7 @@ class DateTimeOffsetDataTypeHandler extends BasicPrimitiveDataTypeHandler
     \codename\parquet\format\SchemaElement $tse,
     \codename\parquet\adapter\BinaryWriter $writer,
     array $values,
-    \codename\parquet\data\DataColumnStatistics $statistics = null
+    ?\codename\parquet\data\DataColumnStatistics $statistics = null
   ): void {
 
     switch($tse->type) {

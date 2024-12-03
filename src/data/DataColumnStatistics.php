@@ -37,8 +37,8 @@ class DataColumnStatistics
    * @param mixed|null  $maxValue
    */
   public function __construct(
-    int $nullCount = null,
-    int $distinctCount = null,
+    ?int $nullCount = null,
+    ?int $distinctCount = null,
     $minValue = null,
     $maxValue = null
   ) {

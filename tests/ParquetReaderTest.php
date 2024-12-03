@@ -249,34 +249,34 @@ final class ParquetReaderTest extends TestBase
 
     // additional, compare pandas result
     $handle = fopen(__DIR__.'/data/special/multi_page_bit_packed_near_page_border.pandas.csv', 'r');
-    $row = fgetcsv($handle);
+    $row = fgetcsv($handle, null, ',', '"', '\\');
     for ($i=0; $i < $cnt; $i++) {
-      $row = fgetcsv($handle);
+      $row = fgetcsv($handle, null, ',', '"', '\\');
       $this->assertEquals($data[$i], $row[1]);
     }
-    $this->assertFalse(fgetcsv($handle)); // try to read one more
+    $this->assertFalse(fgetcsv($handle, null, ',', '"', '\\')); // try to read one more
     $this->assertTrue(feof($handle));
     fclose($handle);
 
     // additional, compare pyarrow result
     $handle = fopen(__DIR__.'/data/special/multi_page_bit_packed_near_page_border.pyarrow.csv', 'r');
-    $row = fgetcsv($handle);
+    $row = fgetcsv($handle, null, ',', '"', '\\');
     for ($i=0; $i < $cnt; $i++) {
-      $row = fgetcsv($handle);
+      $row = fgetcsv($handle, null, ',', '"', '\\');
       $this->assertEquals($data[$i], $row[1]);
     }
-    $this->assertFalse(fgetcsv($handle)); // try to read one more
+    $this->assertFalse(fgetcsv($handle, null, ',', '"', '\\')); // try to read one more
     $this->assertTrue(feof($handle));
     fclose($handle);
 
     // additional, compare fastparquet result
     $handle = fopen(__DIR__.'/data/special/multi_page_bit_packed_near_page_border.fastparquet.csv', 'r');
-    $row = fgetcsv($handle);
+    $row = fgetcsv($handle, null, ',', '"', '\\');
     for ($i=0; $i < $cnt; $i++) {
-      $row = fgetcsv($handle);
+      $row = fgetcsv($handle, null, ',', '"', '\\');
       $this->assertEquals($data[$i], $row[1]);
     }
-    $this->assertFalse(fgetcsv($handle)); // try to read one more
+    $this->assertFalse(fgetcsv($handle, null, ',', '"', '\\')); // try to read one more
     $this->assertTrue(feof($handle));
     fclose($handle);
   }
