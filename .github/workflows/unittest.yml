@@ -23,9 +23,10 @@ jobs:
           - 8.1
           - 8.2
           - 8.3
+          - 8.4
         phpunit-versions: ['latest']
     env:
-      extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.1
+      extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.2
       key: extcache-v1
 
     steps:
