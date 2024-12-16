@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+### Added
+- PHP 8.4 support
+
 ## [0.7.1 - 2024-01-07]
 ### Added
 - PHP 8.3 Support
