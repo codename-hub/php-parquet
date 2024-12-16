@@ -287,9 +287,9 @@ abstract class BasicDataTypeHandler implements DataTypeHandlerInterface
    * @param SchemaElement $tse        [description]
    * @param BinaryWriter        $writer     [description]
    * @param array         $values     [description]
-   * @param DataColumnStatistics    $statistics [description]
+   * @param DataColumnStatistics|null    $statistics [description]
    */
-  public function Write(SchemaElement $tse, BinaryWriter $writer, array $values, DataColumnStatistics $statistics = null): void
+  public function Write(SchemaElement $tse, BinaryWriter $writer, array $values, ?DataColumnStatistics $statistics = null): void
   {
     foreach($values as $one) {
       $this->WriteOne($writer, $one);

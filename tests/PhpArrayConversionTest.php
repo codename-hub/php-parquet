@@ -1654,7 +1654,7 @@ final class PhpArrayConversionTest extends TestBase
     }
 
     foreach($result as $rowIndex => $row) {
-      $csvRow = fgetcsv($handle, 512, '|');
+      $csvRow = fgetcsv($handle, 512, '|', '"', '\\');
       foreach($csvRow as $colIndex => $value) {
         $compareKey = $keys[$colIndex];
         $this->assertEquals($value, $row[$compareKey]);

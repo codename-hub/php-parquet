@@ -74,9 +74,9 @@ interface DataTypeHandlerInterface
    * @param SchemaElement        $tse        [description]
    * @param BinaryWriter         $writer     [description]
    * @param array                $values     [description]
-   * @param DataColumnStatistics $statistics [description]
+   * @param DataColumnStatistics|null $statistics [description]
    */
-  function write(SchemaElement $tse, BinaryWriter $writer, array $values, DataColumnStatistics $statistics = null): void;
+  function write(SchemaElement $tse, BinaryWriter $writer, array $values, ?DataColumnStatistics $statistics = null): void;
 
   /**
    * [createThrift description]
