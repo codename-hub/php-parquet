@@ -1,8 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [0.7.2 - 2025-03-29]
 ### Added
-- PHP 8.4 support
+- PHP 8.4 support, CI adapted
+### Changed
+- Updated thrift dependency for improved PHP 8.4 support
 
 ## [0.7.1 - 2024-01-07]
 ### Added
