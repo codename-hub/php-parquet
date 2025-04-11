@@ -211,7 +211,10 @@ class ThriftFooter {
           array_merge(
             $path ?? [], // Fallback to empty array as path
             $se->path ?? [ $se->name ] // NOTE: fallback to array-ified $se->name
-          )
+          ),
+          function ($v) {
+              return !empty($v) || $v == "0";
+          }
         )
       ));
 
