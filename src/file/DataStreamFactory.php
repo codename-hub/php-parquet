@@ -7,6 +7,7 @@ use codename\parquet\GapStreamWrapper;
 use codename\parquet\CompressionMethod;
 use codename\parquet\GzipStreamWrapper;
 use codename\parquet\SnappyInMemoryStreamWrapper;
+use codename\parquet\ZstdStreamWrapper;
 
 use codename\parquet\format\CompressionCodec;
 
@@ -21,6 +22,7 @@ class DataStreamFactory
     CompressionCodec::UNCOMPRESSED  => 'none',
     CompressionCodec::GZIP          => 'gzip',
     CompressionCodec::SNAPPY        => 'snappy',
+    CompressionCodec::ZSTD          => 'zstd',
   ];
 
   /**
@@ -30,6 +32,7 @@ class DataStreamFactory
     GapStreamWrapper::register();
     GzipStreamWrapper::register();
     SnappyInMemoryStreamWrapper::register();
+    ZstdStreamWrapper::register();
   }
 
   /**
@@ -56,6 +59,11 @@ class DataStreamFactory
           $dest = SnappyInMemoryStreamWrapper::createWrappedStream($nakedStream, 'r+', SnappyInMemoryStreamWrapper::MODE_COMPRESS);
           $leaveNakedOpen = false;
            break;
+
+        case CompressionMethod::Zstd:
+          $dest = ZstdStreamWrapper::createWrappedStream($nakedStream, 'r+', ZstdStreamWrapper::MODE_COMPRESS);
+          $leaveNakedOpen = false;
+          break;
 
         case CompressionMethod::None:
            $dest = $nakedStream;
@@ -145,6 +153,15 @@ class DataStreamFactory
         if($uncompressedData === false) {
           throw new \Exception('Decompression error (snappy)');
         }
+        $data = $uncompressedData;
+        break;
+
+      case 'zstd':
+        $uncompressedData = zstd_uncompress($data);
+        if($uncompressedData === false) {
+          throw new \Exception('Decompression error (zstd)');
+        }
+
         $data = $uncompressedData;
         break;
 

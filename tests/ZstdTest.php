@@ -3,12 +3,13 @@ declare(strict_types=1);
 namespace codename\parquet\tests;
 
 use codename\parquet\StreamHelper;
-use codename\parquet\SnappyInMemoryStreamWrapper;
+use codename\parquet\ZstdStreamWrapper;
 
-final class SnappyTest extends TestBase
+final class ZstdTest extends TestBase
 {
   /**
    * @inheritDoc
+   * @requires extension zstd
    */
   protected function setUp(): void
   {
@@ -16,13 +17,12 @@ final class SnappyTest extends TestBase
   }
 
   /**
-   * Simple test for a working snappy extension
-   * @requires extension snappy
+   * Simple test for a working zstd extension
    */
-  public function testSimpleSnappy(): void {
+  public function testSimpleZstd(): void {
     $sampleString = 'sample';
-    $compressed = snappy_compress($sampleString);
-    $uncompressed = snappy_uncompress($compressed);
+    $compressed = zstd_compress($sampleString);
+    $uncompressed = zstd_uncompress($compressed);
 
     $this->assertNotFalse($compressed); // Assert it's not FALSE (-> erroneous)
     $this->assertEquals($sampleString, $uncompressed);
@@ -30,7 +30,6 @@ final class SnappyTest extends TestBase
 
   /**
    * [testCompressDecompressRandomByteChunks description]
-   * @requires extension snappy
    */
   public function testCompressDecompressRandomByteChunks(): void {
     for ($i=0; $i < 100; $i++) {
@@ -52,11 +51,11 @@ final class SnappyTest extends TestBase
 
     $source = fopen('php://memory', 'r+');
 
-    SnappyInMemoryStreamWrapper::register();
-    $snappy = SnappyInMemoryStreamWrapper::createWrappedStream($source, 'r+', SnappyInMemoryStreamWrapper::MODE_COMPRESS);
+    ZstdStreamWrapper::register();
+    $zstd = ZstdStreamWrapper::createWrappedStream($source, 'r+', ZstdStreamWrapper::MODE_COMPRESS);
 
-    fwrite($snappy, $stage1);
-    StreamHelper::MarkWriteFinished($snappy);
+    fwrite($zstd, $stage1);
+    StreamHelper::MarkWriteFinished($zstd);
 
     // fseek($source, 0); // ?
     $stage2 = stream_get_contents($source, -1, 0);
@@ -65,11 +64,11 @@ final class SnappyTest extends TestBase
     fwrite($source, $stage2);
     fseek($source, 0);
 
-    $snappy = SnappyInMemoryStreamWrapper::createWrappedStream($source, 'r+', SnappyInMemoryStreamWrapper::MODE_DECOMPRESS);
+    $zstd = ZstdStreamWrapper::createWrappedStream($source, 'r+', ZstdStreamWrapper::MODE_DECOMPRESS);
 
     $ms = fopen('php://memory', 'r+');
 
-    stream_copy_to_stream($snappy, $ms);
+    stream_copy_to_stream($zstd, $ms);
 
     $stage3 = stream_get_contents($ms, -1, 0);
 
