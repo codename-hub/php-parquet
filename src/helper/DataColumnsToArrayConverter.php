@@ -279,7 +279,7 @@ class DataColumnsToArrayConverter
         // for performance reasons, we directly set the field's value per row
         //
         $key = $path[0] ?? null;
-        if($key) {
+        if($key !== null) {
           foreach($data as $index => $value) {
             $result[$index][$key] = $value;
           }

@@ -4,6 +4,7 @@
 ### Added
 - PHP 8.5 support, CI adapted
 ### Fixed
+- Reading and writing data columns with field name "0"
 - Deprecation warnings on PHP 8.5
 
 ## [0.7.2 - 2025-03-29]

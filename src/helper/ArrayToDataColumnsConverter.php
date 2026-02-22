@@ -167,7 +167,7 @@ class ArrayToDataColumnsConverter
       //
       // Maximum recursion level
       //
-      if($key) {
+      if($key !== null) {
         //
         // Explicit key
         //
