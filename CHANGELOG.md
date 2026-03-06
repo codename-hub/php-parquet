@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.3 - 2026-02-21]
+### Added
+- PHP 8.5 support, CI adapted
+### Fixed
+- Reading and writing data columns with field name "0"
+- Deprecation warnings on PHP 8.5
+
 ## [0.7.2 - 2025-03-29]
 ### Added
 - PHP 8.4 support, CI adapted

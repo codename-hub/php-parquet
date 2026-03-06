@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         operating-system:
-          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
         php-versions:
           - 7.3
           - 7.4
@@ -24,6 +24,7 @@ jobs:
           - 8.2
           - 8.3
           - 8.4
+          - 8.5
         phpunit-versions: ['latest']
     env:
       extensions: mbstring, intl, xml, gmp, bcmath, snappy-kjdev/php-ext-snappy@0.2.2

@@ -5,6 +5,10 @@ namespace codename\parquet\tests;
 use Exception;
 
 use codename\parquet\ParquetReader;
+use codename\parquet\ParquetOptions;
+
+use codename\parquet\helper\ParquetDataWriter;
+use codename\parquet\helper\ParquetDataIterator;
 
 use codename\parquet\data\Schema;
 use codename\parquet\data\DataType;
@@ -385,5 +389,43 @@ final class SchemaTest extends TestBase
     // smoke test we can read it
     $rg = $reader->OpenRowGroupReader(0);
     $values4 = $rg->ReadColumn($schema->fields[4]);
+  }
+
+  public function testIndexedColumnNames(): void
+  {
+    $schema = new Schema([
+      DataField::createFromType('0', 'integer'),
+      DataField::createFromType('1', 'string')
+    ]);
+
+    $handle = fopen('php://memory', 'r+');
+    $instance = new ParquetDataWriter($handle, $schema);
+
+    for ($i=0; $i < 4; $i++) {
+      $instance->put([
+        '0' => $i,
+        '1' => 'id#'.$i,
+      ]);
+    }
+    $instance->finish();
+
+    fseek($handle, 0, SEEK_SET);
+
+    $reader = new ParquetReader($handle);
+    $this->assertEquals(1, $reader->getRowGroupCount());
+
+    fseek($handle, 0, SEEK_SET);
+
+    // Re-read data
+    $iterator = ParquetDataIterator::fromHandle($handle);
+
+    $cnt = 0;
+    foreach($iterator as $i => $data) {
+      $this->assertEquals($i, $data['0']);
+      $this->assertEquals('id#'.$i, $data['1']);
+      $cnt++;
+    }
+    $this->assertEquals(4, $cnt);
+
   }
 }

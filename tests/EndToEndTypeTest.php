@@ -43,7 +43,7 @@ final class EndToEndTypeTest extends TestBase
       ],
       "double" => [
         'field'         => DataField::createFromType("double", 'double'),
-        'expectedValue' => (double)10.44
+        'expectedValue' => (float)10.44
       ],
       "simple DateTime" => [
         'field'           => DataField::createFromType('datetime', \DateTimeImmutable::class),

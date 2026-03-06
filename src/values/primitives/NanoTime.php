@@ -92,7 +92,7 @@ class NanoTime
     // $ms = $timeOfDayNanos / (double)1000000;
     // $microseconds = (int)($ms / 1000);
 
-    $microseconds = (int) ($timeOfDayNanos / (double)1000);
+    $microseconds = (int) ($timeOfDayNanos / (float)1000);
 
     $result = new \DateTime();
     $result
@@ -121,7 +121,7 @@ class NanoTime
     // $ms = $nanoTime->_timeOfDayNanos / (double)1000000;
     // $microseconds = (int)($ms / 1000);
 
-    $microseconds = (int) ($nanoTime->_timeOfDayNanos / (double)1000);
+    $microseconds = (int) ($nanoTime->_timeOfDayNanos / (float)1000);
 
     $result = new \DateTime();
     $result
