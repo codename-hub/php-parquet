@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+### Fixed
+- Handling of nested fields with same names in other places in the schema
+
 ## [0.7.3 - 2026-02-21]
 ### Added
 - PHP 8.5 support, CI adapted
