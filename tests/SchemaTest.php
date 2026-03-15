@@ -474,7 +474,7 @@ final class SchemaTest extends TestBase
       $this->assertEquals($i, $data['0']['0']);
       $this->assertEquals('id#'.$i, $data['0']['1']);
       $this->assertEquals($i+4, $data['1']['0']);
-      $this->assertEquals('id#'.$i+4, $data['1']['1']);
+      $this->assertEquals('id#'.($i+4), $data['1']['1']);
       $cnt++;
     }
     $this->assertEquals(4, $cnt);
