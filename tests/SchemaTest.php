@@ -453,8 +453,8 @@ final class SchemaTest extends TestBase
         ],
         '1' => [
           '0' => $i + 4,
-          '1' => 'id#'.$i+4,
-        ],
+          '1' => 'id#'.($i+4),
+        ]
       ]);
     }
     $instance->finish();
