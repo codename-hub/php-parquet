@@ -142,29 +142,34 @@ class ThriftFooter {
    */
   public function GetSchemaElement(ColumnChunk $columnChunk) : SchemaElement
   {
-     // if ($columnChunk == null)
-     // {
-     //    throw new ArgumentNullException(nameof(columnChunk));
-     // }
+    $path = $columnChunk->meta_data->path_in_schema;
+    $lastPathIndex = \count($path) - 1;
+    $fieldCount = \count($this->fileMeta->schema);
+    
+    $i = -1;
+    foreach ($path as $pi => $pp)
+    {
+      $i++;
+      while($i < $fieldCount)
+      {
+        if ($this->fileMeta->schema[$i]->name === $pp) {
+          $se = $this->fileMeta->schema[$i];
 
-     // List<string> path = columnChunk.Meta_data.Path_in_schema;
+          if ($pi !== $lastPathIndex && $se->type !== null) {
+            // Skip data fields (type !== null) that somehow popped up as intermediary field
+            // If we're not looking for the current leaf-node (lastPathIndex)
+            // Example: fields with same name, but not part of the current depth-search target
+            $i++;
+            continue;
+          }
 
-     $path = $columnChunk->meta_data->path_in_schema;
-
-     $i = 0;
-     foreach ($path as $pp)
-     {
-        while($i < count($this->fileMeta->schema))
-        {
-           if ($this->fileMeta->schema[$i]->name == $pp) {
-             break;
-           }
-
-           $i++;
+          break;
         }
-     }
+        $i++;
+      }
+    }
 
-     return $this->fileMeta->schema[$i];
+    return $this->fileMeta->schema[$i];
   }
 
   public function CreateModelSchema(?ParquetOptions $formatOptions) : Schema {
@@ -249,17 +254,27 @@ class ThriftFooter {
     $maxRepetitionLevel = 0;
     $maxDefinitionLevel = 0;
 
-    $i = 0;
+    $i = -1;
     $path = $columnChunk->meta_data->path_in_schema;
+    $lastPathIndex = \count($path) - 1;
     $fieldCount = \count($this->fileMeta->schema);
 
-    foreach ($path as $pp)
+    foreach ($path as $pi => $pp)
     {
+      $i++;
       while($i < $fieldCount)
       {
-        if($this->fileMeta->schema[$i]->name == $pp)
+        if($this->fileMeta->schema[$i]->name === $pp)
         {
           $se = $this->fileMeta->schema[$i];
+
+          if ($pi !== $lastPathIndex && $se->type !== null) {
+            // Skip data fields (type !== null) that somehow popped up as intermediary field
+            // If we're not looking for the current leaf-node (lastPathIndex)
+            // Example: fields with same name, but not part of the current depth-search target
+            $i++;
+            continue;
+          }
 
           $repeated = ($se->repetition_type !== null && $se->repetition_type == FieldRepetitionType::REPEATED);
           $defined = ($se->repetition_type == FieldRepetitionType::REQUIRED);
@@ -270,14 +285,14 @@ class ThriftFooter {
 
           if ($repeated) $maxRepetitionLevel += 1;
           if (!$defined) $maxDefinitionLevel += 1;
-
+  
           break;
         }
 
         $i++;
       }
     }
-   }
+  }
 
   // /**
   //  *

@@ -428,4 +428,56 @@ final class SchemaTest extends TestBase
     $this->assertEquals(4, $cnt);
 
   }
+
+  public function testNestedIndexedColumnNames(): void
+  {
+    $schema = new Schema([
+      StructField::createWithFieldArray('0', [
+        DataField::createFromType('0', 'integer'),
+        DataField::createFromType('1', 'string')
+      ]),
+      StructField::createWithFieldArray('1', [
+        DataField::createFromType('0', 'integer'),
+        DataField::createFromType('1', 'string')
+      ]),
+    ]);
+
+    $handle = fopen('php://memory', 'r+');
+    $instance = new ParquetDataWriter($handle, $schema);
+
+    for ($i=0; $i < 4; $i++) {
+      $instance->put([
+        '0' => [
+          '0' => $i,
+          '1' => 'id#'.$i,
+        ],
+        '1' => [
+          '0' => $i + 4,
+          '1' => 'id#'.$i+4,
+        ],
+      ]);
+    }
+    $instance->finish();
+
+    fseek($handle, 0, SEEK_SET);
+
+    $reader = new ParquetReader($handle);
+    $this->assertEquals(1, $reader->getRowGroupCount());
+
+    fseek($handle, 0, SEEK_SET);
+
+    // Re-read data
+    $iterator = ParquetDataIterator::fromHandle($handle);
+
+    $cnt = 0;
+    foreach($iterator as $i => $data) {
+      $this->assertEquals($i, $data['0']['0']);
+      $this->assertEquals('id#'.$i, $data['0']['1']);
+      $this->assertEquals($i+4, $data['1']['0']);
+      $this->assertEquals('id#'.$i+4, $data['1']['1']);
+      $cnt++;
+    }
+    $this->assertEquals(4, $cnt);
+
+  }
 }
