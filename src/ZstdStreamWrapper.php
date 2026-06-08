@@ -10,13 +10,26 @@ use Exception;
 class ZstdStreamWrapper implements StreamWrapperInterface, MarkWriteFinishedInterface
 {
   /**
-   * The internal default compression level
-   * 1 = Lowest compression, highest speed
-   * 6 = ZLIB/Gzip common default (usually)
-   * 9 = 'Highest' compression, lowest speed
+   * Default zstd compression level used when writing pages.
+   *
+   * zstd_compress accepts levels 1..22 (and negative values down to
+   * ZSTD_minCLevel() for "fast" mode — roughly -131072..-1, ratio drops
+   * sharply in exchange for very fast writes).
+   *
+   *   1   = fastest write, weakest ratio
+   *   3   = upstream zstd default
+   *   9   = chosen here: good ratio for parquet's per-page chunks without
+   *         materially slowing writes (per benchmarking)
+   *  15+ = noticeably better ratios on this workload, but write cost
+   *         starts to climb (level 22 is ~30% slower than 9)
+   *
+   * Per-page compression means zstd can't build a dictionary across the
+   * file, so very high levels show diminishing returns vs. one-shot
+   * compression of the same data.
+   *
    * @var int
    */
-  const DEFAULT_COMPRESSION_LEVEL = 6;
+  const DEFAULT_COMPRESSION_LEVEL = 9;
 
   /**
    * [createWrappedStream description]
@@ -68,10 +81,13 @@ class ZstdStreamWrapper implements StreamWrapperInterface, MarkWriteFinishedInte
   protected $leaveOpen = false;
 
   /**
-   * GZ/ZLIB compression level
+   * Zstd compression level (1..22, or negative for fast mode).
+   * Overwritten in stream_open from the stream context; this initializer
+   * is only the fallback if the wrapper is somehow constructed without a
+   * context, and matches {@see DEFAULT_COMPRESSION_LEVEL}.
    * @var int
    */
-  protected $compressionLevel = 9;
+  protected $compressionLevel = self::DEFAULT_COMPRESSION_LEVEL;
 
   /**
    * @inheritDoc
@@ -265,7 +281,7 @@ class ZstdStreamWrapper implements StreamWrapperInterface, MarkWriteFinishedInte
       // Passed via stream option
       $this->leaveOpen = stream_context_get_options($this->context)['zstd']['leave_open'] ?? false;
       $this->compressionMode = stream_context_get_options($this->context)['zstd']['compression_mode'] ?? null;
-      $this->compressionLevel = stream_context_get_options($this->context)['zstd']['compression_level'] ?? 6; // Default fallback: 6 (common default)
+      $this->compressionLevel = stream_context_get_options($this->context)['zstd']['compression_level'] ?? static::DEFAULT_COMPRESSION_LEVEL;
 
       if($this->compressionMode === null) {
         throw new Exception('Compression mode undefined');
