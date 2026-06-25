@@ -14,7 +14,6 @@
         "ext-gmp" : "*",
         "ext-bcmath" : "*",
         "ext-zlib": "*",
-        "pear/math_biginteger" : "^1.0",
         "packaged/thrift": "^0.16.0"
     },
     "suggest" : {
