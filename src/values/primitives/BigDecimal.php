@@ -1,6 +1,9 @@
 <?php
 namespace codename\parquet\values\primitives;
 
+use Brick\Math\BigDecimal as MathBigDecimal;
+use Brick\Math\BigInteger;
+use Brick\Math\RoundingMode;
 use Exception;
 
 use codename\parquet\format\SchemaElement;
@@ -17,8 +20,6 @@ class BigDecimal
     // DecimalValue = d;
     // Precision = precision;
     // Scale = scale;
-
-    // $debug = $d === "-1";
 
     // BigInteger scaleMultiplier = BigInteger.Pow(10, scale);
     $scaleMultiplier = bcpow(10, $scale, 0);
@@ -66,29 +67,11 @@ class BigDecimal
     // -1 | [1111 1111] | [1111 1111] - no difference, so maybe buffer size?
     //
 
-    // byte[] result = AllocateResult();
     $result = array_fill(0, $bufferSize = static::getBufferSize($precision), null); // from AllocateResult
-
-    // byte[] data = UnscaledValue.ToByteArray();
-    // $data = str_split($UnscaledValue);
-
-    $mbi = new \Math_BigInteger(gmp_strval($UnscaledValue));
+    $mbi = BigInteger::of(gmp_strval($UnscaledValue));
     $export = $mbi->toBytes(true);
-
-    // $export = gmp_export($UnscaledValue, 1, GMP_BIG_ENDIAN | GMP_MSW_FIRST);
     $data = unpack('C*', $export);
-
-
     $data = array_reverse($data);
-
-    // if($debug) {
-      // echo("EXPORT = ".bin2hex($export));
-      // // echo(bin2hex(implode('', $data)));
-      // echo("Data: ");
-      // print_r($data);
-      // echo("UnscaledValue: ");
-      // print_r($UnscaledValue);
-    // }
 
     if (count($data) > count($result)) throw new Exception("decimal data buffer is ".count($data)." but result must fit into ".count($result)." bytes");
 
@@ -115,22 +98,6 @@ class BigDecimal
 
     $result = array_reverse($result);
 
-    // if($debug) {
-    //   print_r([
-    //     '$result1' => $result1,
-    //     '$result' => $result,
-    //     '$bufferSize' => $bufferSize,
-    //     'cnt' => count($result),
-    //     // 'array_filter($result)' => array_filter($result, function($byte) { return $byte !== null; }),
-    //   ]);
-    // }
-
-    // TESTING null filtering?
-    // $result = array_filter($result, function($byte) { return $byte !== null; });
-    // if($debug) {
-    //   echo("RESULT = ".bin2hex(implode('', $result)));
-    // }
-
     return $result;
   }
 
@@ -140,76 +107,15 @@ class BigDecimal
    * @param SchemaElement $schema [description]
    */
   public static function BinaryDataToDecimal($data, SchemaElement $schema) {
-    // $data = array_reverse(chunk_split($data, 1));
-    // $data = chunk_split($data, 1);
-
-    // $data = strrev($data);
-    // print_r($data);
-
-    // $data = unpack('C*', $data);
-    //
-    // print_r($data);
-    // // $data = array_reverse($data);
-    // //
-
-    // $data = strrev($data);
-    // $data = ~$data;
-
-
-    //
-    // This is just crazy.
-    //
-    $mbi = new \Math_BigInteger($data, -256);
-    $UnscaledValue = $mbi->value;
-
-    // $rawParsed = $raw->toString();
-    // // //
-    // echo("RAW PARSED");
-    // print_r($raw);
-
-
-    // $UnscaledValue = new \Math_BigInteger($data);
-    // $UnscaledValue = \gmp_import($data); // new BigInteger(data);
-
-    // print_r($UnscaledValue);
-
+    $newUnscaledValue = BigInteger::fromBytes($data);
     $precision = $schema->precision;
     $scale = $schema->scale;
-
-    // BigInteger scaleMultiplier = BigInteger.Pow(10, Scale);
-    // $scaleMultiplier = \gmp_powm(10, $scale);
-    $scaleMultiplier = bcpow(10, $scale, 0); // (new \Math_BigInteger())->powMod();
-
-    // decimal ipScaled = (decimal)BigInteger.DivRem(UnscaledValue, scaleMultiplier, out BigInteger fpUnscaled);
-    // list($ipScaled, $fpUnscaled) = $UnscaledValue->divide($UnscaledValue);
-
-    // see https://www.php.net/manual/de/function.gmp-div-qr.php
-    list($ipScaled, $fpUnscaled) = \gmp_div_qr($UnscaledValue, $scaleMultiplier);
-    // $ipScaled = $res[0];
-    // $fpUnscaled = $res[1];
-
-    // $fpScaled = $fpUnscaled / $scaleMultiplier;
-    // $fpScaled = \gmp_div_q($fpUnscaled, $scaleMultiplier);
-
-    $ipScaled = gmp_strval($ipScaled);
-
-    $fpScaled = bcdiv(gmp_strval($fpUnscaled), gmp_strval($scaleMultiplier), $precision);
-
-    // DecimalValue = ipScaled + fpScaled;
-    $decimalValue = bcadd($ipScaled, $fpScaled, $precision); // $ipScaled + $fpScaled;
-
-    // print_r([
-    //   'data' => $data,
-    //   'UnscaledValue' => $UnscaledValue,
-    //   'decimalValue' => $decimalValue,
-    //   'ipScaled' => $ipScaled,
-    //   'fpScaled' => $fpScaled,
-    //   'fpUnscaled' => $fpUnscaled,
-    //   'scaleMultiplier' => $scaleMultiplier,
-    //   'out' => $decimalValue, // gmp_strval($decimalValue, 10),
-    // ]);
-
-    return $decimalValue;
+    $scaleMultiplier = bcpow(10, $scale, 0);
+    list($newIpScaled, $newFpUnscaled) = $newUnscaledValue->quotientAndRemainder($scaleMultiplier);
+    $newFpScaled = MathBigDecimal::of($newFpUnscaled)->dividedBy($scaleMultiplier, $precision);
+    $newDecimalValue = MathBigDecimal::of($newIpScaled)->plus($newFpScaled)
+      ->toScale($precision, RoundingMode::Unnecessary)->toString();
+    return $newDecimalValue;
   }
 
   /**
