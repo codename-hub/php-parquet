@@ -18,7 +18,8 @@
         "packaged/thrift": "^0.16.0"
     },
     "suggest" : {
-      "ext-snappy" : "Install/compile snappy extension to get support for snappy compression reading/writing"
+      "ext-snappy" : "Install/compile snappy extension to get support for snappy compression reading/writing",
+      "ext-zstd" : "Install/compile zstd extension to get support for zstd compression reading/writing"
     },
     "autoload": {
         "psr-4": {

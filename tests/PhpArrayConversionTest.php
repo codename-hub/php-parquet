@@ -427,12 +427,9 @@ final class PhpArrayConversionTest extends TestBase
    * Tests reading a file re-written by spark
    * Which originates from a method below
    * @see testSuperComplexWriteRead
+   * @requires extension snappy
    */
   public function testReadSparkRewrittenSuperComplex(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
-
     // Re-written by spark
     $readerSpark = new ParquetReader($this->openTestFile('custom/supercomplex1.spark.parquet'));
     $rgsSpark = $readerSpark->ReadEntireRowGroup();
@@ -502,12 +499,9 @@ final class PhpArrayConversionTest extends TestBase
    * Tests reading a file re-written by spark
    * Which originates from a method below
    * @see testComplexStructsWriteRead
+   * @requires extension snappy
    */
   public function testReadSparkRewrittenComplexStructs(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
-
     // Re-written by spark
     $readerSpark = new ParquetReader($this->openTestFile('custom/complex_structs1.spark.parquet'));
     $rgsSpark = $readerSpark->ReadEntireRowGroup();
@@ -704,12 +698,9 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * Tests reading and writing of nested lists
+   * @requires extension snappy
    */
   public function testWriteNestedLists(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
-
     $reader = new ParquetReader($this->openTestFile('nested_lists.snappy.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $arrayConverter = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -746,12 +737,9 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * Tests reading and writing of nested structs
+   * @requires extension snappy
    */
   public function testWriteNestedStructs(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
-
     $reader = new ParquetReader($this->openTestFile('nested_structs.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $arrayConverter = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -792,12 +780,9 @@ final class PhpArrayConversionTest extends TestBase
   /**
    * Tests reading and writing repeated structs
    * and some specialties
+   * @requires extension snappy
    */
   public function testWriteRepeatedFieldsWithStructs(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
-
     $reader = new ParquetReader($this->openTestFile('repeated_no_annotation.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $arrayConverter = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -831,12 +816,9 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * Tests reading and writing (purely) nested maps
+   * @requires extension snappy
    */
   public function testWriteNestedMaps(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
-
     $reader = new ParquetReader($this->openTestFile('nested_maps.snappy.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $arrayConverter = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -1503,11 +1485,9 @@ final class PhpArrayConversionTest extends TestBase
    * Subject's field path is split.leftCategoriesOrThreshold.array
    * So there's no intermediary 'list' field
    * But the element itself is repeated
+   * @requires extension snappy
    */
   public function testLegacyListOneArray(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
     $reader = new ParquetReader($this->openTestFile('legacy-list-onearray.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $conv = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -1540,11 +1520,9 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * Tests some list columns w/ and w/o nulls
+   * @requires extension snappy
    */
   public function testListColumns(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
     $reader = new ParquetReader($this->openTestFile('list_columns.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $conv = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -1558,11 +1536,9 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * Tests reading of (purely) nested lists (and their elements)
+   * @requires extension snappy
    */
   public function testNestedLists(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
     $reader = new ParquetReader($this->openTestFile('nested_lists.snappy.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $conv = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -1585,11 +1561,9 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * Tests reading of (purely) nested maps (and their keys/values)
+   * @requires extension snappy
    */
   public function testNestedMaps(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
     $reader = new ParquetReader($this->openTestFile('nested_maps.snappy.parquet'));
     $rgs = $reader->ReadEntireRowGroup();
     $conv = new DataColumnsToArrayConverter($reader->schema, $rgs);
@@ -1606,11 +1580,9 @@ final class PhpArrayConversionTest extends TestBase
 
   /**
    * Tests reading (purely) nested structs (groups) and their fields
+   * @requires extension snappy
    */
   public function testNestedStructs(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
     //
     // NOTE: nested_structs.rust.parquet (the original file)
     // has been compressed using ZSTD (codec 6) and for compatibility,
