@@ -78,7 +78,7 @@ Tests fully pass on PHP 7.3 and 7.4. At the time of writing also 8.0.0 RC2 is pe
 This library highly depends on
 
 * __packaged/thrift__ for working with the Thrift-related objects and data (stripped-down version of apache/thrift)
-* __pear/Math_BigInteger__ for working with binary stored arbitrary-precision decimals (paradox, I know)
+* __brick/math__ for working with binary stored arbitrary-precision decimals (paradox, I know)
 
 As of v0.2, I've also switched to an implementation-agnostic approach of using readers and writers.
 Now, we're dealing with BinaryReader(Interface) and BinaryWriter(Interface) implementations that abstract the underlying mechanism.

@@ -3,6 +3,8 @@
 ## [Unreleased]
 ### Fixed
 - Handling of nested fields with same names in other places in the schema
+### Changed
+- Dropped pear/math_biginteger dependency, now using *brick/math*
 
 ## [0.7.3 - 2026-02-21]
 ### Added
