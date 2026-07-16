@@ -3,7 +3,6 @@ namespace codename\parquet\values\primitives;
 
 use Brick\Math\BigDecimal as MathBigDecimal;
 use Brick\Math\BigInteger;
-use Brick\Math\RoundingMode;
 use Exception;
 
 use codename\parquet\format\SchemaElement;
@@ -114,7 +113,7 @@ class BigDecimal
     list($newIpScaled, $newFpUnscaled) = $newUnscaledValue->quotientAndRemainder($scaleMultiplier);
     $newFpScaled = MathBigDecimal::of($newFpUnscaled)->dividedBy($scaleMultiplier, $precision);
     $newDecimalValue = MathBigDecimal::of($newIpScaled)->plus($newFpScaled)
-      ->toScale($precision, RoundingMode::Unnecessary)->toString();
+      ->toScale($precision)->toString();
     return $newDecimalValue;
   }
 
