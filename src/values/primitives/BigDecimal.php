@@ -113,8 +113,8 @@ class BigDecimal
     list($newIpScaled, $newFpUnscaled) = $newUnscaledValue->quotientAndRemainder($scaleMultiplier);
     $newFpScaled = MathBigDecimal::of($newFpUnscaled)->dividedBy($scaleMultiplier, $precision);
     $newDecimalValue = MathBigDecimal::of($newIpScaled)->plus($newFpScaled)
-      ->toScale($precision)->toString();
-    return $newDecimalValue;
+      ->toScale($precision);
+    return (string) $newDecimalValue;
   }
 
   /**
