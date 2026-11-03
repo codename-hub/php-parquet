@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.5 - 2026-11-03]
+### Added
+- Extend brick/math dependency constraint
+
 ## [0.7.4 - 2026-07-16]
 ### Fixed
 - Handling of nested fields with same names in other places in the schema
