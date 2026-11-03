@@ -56,7 +56,7 @@ final class StatisticsTest extends TestBase
         'Min'           => "one",
         'Max'           => "two" // yes, it is!
       ]),
-      "string2" => new TestDesc([
+      "string3" => new TestDesc([
         'Type'          => 'string', // typeof(string),
         'HasNulls'      => true,
         'Data'          => [ "one", "two", "one", "three", null, "zzz" ],

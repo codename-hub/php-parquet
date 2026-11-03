@@ -20,6 +20,7 @@ class DataFactory
     CompressionMethod::None => CompressionCodec::UNCOMPRESSED,
     CompressionMethod::Gzip => CompressionCodec::GZIP,
     CompressionMethod::Snappy => CompressionCodec::SNAPPY,
+    CompressionMethod::Zstd => CompressionCodec::ZSTD,
   ];
 
   /**

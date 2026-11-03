@@ -8,11 +8,9 @@ final class VariousTest extends TestBase {
 
   /**
    * [testParquetTestingSingleNan description]
+   * @requires extension snappy
    */
   public function testParquetTestingSingleNan(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
     $reader = new ParquetReader($this->openTestFile('single_nan.parquet'));
     $columns = $reader->ReadEntireRowGroup();
     $this->assertEquals(1, $reader->getThriftMetadata()->num_rows);
@@ -22,11 +20,9 @@ final class VariousTest extends TestBase {
 
   /**
    * [testParquet1402Arrow5322 description]
+   * @requires extension snappy
    */
   public function testParquet1402Arrow5322(): void {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
     $this->expectNotToPerformAssertions();
     $reader = new ParquetReader($this->openTestFile('dict-page-offset-zero.parquet'));
     $columns = $reader->ReadEntireRowGroup();

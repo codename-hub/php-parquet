@@ -49,11 +49,9 @@ class TestDataTest extends ParquetCsvComparison
 
   /**
    * [testAllTypesSnappyCompression description]
+   * @requires extension snappy
    */
   public function testAllTypesSnappyCompression(): void {
-    if(!extension_loaded('snappy')) {
-      static::markTestSkipped('ext-snappy unavailable');
-    }
     $this->CompareFiles('types/alltypes', 'snappy', true, [
       'integer',
       'boolean',

@@ -371,11 +371,9 @@ final class SchemaTest extends TestBase
 
   /**
    * [testBackwardCompatListWithOneArray description]
+   * @requires extension snappy
    */
   public function testBackwardCompatListWithOneArray(): void {
-    if(!extension_loaded('snappy')) {
-      static::markTestSkipped('ext-snappy unavailable');
-    }
     $input = $this->openTestFile('legacy-list-onearray.parquet');
     $reader = new ParquetReader($input);
     $schema = $reader->schema;

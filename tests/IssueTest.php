@@ -10,13 +10,10 @@ class IssueTest extends TestBase
    * Tests a specific issue of parquet-dotnet
    * to be or not to be present in our package
    * @see https://github.com/aloneguid/parquet-dotnet/issues/81
+   * @requires extension snappy
    */
   public function testParquetDotnetIssue81(): void
   {
-    if(!extension_loaded('snappy')) {
-      $this->markTestSkipped('ext-snappy unavailable');
-    }
-
     $reader = new ParquetReader($this->openTestFile('issues/parquet-dotnet_81_floats.parquet'));
     $dataColumns = $reader->ReadEntireRowGroup();
     $values = $dataColumns[0]->getData();

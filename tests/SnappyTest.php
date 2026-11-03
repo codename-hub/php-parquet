@@ -12,14 +12,12 @@ final class SnappyTest extends TestBase
    */
   protected function setUp(): void
   {
-    if(!extension_loaded('snappy')) {
-      static::markTestSkipped('ext-snappy unavailable');
-    }
     parent::setUp();
   }
 
   /**
    * Simple test for a working snappy extension
+   * @requires extension snappy
    */
   public function testSimpleSnappy(): void {
     $sampleString = 'sample';
@@ -32,6 +30,7 @@ final class SnappyTest extends TestBase
 
   /**
    * [testCompressDecompressRandomByteChunks description]
+   * @requires extension snappy
    */
   public function testCompressDecompressRandomByteChunks(): void {
     for ($i=0; $i < 100; $i++) {

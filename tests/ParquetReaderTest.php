@@ -5,6 +5,12 @@ namespace codename\parquet\tests;
 use Exception;
 
 use codename\parquet\ParquetReader;
+use codename\parquet\ParquetWriter;
+use codename\parquet\CompressionMethod;
+
+use codename\parquet\data\Schema;
+use codename\parquet\data\DataField;
+use codename\parquet\data\DataColumn;
 
 use codename\parquet\exception\ArgumentNullException;
 
@@ -228,11 +234,9 @@ final class ParquetReaderTest extends TestBase
   //
   /**
    * [testReadBitPackedAtPageBoundary description]
+   * @requires extension snappy
    */
   public function testReadBitPackedAtPageBoundary(): void {
-    if(!extension_loaded('snappy')) {
-      static::markTestSkipped('ext-snappy unavailable');
-    }
     $reader = new ParquetReader($this->openTestFile('special/multi_page_bit_packed_near_page_border.parquet'));
     $columns = $reader->ReadEntireRowGroup();
     $data = $columns[0]->getData();
@@ -355,11 +359,9 @@ final class ParquetReaderTest extends TestBase
 
   /**
    * [testReadEmptyColumn description]
+   * @requires extension snappy
    */
   public function testReadEmptyColumn(): void {
-    if(!extension_loaded('snappy')) {
-      static::markTestSkipped('ext-snappy unavailable');
-    }
     $reader = new ParquetReader($this->openTestFile('emptycolumn.parquet'));
     $columns = $reader->ReadEntireRowGroup();
     $col0 = $columns[0]->getData();
@@ -368,6 +370,77 @@ final class ParquetReaderTest extends TestBase
     foreach($col0 as $value) {
       $this->assertNull($value);
     }
+  }
+
+  /**
+   * Test reading zstd-compressed parquet file
+   * @requires extension zstd
+   */
+  public function testReadZstdCompressedFile(): void {
+    // First, write a zstd-compressed file
+    $ms = fopen('php://memory', 'r+');
+    $id = DataField::createFromType('id', 'integer');
+    $name = DataField::createFromType('name', 'string');
+    $value = DataField::createFromType('value', 'double');
+
+    $writer = new ParquetWriter(new Schema([$id, $name, $value]), $ms, null, false, CompressionMethod::Zstd);
+    $rg = $writer->CreateRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 1, 2, 3, 4, 5 ]));
+    $rg->WriteColumn(new DataColumn($name, [ 'Alice', 'Bob', 'Charlie', 'David', 'Eve' ]));
+    $rg->WriteColumn(new DataColumn($value, [ 1.1, 2.2, 3.3, 4.4, 5.5 ]));
+    $rg->finish();
+    $writer->finish();
+
+    // Now read it back
+    fseek($ms, 0);
+    $reader = new ParquetReader($ms);
+    $columns = $reader->ReadEntireRowGroup();
+
+    $this->assertEquals([ 1, 2, 3, 4, 5 ], $columns[0]->getData());
+    $this->assertEquals([ 'Alice', 'Bob', 'Charlie', 'David', 'Eve' ], $columns[1]->getData());
+    $this->assertEquals([ 1.1, 2.2, 3.3, 4.4, 5.5 ], $columns[2]->getData());
+  }
+
+  /**
+   * Test reading zstd-compressed parquet file with multiple row groups
+   * @requires extension zstd
+   */
+  public function testReadZstdCompressedMultipleRowGroups(): void {
+    $ms = fopen('php://memory', 'r+');
+    $id = DataField::createFromType('id', 'integer');
+
+    $writer = new ParquetWriter(new Schema([$id]), $ms, null, false, CompressionMethod::Zstd);
+
+    // Write first row group
+    $rg = $writer->CreateRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 1, 2, 3 ]));
+    $rg->finish();
+
+    // Write second row group
+    $rg = $writer->CreateRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 4, 5, 6 ]));
+    $rg->finish();
+
+    // Write third row group
+    $rg = $writer->CreateRowGroup();
+    $rg->WriteColumn(new DataColumn($id, [ 7, 8, 9 ]));
+    $rg->finish();
+
+    $writer->finish();
+
+    // Read back and verify
+    fseek($ms, 0);
+    $reader = new ParquetReader($ms);
+    $this->assertEquals(3, $reader->getRowGroupCount());
+
+    $rg = $reader->OpenRowGroupReader(0);
+    $this->assertEquals([ 1, 2, 3 ], $rg->ReadColumn($id)->getData());
+
+    $rg = $reader->OpenRowGroupReader(1);
+    $this->assertEquals([ 4, 5, 6 ], $rg->ReadColumn($id)->getData());
+
+    $rg = $reader->OpenRowGroupReader(2);
+    $this->assertEquals([ 7, 8, 9 ], $rg->ReadColumn($id)->getData());
   }
 
 }
